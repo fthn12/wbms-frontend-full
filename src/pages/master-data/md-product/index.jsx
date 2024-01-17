@@ -28,6 +28,9 @@ const MDSite = () => {
   const { data, error, refetch } = useGetProductsQuery();
   const [eDispatchSync, { isLoading }] = useEDispatchProductSyncMutation();
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const deleteById = (id, name) => {
     try {
       const userConfirmed = window.confirm(`Anda yakin ingin menghapus data ${name}?`);
@@ -53,10 +56,6 @@ const MDSite = () => {
       // Tangani error atau tampilkan pesan error jika ada kesalahan
     }
   };
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const actionsRenderer = (params) => {
     return (

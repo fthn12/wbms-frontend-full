@@ -44,7 +44,8 @@ const PksManualEntryOthersIn = (props) => {
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { openedTransaction, wbTransaction, setWbTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, wbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
+    useTransaction();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
@@ -80,21 +81,24 @@ const PksManualEntryOthersIn = (props) => {
 
     try {
       // tempTrans.originWeighInTimestamp = SemaiUtils.GetDateStr();
+      // tempTrans.progressStatus = 1;
+      // tempTrans.typeTransaction = 2;
+      tempTrans.originWeighInKg = wb.weight;
       tempTrans.transportVehicleId = ProductId;
       tempTrans.transportVehicleProductName = ProductName;
       tempTrans.transportVehicleProductCode = ProductCode;
       tempTrans.transporterCompanyId = TransporterId;
       tempTrans.transporterCompanyName = TransporterCompanyName;
       tempTrans.transporterCompanyCode = TransporterCompanyCode;
-      tempTrans.transportVehiclePlateNo = PlateNo;
+      tempTrans.transportVehiclePlateNo = PlateNo.toUpperCase();
       tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name;
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { wbTransaction: { ...tempTrans } };
+      const data = { tempTrans };
 
       const response = await transactionAPI.create(data);
 
@@ -137,31 +141,21 @@ const PksManualEntryOthersIn = (props) => {
   // }, []);
 
   useEffect(() => {
-    setValues(openedTransaction);
+    setValues({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
   }, []);
 
-  // useEffect(() => {
-  //   if (dataValues.originWeighInKg < WBMS.WB_MIN_WEIGHT || dataValues.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
-  //     setOriginWeighNetto(0);
-  //   } else {
-  //     let total =
-  //       Math.abs(dataValues.originWeighInKg - dataValues.originWeighOutKg) -
-  //       dataValues.potonganWajib -
-  //       dataValues.potonganLain;
-  //     setOriginWeighNetto(total);
-  //   }
-  // }, [WBMS.WB_MIN_WEIGHT, dataValues]);
+  useEffect(() => {
+    setWbTransaction({ originWeighInKg: wb.weight });
+  }, [wb.weight]);
 
-  // // Untuk validasi field
-  // useEffect(() => {
-  //   let cSubmit = false;
-
-  //   if (values.originWeighInKg >= WBMS.WB_MIN_WEIGHT) {
-  //     cSubmit = true;
-  //   }
-
-  //   setCanSubmit(cSubmit);
-  // }, [values]);
+  useEffect(() => {
+    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+      setOriginWeighNetto(0);
+    } else {
+      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      setOriginWeighNetto(total);
+    }
+  }, [wbTransaction]);
 
   return (
     <>
@@ -188,6 +182,7 @@ const PksManualEntryOthersIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
+              value={values?.kebun}
               onChange={handleChange}
               sx={{ mt: 2 }}
             />
@@ -210,17 +205,18 @@ const PksManualEntryOthersIn = (props) => {
               size="small"
               fullWidth
               onChange={handleChange}
+              value={values?.blok}
               sx={{ mt: 2 }}
             />
             <TextField
-              name="qtyTbs"
+              name="janjang"
               label="Janjang/Sak"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
-              value={values?.qtyTbs}
+              value={values?.janjang}
               sx={{ mt: 2 }}
             />
             <TextField
@@ -235,14 +231,14 @@ const PksManualEntryOthersIn = (props) => {
               sx={{ mt: 2 }}
             />
             <TextField
-              name="deliveryOrderNo"
+              name="npb"
               label="NPB/BE"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
-              value={values?.deliveryOrderNo}
+              value={values?.npb}
               sx={{ mt: 2 }}
             />
             <TextField
@@ -256,7 +252,7 @@ const PksManualEntryOthersIn = (props) => {
               value={values?.tahun}
               sx={{ mt: 2 }}
             />
-{/* 
+            {/* 
             <TextField
               name="sptbs"
               label="SPTBS"
@@ -387,9 +383,13 @@ const PksManualEntryOthersIn = (props) => {
             <Button
               variant="contained"
               fullWidth
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2,
+                display: false ? "none" : "",
+              }}
+              hide={true}
               onClick={handleSubmit}
-              disabled={!(canSubmit && !isSubmitted && wb?.isStable)}
+              disabled={!(wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
             >
               Simpan
             </Button>
@@ -410,7 +410,7 @@ const PksManualEntryOthersIn = (props) => {
           }}
         />
       )}
-      {!wbTransaction && (
+      {/* {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{
@@ -421,7 +421,7 @@ const PksManualEntryOthersIn = (props) => {
             zIndex: 999,
           }}
         />
-      )}
+      )} */}
     </>
   );
 };

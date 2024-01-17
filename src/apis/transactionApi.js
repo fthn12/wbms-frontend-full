@@ -4,6 +4,11 @@ export const TransactionAPI = () => {
   const { axios } = useAxios();
   const endpoint = "transactions";
 
+  const create = async (data) => {
+    const response = await axios.post(`${endpoint}`, data).then((res) => res.data);
+    return response;
+  };
+
   const getById = async (id) => {
     const response = await axios.get(`${endpoint}/${id}`).then((res) => res.data);
     return response;
@@ -125,6 +130,7 @@ export const TransactionAPI = () => {
   };
 
   return {
+    create,
     getById,
     GetByPlateNo,
     findFirst,

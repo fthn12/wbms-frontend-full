@@ -9,9 +9,10 @@ import { RichSelectModule } from "@ag-grid-enterprise/rich-select";
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 import { ModuleRegistry } from "@ag-grid-community/core";
-
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import PlagiarismOutlinedIcon from "@mui/icons-material/PlagiarismOutlined";
-
+import CreateCompanies from "./createCompanies";
+import EditCompanies from "./editCompanies";
 import Header from "../../../components/layout/signed/Header";
 
 import { useConfig, useCompany } from "../../../hooks";
@@ -25,6 +26,9 @@ const MDCompany = () => {
   const { data, error, refetch } = useGetCompaniesQuery();
   const [eDispatchSync, { isLoading }] = useEDispatchCompanySyncMutation();
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const handleViewClick = async (id) => {
     // try {
     //   setIsLoading(true);
@@ -41,11 +45,20 @@ const MDCompany = () => {
   const actionsRenderer = (params) => {
     return (
       <>
-        {params.data && (
+        {params.data && params.data.refType === 0 && (
           <Box display="flex" justifyContent="center" alignItems="center">
-            <IconButton size="small" onClick={() => handleViewClick(params.data.id)}>
+            <IconButton
+              size="small"
+              onClick={() => {
+                setSelectedCompany(params.data);
+                setIsEditOpen(true);
+              }}
+            >
               <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
             </IconButton>
+            {/* <IconButton size="small" onClick={() => deleteById(params.value, params.data.name)}>
+              <DeleteForeverOutlinedIcon sx={{ fontSize: 20 }} />
+            </IconButton> */}
           </Box>
         )}
       </>
@@ -146,7 +159,12 @@ const MDCompany = () => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        <Button variant="contained" onClick={() => eDispatchSync()}>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
           Add
         </Button>
         <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => eDispatchSync()}>
@@ -191,6 +209,11 @@ const MDCompany = () => {
           }}
         />
       )}
+      {/* Create */}
+      <CreateCompanies isOpen={isOpen} onClose={setIsOpen} refetch={refetch} />
+
+      {/* edit */}
+      <EditCompanies isEditOpen={isEditOpen} refetch={refetch} onClose={() => setIsEditOpen(false)} dtCompanies={selectedCompany} />
     </Box>
   );
 };

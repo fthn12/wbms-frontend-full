@@ -21,7 +21,9 @@ import * as yup from "yup";
 import { grey } from "@mui/material/colors";
 import { useCompany } from "../../../hooks";
 
-const CreateCompanies = ({ isOpen, onClose }) => {
+const CreateCompanies = (props) => {
+  const { isOpen, onClose, refetch } = props;
+
   const { useCreateCompanyMutation } = useCompany();
   const [createCompany] = useCreateCompanyMutation();
 
@@ -32,6 +34,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
         toast.success("Data Berhasil Disimpan");
         setSubmitting(false);
         resetForm();
+        refetch();
         onClose("", false);
       });
     } catch (error) {
@@ -45,9 +48,9 @@ const CreateCompanies = ({ isOpen, onClose }) => {
     province: "",
     city: "",
     code: "",
-    codeVendor: "",
-    persenPotngWajib: "",
-    type: "",
+    codeSap: "",
+    // persenPotngWajib: "",
+    // type: "",
     shortName: "",
     address: "",
     addressExt: "",
@@ -58,39 +61,39 @@ const CreateCompanies = ({ isOpen, onClose }) => {
     contactName: "",
     contactEmail: "",
     contactPhone: "",
-    isMillOperator: "",
-    isTransporter: "",
-    isSiteOperator: "",
-    isEstate: "",
+    isMillOperator: false,
+    isTransporter: false,
+    isSiteOperator: false,
+    isEstate: false,
   };
 
   const checkoutSchema = yup.object().shape({
     name: yup.string().required("required"),
-    province: yup.string().required("required"),
-    city: yup.string().required("required"),
+    // province: yup.string().required("required"),
+    // city: yup.string().required("required"),
     code: yup.string().required("required"),
-    codeVendor: yup.string().required("required"),
-    persenPotngWajib: yup.string().required("required"),
-    type: yup.string().required("required"),
+    codeSap: yup.string().required("required"),
+    // persenPotngWajib: yup.string().required("required"),
+    // type: yup.string().required("required"),
     shortName: yup.string().required("required"),
-    address: yup.string().required("required"),
-    addressExt: yup.string().required("required"),
-    postalCode: yup.string().required("required"),
-    country: yup.string().required("required"),
+    // address: yup.string().required("required"),
+    // addressExt: yup.string().required("required"),
+    // postalCode: yup.string().required("required"),
+    // country: yup.string().required("required"),
     phone: yup.string().required("required"),
-    url: yup.string().required("required"),
+    // url: yup.string().required("required"),
     contactName: yup.string().required("required"),
     contactEmail: yup.string().email("Enter a valid email").required("Email is required"),
     contactPhone: yup.string().required("required"),
-    isMillOperator: yup.boolean().required("required"),
-    isTransporter: yup.boolean().required("required"),
-    isSiteOperator: yup.boolean().required("required"),
-    isEstate: yup.boolean().required("required"),
+    // isMillOperator: yup.boolean().required("required"),
+    // isTransporter: yup.boolean().required("required"),
+    // isSiteOperator: yup.boolean().required("required"),
+    // isEstate: yup.boolean().required("required"),
   });
 
   return (
     <Dialog open={isOpen} fullWidth maxWidth={"md"}>
-      <DialogTitle sx={{ color: "white", backgroundColor: "black", fontSize: "27px" }}>
+      <DialogTitle sx={{ color: "white", backgroundColor: "black", fontSize: "20px" }}>
         Tambah Data Company
         <IconButton
           sx={{
@@ -129,7 +132,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Code
+                    Kode
                   </FormLabel>
                   <TextField
                     fullWidth
@@ -153,19 +156,19 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Code Vendor
+                    Kode SAP
                   </FormLabel>
                   <TextField
                     fullWidth
                     variant="outlined"
                     type="text"
-                    placeholder="Masukkan Code Vendor...."
+                    placeholder="Masukkan Kode SAP...."
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.codeVendor}
-                    name="codeVendor"
-                    error={!!touched.codeVendor && !!errors.codeVendor}
-                    helperText={touched.codeVendor && errors.codeVendor}
+                    value={values?.codeSap}
+                    name="codeSap"
+                    error={!!touched.codeSap && !!errors.codeSap}
+                    helperText={touched.codeSap && errors.codeSap}
                   />
                 </FormControl>
                 <FormControl sx={{ gridColumn: "span 5" }}>
@@ -177,13 +180,13 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Full Name
+                    Nama Panjang
                   </FormLabel>
 
                   <TextField
                     variant="outlined"
                     type="text"
-                    placeholder="Masukkan Full Name...."
+                    placeholder="Masukkan Nama Panjang...."
                     onBlur={handleBlur}
                     onChange={handleChange}
                     value={values?.name}
@@ -202,12 +205,12 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Short Name
+                    Nama Pendek
                   </FormLabel>
                   <TextField
                     fullWidth
                     variant="outlined"
-                    placeholder="Masukkan Short Name...."
+                    placeholder="Masukkan Nama Pendek...."
                     type="text"
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -217,6 +220,174 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                     helperText={touched.shortName && errors.shortName}
                   />
                 </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Nama Email
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Nama Email..."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.contactName}
+                    name="contactName"
+                    error={!!touched.contactName && !!errors.contactName}
+                    helperText={touched.contactName && errors.contactName}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Email
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="email"
+                    placeholder="Masukkan Email..."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.contactEmail}
+                    name="contactEmail"
+                    error={!!touched.contactEmail && !!errors.contactEmail}
+                    helperText={touched.contactEmail && errors.contactEmail}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Nama Kontak Telp.
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Contact Phone.."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.contactPhone}
+                    name="contactPhone"
+                    error={!!touched.contactPhone && !!errors.contactPhone}
+                    helperText={touched.contactPhone && errors.contactPhone}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Nomor Telepon
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Phone Number...."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.phone}
+                    name="phone"
+                    error={!!touched.phone && !!errors.phone}
+                    helperText={touched.phone && errors.phone}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Negara
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Negara...."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.country}
+                    name="country"
+                    error={!!touched.country && !!errors.country}
+                    helperText={touched.country && errors.country}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Provinsi
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Provinsi ...."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.province}
+                    name="province"
+                    error={!!touched.province && !!errors.province}
+                    helperText={touched.province && errors.province}
+                  />
+                </FormControl>
+                <FormControl sx={{ gridColumn: "span 4" }}>
+                  <FormLabel
+                    sx={{
+                      marginBottom: "8px",
+                      color: "black",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Kota
+                  </FormLabel>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                    placeholder="Masukkan Kota ...."
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values?.city}
+                    name="city"
+                    error={!!touched.city && !!errors.city}
+                    helperText={touched.city && errors.city}
+                  />
+                </FormControl>{" "}
                 <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{
@@ -249,175 +420,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Email
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="email"
-                    placeholder="Masukkan Email..."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.contactEmail}
-                    name="contactEmail"
-                    error={!!touched.contactEmail && !!errors.contactEmail}
-                    helperText={touched.contactEmail && errors.contactEmail}
-                  />
-                </FormControl>{" "}
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Phone Number
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Phone Number...."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.phone}
-                    name="phone"
-                    error={!!touched.phone && !!errors.phone}
-                    helperText={touched.phone && errors.phone}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Contact Name
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Contact Name..."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.contactName}
-                    name="contactName"
-                    error={!!touched.contactName && !!errors.contactName}
-                    helperText={touched.contactName && errors.contactName}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Contact Phone
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Contact Phone.."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.contactPhone}
-                    name="contactPhone"
-                    error={!!touched.contactPhone && !!errors.contactPhone}
-                    helperText={touched.contactPhone && errors.contactPhone}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Country
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Country Name...."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.country}
-                    name="country"
-                    error={!!touched.country && !!errors.country}
-                    helperText={touched.country && errors.country}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Province
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Province ...."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.province}
-                    name="province"
-                    error={!!touched.province && !!errors.province}
-                    helperText={touched.province && errors.province}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    City
-                  </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan City ...."
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.city}
-                    name="city"
-                    error={!!touched.city && !!errors.city}
-                    helperText={touched.city && errors.city}
-                  />
-                </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
-                  <FormLabel
-                    sx={{
-                      marginBottom: "8px",
-                      color: "black",
-                      fontSize: "16px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Address
+                    Alamat
                   </FormLabel>
                   <TextField
                     fullWidth
@@ -441,7 +444,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Postal Code
+                    Kode Pos
                   </FormLabel>
                   <TextField
                     variant="outlined"
@@ -464,7 +467,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Address Ext
+                    Alamat Lengkap
                   </FormLabel>
                   <TextField
                     fullWidth
@@ -480,7 +483,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                     helperText={touched.addressExt && errors.addressExt}
                   />
                 </FormControl>
-                <FormControl sx={{ gridColumn: "span 4" }}>
+                {/* <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{
                       color: "black",
@@ -540,7 +543,7 @@ const CreateCompanies = ({ isOpen, onClose }) => {
                     error={!!touched.persenPotngWajib && !!errors.persenPotngWajib}
                     helperText={touched.persenPotngWajib && errors.persenPotngWajib}
                   />
-                </FormControl>
+                </FormControl> */}
                 <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{

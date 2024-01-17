@@ -14,7 +14,7 @@ import BonTripPrint from "../../../components/BonTripPrint";
 
 import { TransactionAPI } from "../../../apis";
 
-import { useConfig, useTransaction, useCompany, useWeighbridge, useProduct, useDriver } from "../../../hooks";
+import { useConfig, useTransaction, useCompany, useWeighbridge, useProduct, useTransportVehicle } from "../../../hooks";
 
 const PksManualEntryWBIn = () => {
   const navigate = useNavigate();
@@ -25,13 +25,12 @@ const PksManualEntryWBIn = () => {
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
-  const { useGetDriversQuery } = useDriver();
+  const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
-  const { data, error } = useGetDriversQuery();
-  console.log(data?.records, "data driver");
+  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -111,25 +110,21 @@ const PksManualEntryWBIn = () => {
               onChange={handleChange}
             /> */}
             <Autocomplete
-              id="select-label"
-              options={data?.records || []}
-              getOptionLabel={(option) => `[${option.plateNo}] ${option.name}`}
+              id="autocomplete"
               freeSolo
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Nomor Plat"
-                  variant="outlined"
-                  size="small"
-                  value={values?.transportVehiclePlateNo}
-                />
-              )}
+              options={dtTransport?.records || []}
+              getOptionLabel={(option) => option.plateNo}
+              onInputChange={(event, newInputValue) => {
+                setValues({ ...values, transportVehiclePlateNo: newInputValue });
+              }}
+              renderInput={(params) => <TextField {...params} label="Nomor Plat" variant="outlined" size="small" />}
             />
+
             <Autocomplete
               id="select-label"
               options={dtCompany?.records || []}
-              getOptionLabel={(option) => `[${option.code}] ${option.name}`}
-              value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyName) || null}
+              getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+              value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
               onChange={(event, newValue) => {
                 setValues((prevValues) => ({
                   ...prevValues,
@@ -152,23 +147,25 @@ const PksManualEntryWBIn = () => {
             />
             <Autocomplete
               id="select-label"
-              options={dtProduct?.records.filter((option) => !["cpo", "pko"].includes(option.name.toLowerCase()))}
+              options={(dtProduct?.records || []).filter(
+                (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+              )}
               getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-              value={selectedProduct}
+              value={dtProduct?.records?.find((item) => item.id === values.transportVehicleId) || null}
               onChange={(event, newValue) => {
-                const { id, name, code } = newValue || { id: "", name: "", code: "" };
                 setValues((prevValues) => ({
                   ...prevValues,
-                  transportVehicleId: id,
-                  transportVehicleProductName: name,
-                  transportVehicleProductCode: code,
+                  transportVehicleId: newValue ? newValue.id : "",
+                  transportVehicleProductName: newValue ? newValue.name : "",
+                  transportVehicleProductCode: newValue ? newValue.code : "",
                 }));
-                setSelectedProduct({ id, name, code });
-                const filterOption = name.toLowerCase().includes("kernel")
+
+                const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
                   ? "Kernel"
-                  : name.toLowerCase().includes("tbs")
+                  : (newValue?.name || "").toLowerCase().includes("tbs")
                   ? "Tbs"
                   : "Others";
+
                 setSelectedOption(filterOption);
               }}
               renderInput={(params) => (
@@ -194,8 +191,8 @@ const PksManualEntryWBIn = () => {
 
           {selectedOption === "Others" && (
             <OTHERS
-              ProductId={values?.productId}
-              ProductName={values?.productName}
+              ProductId={values?.transportVehicleId}
+              ProductName={values?.transportVehicleProductName}
               ProductCode={values?.transportVehicleProductCode}
               TransporterId={values?.transporterCompanyId}
               TransporterCompanyName={values?.transporterCompanyName}
