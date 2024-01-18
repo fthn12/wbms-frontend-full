@@ -38,14 +38,14 @@ const PksManualEntryWBIn = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
 
-  const { values, setValues } = useForm({ ...TransactionAPI.InitialData });
+  const { values, setValues } = useForm({ ...transactionAPI.InitialData });
 
-  const handleChange = (event) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
-    });
-  };
+  // const handleChange = (event) => {
+  //   setValues({
+  //     ...values,
+  //     [event.target.name]: event.target.value,
+  //   });
+  // };
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -53,14 +53,14 @@ const PksManualEntryWBIn = () => {
     navigate("/wb/transactions");
   };
 
-  useEffect(() => {
-    if (!openedTransaction)
-      // return handleClose();
+  // useEffect(() => {
+  //   if (!openedTransaction)
+  //     // return handleClose();
 
-      return () => {
-        // console.clear();
-      };
-  }, []);
+  //     return () => {
+  //       // console.clear();
+  //     };
+  // }, []);
 
   // useEffect(() => {
   //   if (dataValues.originWeighInKg < WBMS.WB_MIN_WEIGHT || dataValues.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
@@ -96,7 +96,7 @@ const PksManualEntryWBIn = () => {
       </Box>
       <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
         <Grid container spacing={1}>
-          <Grid item xs={6} sm={3}>
+          <Grid item xs={12} sm={6} lg={3}>
             <Grid item xs={12}>
               <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
             </Grid>

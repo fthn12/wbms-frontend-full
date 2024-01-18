@@ -12,22 +12,26 @@ import { TransactionAPI } from "../../../../../apis";
 
 import { useAuth, useConfig, useTransaction, useTransportVehicle, useWeighbridge, useApp } from "../../../../../hooks";
 
-const validationSchema = yup.object().shape({
-  // username: yup.string().required("Wajib diisi."),
-  // password: yup
-  //   .string()
-  //   .min(8, "Panjang password minimal 8 karakter dan maksimal 20 karakter.")
-  //   .max(20, "Panjang password minimal 8 karakter dan maksimal 20 karakter.")
-  //   .required("Wajib diisi."),
-  // passwordConfirm: yup.string().oneOf([yup.ref("password"), null], "Password harus sama."),
-  // email: yup.string().email("Email tidak valid.").required("Wajib diisi."),
-  // npk: yup.string().required("Wajib diisi."),
-  // nik: yup.string().required("Wajib diisi."),
-  // name: yup.string().required("Wajib diisi."),
-  // division: yup.string().required("Wajib diisi."),
-  // position: yup.string().required("Wajib diisi."),
-  // role: yup.number().required("Wajib diisi."),
-});
+const initialValues = {
+  bonTripNo: "",
+  driverName: "",
+  transporterId: "",
+  transporterCompanyName: "",
+  transporterCompanyCode: "",
+  transportVehiclePlateNo: "",
+  productId: "",
+  productName: "",
+  originWeighInKg: "",
+  deliveryOrderNo: "",
+  progressStatus: "",
+  originWeighInTimestamp: "",
+  transportVehicleSccModel: "",
+  afdeling: "",
+  blok: "",
+  sptbs: "",
+  // yearPlan: "",
+  // kebun: "",
+};
 
 const PksManualEntryOthersIn = (props) => {
   const {
@@ -58,9 +62,7 @@ const PksManualEntryOthersIn = (props) => {
 
   const [dtTrx, setDtTrx] = useState(null);
 
-  const { values, setValues } = useForm({
-    ...TransactionAPI.InitialData,
-  });
+  const [values, setValues] = useState(initialValues);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -77,35 +79,36 @@ const PksManualEntryOthersIn = (props) => {
   };
 
   const handleSubmit = async () => {
-    let tempTrans = { ...values };
+    // let tempTrans = { ...values };
 
     try {
-      // tempTrans.originWeighInTimestamp = SemaiUtils.GetDateStr();
-      // tempTrans.progressStatus = 1;
-      // tempTrans.typeTransaction = 2;
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.transportVehicleId = ProductId;
-      tempTrans.transportVehicleProductName = ProductName;
-      tempTrans.transportVehicleProductCode = ProductCode;
-      tempTrans.transporterCompanyId = TransporterId;
-      tempTrans.transporterCompanyName = TransporterCompanyName;
-      tempTrans.transporterCompanyCode = TransporterCompanyCode;
-      tempTrans.transportVehiclePlateNo = PlateNo.toUpperCase();
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
+      values.originWeighInKg = wb.weight;
+      // values.transportVehicleId = ProductId;
+      // values.transportVehicleProductName = ProductName;
+      // values.transportVehicleProductCode = ProductCode;
+      values.productId = ProductId;
+      values.productName = ProductName;
+      values.productCode = ProductCode;
+      values.transporterCompanyId = TransporterId;
+      values.transporterCompanyName = TransporterCompanyName;
+      values.transporterCompanyCode = TransporterCompanyCode;
+      values.transportVehiclePlateNo = PlateNo.toUpperCase();
+      values.originWeighInTimestamp = moment().toDate();
+      values.originWeighInOperatorName = user.name.toUpperCase();
+      values.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { tempTrans };
+      const data = { values };
 
-      const response = await transactionAPI.create(data);
+      const response = await transactionAPI.ManualEntryPksInOthers(values);
 
       if (!response.status) throw new Error(response?.message);
 
       // setWbTransaction(response.data.transaction);
       clearOpenedTransaction();
+      handleClose();
       setValues({ ...response.data.transaction });
       setIsSubmitted(true);
 
@@ -145,10 +148,6 @@ const PksManualEntryOthersIn = (props) => {
   }, []);
 
   useEffect(() => {
-    setWbTransaction({ originWeighInKg: wb.weight });
-  }, [wb.weight]);
-
-  useEffect(() => {
     if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
       setOriginWeighNetto(0);
     } else {
@@ -172,7 +171,7 @@ const PksManualEntryOthersIn = (props) => {
               sx={{ backgroundColor: "whitesmoke", mt: 2 }}
               label="NO BONTRIP"
               name="bonTripNo"
-              value={values?.bonTripNo || ""}
+              value={values?.bonTripNo}
               inputProps={{ readOnly: true }}
             />
             <TextField
@@ -395,7 +394,7 @@ const PksManualEntryOthersIn = (props) => {
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} />
+            <BonTripPrint dtTrans={{ ...values }} disabled={true} />
           </Grid>
         </Grid>
       </Grid>

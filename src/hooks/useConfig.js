@@ -31,6 +31,14 @@ const progressStatus = {
   31: "REJECT TERSIMPAN",
 
   100: "DELETED TRANSAKSI",
+
+  35: "PENDING OTHERS",
+  36: "PENDING TBS",
+  37: "PENDING KERNEL",
+
+  40: "COMPLETE OTHERS",
+  41: "COMPLETE TBS",
+  42: "COMPLETE KERNEL",
 };
 
 const pksProgressStatus = {

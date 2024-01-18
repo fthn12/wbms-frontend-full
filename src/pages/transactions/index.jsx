@@ -12,7 +12,7 @@ import { useConfig, useTransaction, useApp } from "../../hooks";
 const TransactionPks = () => {
   const navigate = useNavigate();
 
-  // const transactionAPI = TransactionAPI();
+  const transactionAPI = TransactionAPI();
   const { WBMS } = useConfig();
   const { setSidebar, setUrlPrev } = useApp();
   const { setOpenedTransaction, clearWbTransaction, clearOpenedTransaction } = useTransaction();
@@ -65,12 +65,11 @@ const TransactionPks = () => {
               sx={{ mr: 0.5 }}
               onClick={() => {
                 const newTransaction = {
-                  ...TransactionAPI.InitialData,
-                  bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}`,
+                  ...transactionAPI.InitialData,
+                  bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,
                 };
 
                 setOpenedTransaction(newTransaction);
-                console.log(setOpenedTransaction(newTransaction), "open transaksi");
                 navigate("/wb/pks/manualentry-in");
               }}
             >
@@ -78,7 +77,8 @@ const TransactionPks = () => {
             </Button>
             <Button
               variant="contained"
-        k      onClick={() => {
+              k
+              onClick={() => {
                 const newTransaction = {
                   ...TransactionAPI.InitialData,
                   bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,

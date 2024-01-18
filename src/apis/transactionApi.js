@@ -4,11 +4,6 @@ export const TransactionAPI = () => {
   const { axios } = useAxios();
   const endpoint = "transactions";
 
-  const create = async (data) => {
-    const response = await axios.post(`${endpoint}`, data).then((res) => res.data);
-    return response;
-  };
-
   const getById = async (id) => {
     const response = await axios.get(`${endpoint}/${id}`).then((res) => res.data);
     return response;
@@ -129,13 +124,20 @@ export const TransactionAPI = () => {
     return response;
   };
 
+  const ManualEntryPksInOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-pks-in-others`, data).then((res) => res.data);
+
+    return response;
+  };
+
   return {
-    create,
     getById,
     GetByPlateNo,
     findFirst,
     findMany,
     updateById,
+
+    ManualEntryPksInOthers,
 
     eDispatchFindOrCreateByQrcode,
 

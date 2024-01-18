@@ -194,7 +194,7 @@ const TransactionGrid = (props) => {
     },
     { headerName: "NO BONTRIP", field: "bonTripNo", hide: true },
     { headerName: "NOPOL", field: "transportVehiclePlateNo", maxWidth: 95 },
-    { headerName: "NAMA SUPIR", field: "driverName", maxWidth: 130 },
+    { headerName: "NAMA SUPIR", field: "driverName", maxWidth: 130, cellStyle: { textAlign: "center" } },
     {
       headerName: "STATUS",
       field: "progressStatus",
@@ -203,7 +203,7 @@ const TransactionGrid = (props) => {
       rowGroup: true,
       hide: true,
     },
-    { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115 },
+    { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115, cellStyle: { textAlign: "center" } },
     { headerName: "PRODUK", field: "productName", maxWidth: 90, cellStyle: { textAlign: "center" } },
     { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
     { headerName: "WB-OUT", field: "originWeighOutKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
