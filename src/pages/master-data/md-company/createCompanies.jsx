@@ -49,8 +49,8 @@ const CreateCompanies = (props) => {
     city: "",
     code: "",
     codeSap: "",
-    // persenPotngWajib: "",
-    // type: "",
+    potonganWajib: 0,
+    type: "",
     shortName: "",
     address: "",
     addressExt: "",
@@ -61,7 +61,7 @@ const CreateCompanies = (props) => {
     contactName: "",
     contactEmail: "",
     contactPhone: "",
-    isMillOperator: false,
+    isMillOperator: "",
     isTransporter: false,
     isSiteOperator: false,
     isEstate: false,
@@ -73,18 +73,19 @@ const CreateCompanies = (props) => {
     // city: yup.string().required("required"),
     code: yup.string().required("required"),
     codeSap: yup.string().required("required"),
-    // persenPotngWajib: yup.string().required("required"),
-    // type: yup.string().required("required"),
+    potonganWajib: yup.string().required("required"),
+    type: yup.string().required("required"),
     shortName: yup.string().required("required"),
     // address: yup.string().required("required"),
     // addressExt: yup.string().required("required"),
     // postalCode: yup.string().required("required"),
     // country: yup.string().required("required"),
-    phone: yup.string().required("required"),
+    // phone: yup.string().required("required"),
     // url: yup.string().required("required"),
     contactName: yup.string().required("required"),
-    contactEmail: yup.string().email("Enter a valid email").required("Email is required"),
-    contactPhone: yup.string().required("required"),
+    contactEmail: yup.string().email("Enter a valid email"),
+    // .required("Email is required"),
+    // contactPhone: yup.string().required("required"),
     // isMillOperator: yup.boolean().required("required"),
     // isTransporter: yup.boolean().required("required"),
     // isSiteOperator: yup.boolean().required("required"),
@@ -229,7 +230,7 @@ const CreateCompanies = (props) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Nama Email
+                    Nama Kontak Email
                   </FormLabel>
                   <TextField
                     fullWidth
@@ -483,7 +484,7 @@ const CreateCompanies = (props) => {
                     helperText={touched.addressExt && errors.addressExt}
                   />
                 </FormControl>
-                {/* <FormControl sx={{ gridColumn: "span 4" }}>
+                <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{
                       color: "black",
@@ -505,12 +506,14 @@ const CreateCompanies = (props) => {
                     sx={{
                       color: MenuItem ? "gray" : "black",
                     }}
+                    error={!!touched.type && !!errors.type}
+                    helperText={touched.type && errors.type}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih Tipe --
                     </MenuItem>
-                    <MenuItem value="Internal">Internal</MenuItem>
-                    <MenuItem value="Eksternal">Eksternal</MenuItem>
+                    <MenuItem value="INTERNAL">INTERNAL</MenuItem>
+                    <MenuItem value="EKSTERNAL">EKSTERNAL</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl sx={{ gridColumn: "span 4" }}>
@@ -538,12 +541,12 @@ const CreateCompanies = (props) => {
                     placeholder="Masukkan Potongan Wajib...."
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.persenPotngWajib}
-                    name="persenPotngWajib"
-                    error={!!touched.persenPotngWajib && !!errors.persenPotngWajib}
-                    helperText={touched.persenPotngWajib && errors.persenPotngWajib}
+                    value={values?.potonganWajib}
+                    name="potonganWajib"
+                    error={!!touched.potonganWajib && !!errors.potonganWajib}
+                    helperText={touched.potonganWajib && errors.potonganWajib}
                   />
-                </FormControl> */}
+                </FormControl>
                 <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{

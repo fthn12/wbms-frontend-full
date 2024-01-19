@@ -114,10 +114,21 @@ const PksManualEntryWBIn = () => {
               freeSolo
               options={dtTransport?.records || []}
               getOptionLabel={(option) => option.plateNo}
-              onInputChange={(event, newInputValue) => {
-                setValues({ ...values, transportVehiclePlateNo: newInputValue });
+              onInputChange={(event, InputValue) => {
+                setValues({ ...values, transportVehiclePlateNo: InputValue });
               }}
-              renderInput={(params) => <TextField {...params} label="Nomor Plat" variant="outlined" size="small" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Nomor Plat"
+                  variant="outlined"
+                  size="small"
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { textTransform: "uppercase" },
+                  }}
+                />
+              )}
             />
 
             <Autocomplete

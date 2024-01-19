@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, InputAdornment, Divider, Paper, TextField } from "@mui/material";
+import { Autocomplete, Button, CircularProgress, Grid, InputAdornment, Divider, Paper, TextField } from "@mui/material";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import { useForm } from "../../../../../utils/useForm";
@@ -10,27 +10,31 @@ import BonTripPrint from "../../../../../components/BonTripPrint";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useTransportVehicle, useWeighbridge, useApp } from "../../../../../hooks";
+import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
 const initialValues = {
   bonTripNo: "",
   driverName: "",
+
   transporterId: "",
   transporterCompanyName: "",
   transporterCompanyCode: "",
   transportVehiclePlateNo: "",
+
   productId: "",
   productName: "",
+  productCode: "",
+
   originWeighInKg: "",
-  deliveryOrderNo: "",
-  progressStatus: "",
   originWeighInTimestamp: "",
-  transportVehicleSccModel: "",
+  originWeighInOperatorName: "",
+
+  npb: "",
   afdeling: "",
   blok: "",
-  sptbs: "",
-  // yearPlan: "",
-  // kebun: "",
+  tahun: "",
+  kebun: "",
+  janjang: "",
 };
 
 const PksManualEntryOthersIn = (props) => {
@@ -50,11 +54,11 @@ const PksManualEntryOthersIn = (props) => {
   const { WBMS, SCC_MODEL } = useConfig();
   const { openedTransaction, wbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { useGetDriversQuery } = useDriver();
   const { setSidebar } = useApp();
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
-  const { data: dtTransportVehicles } = useGetTransportVehiclesQuery();
+  const { data: dtDrivers } = useGetDriversQuery();
 
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,8 +83,6 @@ const PksManualEntryOthersIn = (props) => {
   };
 
   const handleSubmit = async () => {
-    // let tempTrans = { ...values };
-
     try {
       values.originWeighInKg = wb.weight;
       // values.transportVehicleId = ProductId;
@@ -92,7 +94,7 @@ const PksManualEntryOthersIn = (props) => {
       values.transporterCompanyId = TransporterId;
       values.transporterCompanyName = TransporterCompanyName;
       values.transporterCompanyCode = TransporterCompanyCode;
-      values.transportVehiclePlateNo = PlateNo.toUpperCase();
+      values.transportVehiclePlateNo = PlateNo;
       values.originWeighInTimestamp = moment().toDate();
       values.originWeighInOperatorName = user.name.toUpperCase();
       values.dtTransaction = moment()
@@ -100,9 +102,9 @@ const PksManualEntryOthersIn = (props) => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { values };
+      const data = { ...values };
 
-      const response = await transactionAPI.ManualEntryPksInOthers(values);
+      const response = await transactionAPI.ManualEntryPksInOthers(data);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -174,16 +176,38 @@ const PksManualEntryOthersIn = (props) => {
               value={values?.bonTripNo}
               inputProps={{ readOnly: true }}
             />
-            <TextField
-              name="kebun"
-              label="Kebun"
+            {/* <TextField
+              name="driverName"
+              label="Nama Supir"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
-              value={values?.kebun}
               onChange={handleChange}
+              value={values?.driverName}
               sx={{ mt: 2 }}
+            /> */}
+            <Autocomplete
+              id="autocomplete"
+              freeSolo
+              options={dtDrivers?.records || []}
+              getOptionLabel={(option) => option.name}
+              onInputChange={(event, inputValue) => {
+                setValues({ ...values, driverName: inputValue });
+              }}
+              sx={{ mt: 2 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Nama Supir"
+                  variant="outlined"
+                  size="small"
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { textTransform: "uppercase" },
+                  }}
+                />
+              )}
             />
             <TextField
               name="afdeling"
@@ -195,6 +219,23 @@ const PksManualEntryOthersIn = (props) => {
               onChange={handleChange}
               value={values?.afdeling}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
+            />
+            <TextField
+              name="kebun"
+              label="Kebun"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={values?.kebun}
+              onChange={handleChange}
+              sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
               name="blok"
@@ -206,27 +247,19 @@ const PksManualEntryOthersIn = (props) => {
               onChange={handleChange}
               value={values?.blok}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
               name="janjang"
               label="Janjang/Sak"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
               value={values?.janjang}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              name="driverName"
-              label="Nama Supir"
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              onChange={handleChange}
-              value={values?.driverName}
               sx={{ mt: 2 }}
             />
             <TextField
@@ -239,11 +272,14 @@ const PksManualEntryOthersIn = (props) => {
               onChange={handleChange}
               value={values?.npb}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
               name="tahun"
               label="Tahun"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
@@ -262,6 +298,9 @@ const PksManualEntryOthersIn = (props) => {
               onChange={handleChange}
               value={values?.sptbs}
               sx={{ mt: 2 }}
+               inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             /> */}
           </Grid>
         </Grid>

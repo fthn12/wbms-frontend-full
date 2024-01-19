@@ -26,7 +26,7 @@ const EditCompanies = (props) => {
   const { useUpdateCompanyMutation } = useCompany();
   const [updateCompany] = useUpdateCompanyMutation();
 
-  const handleFormSubmit = async (values, { setSubmitting}) => {
+  const handleFormSubmit = async (values, { setSubmitting }) => {
     try {
       updateCompany(values).then((results) => {
         toast.success("Data Berhasil Disimpan");
@@ -46,8 +46,8 @@ const EditCompanies = (props) => {
     // city: yup.string().required("required"),
     code: yup.string().required("required"),
     codeSap: yup.string().required("required"),
-    // persenPotngWajib: yup.string().required("required"),
-    // type: yup.string().required("required"),
+    potonganWajib: yup.string().required("required"),
+    type: yup.string().required("required"),
     shortName: yup.string().required("required"),
     // address: yup.string().required("required"),
     // addressExt: yup.string().required("required"),
@@ -456,7 +456,7 @@ const EditCompanies = (props) => {
                     helperText={touched.addressExt && errors.addressExt}
                   />
                 </FormControl>
-                {/* <FormControl sx={{ gridColumn: "span 4" }}>
+                <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{
                       color: "black",
@@ -468,22 +468,19 @@ const EditCompanies = (props) => {
                     Tipe
                   </FormLabel>
                   <Select
-                    labelId="label-module"
+                    // labelId="label-module"
                     fullWidth
                     value={values?.type}
                     name="type"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     displayEmpty
-                    sx={{
-                      color: MenuItem ? "gray" : "black",
-                    }}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih Tipe --
                     </MenuItem>
-                    <MenuItem value="Internal">Internal</MenuItem>
-                    <MenuItem value="Eksternal">Eksternal</MenuItem>
+                    <MenuItem value="INTERNAL">INTERNAL</MenuItem>
+                    <MenuItem value="EKSTERNAL">EKSTERNAL</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl sx={{ gridColumn: "span 4" }}>
@@ -511,12 +508,12 @@ const EditCompanies = (props) => {
                     placeholder="Masukkan Potongan Wajib...."
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.persenPotngWajib}
-                    name="persenPotngWajib"
-                    error={!!touched.persenPotngWajib && !!errors.persenPotngWajib}
-                    helperText={touched.persenPotngWajib && errors.persenPotngWajib}
+                    value={values?.potonganWajib}
+                    name="potonganWajib"
+                    error={!!touched.potonganWajib && !!errors.potonganWajib}
+                    helperText={touched.potonganWajib && errors.potonganWajib}
                   />
-                </FormControl> */}
+                </FormControl>
                 <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
                     sx={{
@@ -536,9 +533,6 @@ const EditCompanies = (props) => {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     displayEmpty
-                    sx={{
-                      color: MenuItem ? "gray" : "black",
-                    }}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih Mill Operator --
@@ -565,9 +559,6 @@ const EditCompanies = (props) => {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     displayEmpty
-                    sx={{
-                      color: MenuItem ? "gray" : "black",
-                    }}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih Mill Operator Transporter --
@@ -595,9 +586,6 @@ const EditCompanies = (props) => {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     displayEmpty
-                    sx={{
-                      color: MenuItem ? "gray" : "black",
-                    }}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih SiteOperator --
@@ -625,9 +613,6 @@ const EditCompanies = (props) => {
                     onBlur={handleBlur}
                     onChange={handleChange}
                     displayEmpty
-                    sx={{
-                      color: MenuItem ? "gray" : "black",
-                    }}
                   >
                     <MenuItem value="" disabled>
                       -- Pilih Estate --

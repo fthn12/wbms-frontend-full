@@ -88,12 +88,13 @@ const MDCompany = () => {
     { field: "codeSap", headerName: "Kode SAP", maxWidth: 150, cellStyle: { textAlign: "center" } },
     // { field: "name", headerName: "Nama", flex: 1 },
     { field: "shortName", headerName: "Nama Pendek", maxWidth: 150, cellStyle: { textAlign: "center" } },
+    { field: "type", headerName: "Tipe", maxWidth: 120, cellStyle: { textAlign: "center" } },
     {
       field: "isMillOperator",
       headerName: "Is Mill",
       valueFormatter: booleanFormatter,
       cellDataType: "text",
-      maxWidth: 140,
+      maxWidth: 100,
       cellStyle: { textAlign: "center" },
     },
     {
@@ -101,7 +102,7 @@ const MDCompany = () => {
       headerName: "Is Estate",
       valueFormatter: booleanFormatter,
       cellDataType: "text",
-      maxWidth: 140,
+      maxWidth: 110,
       cellStyle: { textAlign: "center" },
     },
     {
