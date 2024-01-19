@@ -46,7 +46,6 @@ const BonTripPrint = (props) => {
       <Button
         variant="contained"
         disabled={isDisable}
-        fullWidth
         sx={{ mt: 2 }}
         {...others}
         onClick={() => {

@@ -174,121 +174,109 @@ const PksManualEntryOthersIn = (props) => {
 
   return (
     <Box>
-      {wbTransaction && (
-        <Formik
-          // enableReinitialize
-          onSubmit={handleSubmit}
-          initialValues={wbTransaction}
-          validationSchema={validationSchema}
-          isInitialError={false}
-        >
-          {(props) => {
-            const { values, dirty, isValid } = props;
-            return (
-              <Form>
-                <Grid item xs={12} sm={6} lg={3}>
-                  <Grid container columnSpacing={1}>
-                    <Grid item xs={12}>
-                      <Divider>DATA SUPIR & MUATAN</Divider>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field
-                        name="bonTripNo"
-                        label="NO BONTRIP"
-                        type="text"
-                        required={true}
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                        inputProps={{ readOnly: true }}
-                      />
-                      <Field
-                        name="kebun"
-                        label="Kebun"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        value={values?.kebun}
-                        required={true}
-                        component={TextField}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="afdeling"
-                        label="Afdeling"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.afdeling}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="blok"
-                        label="Blok"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.blok}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="janjang"
-                        label="Janjang/Sak"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.janjang}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="driverName"
-                        label="Nama Supir"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.driverName}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="npb"
-                        label="NPB/BE"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.npb}
-                        sx={{ mt: 2 }}
-                      />
-                      <Field
-                        name="tahun"
-                        label="Tahun"
-                        type="text"
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        required={true}
-                        component={TextField}
-                        value={values?.tahun}
-                        sx={{ mt: 2 }}
-                      />
-                      {/* 
+      <Grid item xs={12} sm={6} lg={3}>
+        <Grid container columnSpacing={1}>
+          <Grid item xs={12}>
+            <Divider>DATA SUPIR & MUATAN</Divider>
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              name="bonTripNo"
+              label="NO BONTRIP"
+              type="text"
+              required={true}
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
+            />
+            <Field
+              name="kebun"
+              label="Kebun"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={values?.kebun}
+              required={true}
+              component={TextField}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="afdeling"
+              label="Afdeling"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.afdeling}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="blok"
+              label="Blok"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.blok}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="janjang"
+              label="Janjang/Sak"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.janjang}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="driverName"
+              label="Nama Supir"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.driverName}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="npb"
+              label="NPB/BE"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.npb}
+              sx={{ mt: 2 }}
+            />
+            <Field
+              name="tahun"
+              label="Tahun"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              required={true}
+              component={TextField}
+              value={values?.tahun}
+              sx={{ mt: 2 }}
+            />
+            {/* 
             <Field
               name="sptbs"
               label="SPTBS"
@@ -301,154 +289,149 @@ const PksManualEntryOthersIn = (props) => {
               value={values?.sptbs}
               sx={{ mt: 2 }}
             /> */}
-                    </Grid>
-                  </Grid>
-                </Grid>
-                <Grid item xs={12} sm={6} lg={3}>
-                  <Grid container columnSpacing={1}>
-                    <Grid item xs={12}>
-                      <Divider>DATA TIMBANG KENDARAAN</Divider>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="number"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                        }}
-                        label="BERAT MASUK - IN"
-                        name="originWeighInKg"
-                        value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="text"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                        label="Waktu WB-IN"
-                        name="originWeighInTimestamp"
-                        value={dtTrx || "-"}
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="number"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                        }}
-                        label="BERAT KELUAR - OUT"
-                        name="originWeighOutKg"
-                        value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="text"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                        label="Waktu WB-Out"
-                        name="originWeighOutTimestamp"
-                        inputProps={{ readOnly: true }}
-                        value={
-                          values?.originWeighOutTimestamp
-                            ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                            : "-"
-                        }
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="text"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                        label="Operator WB-IN"
-                        name="originWeighInOperatorName"
-                        value={user.name}
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Field
-                        type="text"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
-                        label="Operator WB-OUT"
-                        name="originWeighOutOperatorName"
-                        value="-"
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Divider>TOTAL</Divider>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Field
-                        type="number"
-                        component={TextField}
-                        variant="outlined"
-                        size="small"
-                        fullWidth
-                        sx={{ mt: 3, backgroundColor: "whitesmoke" }}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                        }}
-                        label="TOTAL"
-                        name="weightNetto"
-                        value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                        inputProps={{ readOnly: true }}
-                      />
-                    </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sm={6} lg={3}>
+        <Grid container columnSpacing={1}>
+          <Grid item xs={12}>
+            <Divider>DATA TIMBANG KENDARAAN</Divider>
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+              }}
+              label="BERAT MASUK - IN"
+              name="originWeighInKg"
+              value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="text"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={dtTrx || "-"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+              }}
+              label="BERAT KELUAR - OUT"
+              name="originWeighOutKg"
+              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="text"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Waktu WB-Out"
+              name="originWeighOutTimestamp"
+              inputProps={{ readOnly: true }}
+              value={
+                values?.originWeighOutTimestamp
+                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                  : "-"
+              }
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="text"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Operator WB-IN"
+              name="originWeighInOperatorName"
+              value={user.name}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="text"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
+              label="Operator WB-OUT"
+              name="originWeighOutOperatorName"
+              value="-"
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Divider>TOTAL</Divider>
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+              }}
+              label="TOTAL"
+              name="weightNetto"
+              value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
 
-                    <Grid item xs={6}>
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                          mt: 2,
-                          display: false ? "none" : "",
-                        }}
-                        hide={true}
-                        onClick={handleSubmit}
-                        disabled={!(wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
-                      >
-                        Simpan
-                      </Button>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} />
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Form>
-            );
-          }}
-        </Formik>
-      )}
+          <Grid item xs={6}>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{
+                mt: 2,
+                display: false ? "none" : "",
+              }}
+              hide={true}
+              onClick={handleSubmit}
+              disabled={!(wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+            >
+              Simpan
+            </Button>
+          </Grid>
+          <Grid item xs={6}>
+            <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} />
+          </Grid>
+        </Grid>
+      </Grid>
       {isLoading && (
         <CircularProgress
           size={50}

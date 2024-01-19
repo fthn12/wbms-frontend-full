@@ -12,30 +12,6 @@ import { TransactionAPI } from "../../../../../apis";
 
 import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
-const initialValues = {
-  bonTripNo: "",
-  driverName: "",
-
-  transporterId: "",
-  transporterCompanyName: "",
-  transporterCompanyCode: "",
-  transportVehiclePlateNo: "",
-
-  productId: "",
-  productName: "",
-  productCode: "",
-
-  originWeighInKg: "",
-  originWeighInTimestamp: "",
-  originWeighInOperatorName: "",
-
-  npb: "",
-  afdeling: "",
-  blok: "",
-  tahun: "",
-  kebun: "",
-  janjang: "",
-};
 
 const PksManualEntryOthersIn = (props) => {
   const {
@@ -56,6 +32,7 @@ const PksManualEntryOthersIn = (props) => {
     useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { setSidebar } = useApp();
+
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const { data: dtDrivers } = useGetDriversQuery();
@@ -66,7 +43,9 @@ const PksManualEntryOthersIn = (props) => {
 
   const [dtTrx, setDtTrx] = useState(null);
 
-  const [values, setValues] = useState(initialValues);
+  const { values, setValues } = useForm({
+    ...transactionAPI.InitialData,
+  });
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -74,6 +53,10 @@ const PksManualEntryOthersIn = (props) => {
       ...preValues,
       [name]: value,
     }));
+  };
+
+  const validateForm = () => {
+    return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
   };
 
   const handleClose = () => {
@@ -427,7 +410,7 @@ const PksManualEntryOthersIn = (props) => {
               }}
               hide={true}
               onClick={handleSubmit}
-              disabled={!(wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+              disabled={!(validateForm() && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
             >
               Simpan
             </Button>

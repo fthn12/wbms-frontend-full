@@ -204,8 +204,8 @@ const TransactionGrid = (props) => {
       hide: true,
     },
     { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115, cellStyle: { textAlign: "center" } },
-    { headerName: "PRODUK", field: "productName", maxWidth: 90, cellStyle: { textAlign: "center" } },
-    { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
+    { headerName: "PRODUK", field: "productName", maxWidth: 140, cellStyle: { textAlign: "center" } },
+    { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 80, cellStyle: { textAlign: "right" } },
     { headerName: "WB-OUT", field: "originWeighOutKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
     {
       headerName: "NETTO",
@@ -226,7 +226,7 @@ const TransactionGrid = (props) => {
     {
       headerName: "TGL PENGAKUAN",
       field: "dtTransaction",
-      maxWidth: 140,
+      maxWidth: 130,
       cellStyle: { textAlign: "center" },
       valueFormatter: dateFormatter,
     },

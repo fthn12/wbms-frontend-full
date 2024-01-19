@@ -162,22 +162,26 @@ const PksManualEntryWBIn = () => {
                 (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
               )}
               getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-              value={dtProduct?.records?.find((item) => item.id === values.transportVehicleId) || null}
+              value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
               onChange={(event, newValue) => {
-                setValues((prevValues) => ({
-                  ...prevValues,
-                  transportVehicleId: newValue ? newValue.id : "",
-                  transportVehicleProductName: newValue ? newValue.name : "",
-                  transportVehicleProductCode: newValue ? newValue.code : "",
-                }));
+                if (!newValue) {
+                  setSelectedOption("");
+                } else {
+                  setValues((prevValues) => ({
+                    ...prevValues,
+                    productId: newValue.id,
+                    productName: newValue.name,
+                    productCode: newValue.code,
+                  }));
 
-                const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
-                  ? "Kernel"
-                  : (newValue?.name || "").toLowerCase().includes("tbs")
-                  ? "Tbs"
-                  : "Others";
+                  const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
+                    ? "Kernel"
+                    : (newValue?.name || "").toLowerCase().includes("tbs")
+                    ? "Tbs"
+                    : "Others";
 
-                setSelectedOption(filterOption);
+                  setSelectedOption(filterOption);
+                }
               }}
               renderInput={(params) => (
                 <TextField {...params} sx={{ mt: 2 }} label="Product" variant="outlined" size="small" />
@@ -188,9 +192,9 @@ const PksManualEntryWBIn = () => {
 
           {selectedOption === "Tbs" && (
             <TBS
-              ProductId={values?.transportVehicleId}
-              ProductName={values?.transportVehicleProductName}
-              ProductCode={values?.transportVehicleProductCode}
+              ProductId={values?.productId}
+              ProductName={values?.productName}
+              ProductCode={values?.productCode}
               TransporterId={values?.transporterCompanyId}
               TransporterCompanyName={values?.transporterCompanyName}
               TransporterCompanyCode={values?.transporterCompanyCode}
@@ -202,9 +206,9 @@ const PksManualEntryWBIn = () => {
 
           {selectedOption === "Others" && (
             <OTHERS
-              ProductId={values?.transportVehicleId}
-              ProductName={values?.transportVehicleProductName}
-              ProductCode={values?.transportVehicleProductCode}
+              ProductId={values?.productId}
+              ProductName={values?.productName}
+              ProductCode={values?.productCode}
               TransporterId={values?.transporterCompanyId}
               TransporterCompanyName={values?.transporterCompanyName}
               TransporterCompanyCode={values?.transporterCompanyCode}
@@ -216,9 +220,9 @@ const PksManualEntryWBIn = () => {
 
           {selectedOption === "Kernel" && (
             <KERNEL
-              ProductId={values?.transportVehicleId}
-              ProductName={values?.transportVehicleProductName}
-              ProductCode={values?.transportVehicleProductCode}
+              ProductId={values?.productId}
+              ProductName={values?.productName}
+              ProductCode={values?.productCode}
               TransporterId={values?.transporterCompanyId}
               TransporterCompanyName={values?.transporterCompanyName}
               TransporterCompanyCode={values?.transporterCompanyCode}
