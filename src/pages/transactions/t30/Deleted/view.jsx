@@ -189,13 +189,13 @@ const TransactionT30Deleted = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     variant="contained"
                     disabled={isReadOnly ? false : !(isValid && dirty)}
                     onClick={handleSubmit}
                   >
                     {isReadOnly ? "EDIT" : "SIMPAN"}
-                  </Button>
+                  </Button> */}
                   <Button variant="contained" sx={{ ml: 1 }} onClick={handleReset}>
                     {isReadOnly ? "TUTUP" : "BATAL EDIT"}
                   </Button>

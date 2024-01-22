@@ -52,7 +52,10 @@ const TransactionGrid = (props) => {
   const transactionFilter = {
     where: {
       typeSite: WBMS.SITE_TYPE,
-      OR: [{ dtModified: { gte: moment().subtract(3, "hours").format() } }, { progressStatus: { in: [1, 2, 6, 11] } }],
+      OR: [
+        { dtModified: { gte: moment().subtract(3, "hours").format() } },
+        { progressStatus: { in: [1, 2, 6, 11, 35, 36, 37] } },
+      ],
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
@@ -82,6 +85,8 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks-edispatch-reject-bulking-in";
         } else if (progressStatus === 11) {
           urlPath = "/wb/transactions/pks-edispatch-reject-t300-in";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
         } else if (progressStatus === 35) {

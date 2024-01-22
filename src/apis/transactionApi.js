@@ -130,6 +130,12 @@ export const TransactionAPI = () => {
     return response;
   };
 
+  const ManualEntryPksOutOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-pks-out-others`, data).then((res) => res.data);
+
+    return response;
+  };
+
   const ManualEntryPksInKernel = async (data) => {
     const response = await axios.post(`${endpoint}/manual-entry-pks-in-kernel`, data).then((res) => res.data);
 
@@ -150,7 +156,10 @@ export const TransactionAPI = () => {
     updateById,
 
     ManualEntryPksInOthers,
+    ManualEntryPksOutOthers,
+
     ManualEntryPksInKernel,
+
     ManualEntryPksInTbs,
 
     eDispatchFindOrCreateByQrcode,
