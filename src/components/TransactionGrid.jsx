@@ -84,6 +84,12 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks-edispatch-reject-t300-in";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
+        } else if (progressStatus === 35) {
+          urlPath = "/wb/transactions/pks/manual-entry-others-out";
+        } else if (progressStatus === 36) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
         } else {
           throw new Error("Progress Status tidak valid.");
         }

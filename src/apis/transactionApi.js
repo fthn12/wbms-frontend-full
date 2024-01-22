@@ -136,6 +136,12 @@ export const TransactionAPI = () => {
     return response;
   };
 
+  const ManualEntryPksInTbs = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-pks-in-tbs`, data).then((res) => res.data);
+
+    return response;
+  };
+
   return {
     getById,
     GetByPlateNo,
@@ -145,6 +151,7 @@ export const TransactionAPI = () => {
 
     ManualEntryPksInOthers,
     ManualEntryPksInKernel,
+    ManualEntryPksInTbs,
 
     eDispatchFindOrCreateByQrcode,
 

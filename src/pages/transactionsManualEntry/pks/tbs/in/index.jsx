@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, InputAdornment, Divider, Checkbox, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  Grid,
+  InputAdornment,
+  Divider,
+  Checkbox,
+  TextField,
+} from "@mui/material";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import { useForm } from "../../../../../utils/useForm";
@@ -12,15 +21,25 @@ import { TransactionAPI } from "../../../../../apis";
 
 import { SortasiTBS } from "../../../../../components/SortasiTBS";
 
-import { useAuth, useConfig, useTransaction, useTransportVehicle, useWeighbridge, useApp } from "../../../../../hooks";
+import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
 const PksManualEntryTbsIn = (props) => {
-  const { ProductId, ProductName, TransporterId, TransporterCompanyName, TransporterCompanyCode, PlateNo } = props;
+  const {
+    ProductId,
+    ProductName,
+    ProductCode,
+    TransporterId,
+    TransporterCompanyName,
+    TransporterCompanyCode,
+    PlateNo,
+  } = props;
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
+  const { useGetDriversQuery } = useDriver();
+
   const {
     openedTransaction,
     wbTransaction,
@@ -29,19 +48,9 @@ const PksManualEntryTbsIn = (props) => {
     useFindManyTransactionQuery,
     clearOpenedTransaction,
   } = useTransaction();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { data: dtDrivers } = useGetDriversQuery();
   const { setSidebar } = useApp();
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
-
-  const transactionFilter = {
-    where: {
-      typeSite: WBMS.SITE_TYPE,
-      OR: [{ progressStatus: { in: [1] } }],
-    },
-  };
-
-  const { data: results } = useFindManyTransactionQuery(transactionFilter);
-  console.log(results?.records, "results");
 
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,62 +76,35 @@ const PksManualEntryTbsIn = (props) => {
     navigate("/wb/transactions");
   };
 
-  const handleSubmit = async (id) => {
-    let tempTrans = { ...values };
-
+  const handleSubmit = async () => {
     try {
-      // tempTrans.originWeighInTimestamp = SemaiUtils.GetDateStr();
-      tempTrans.productId = ProductId;
-      tempTrans.productName = ProductName;
-      tempTrans.transporterCompanyId = TransporterId;
-      tempTrans.transporterCompanyName = TransporterCompanyName;
-      tempTrans.transporterCompanyCode = TransporterCompanyCode;
-      tempTrans.transportVehiclePlateNo = PlateNo;
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name;
-      tempTrans.dtTransaction = moment()
+      values.originWeighInKg = wb.weight;
+      // values.transportVehicleId = ProductId;
+      // values.transportVehicleProductName = ProductName;
+      // values.transportVehicleProductCode = ProductCode;
+      values.productId = ProductId;
+      values.productName = ProductName;
+      values.productCode = ProductCode;
+      values.transporterCompanyId = TransporterId;
+      values.transporterCompanyName = TransporterCompanyName;
+      values.transporterCompanyCode = TransporterCompanyCode;
+      values.transportVehiclePlateNo = PlateNo.toUpperCase();
+      values.originWeighInTimestamp = moment().toDate();
+      values.originWeighInOperatorName = user.name.toUpperCase();
+      values.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const duplicatePlateNo = results?.records?.find(
-        (item) => item.transportVehiclePlateNo === PlateNo && [1].includes(item.progressStatus),
-      );
+      const data = { ...values };
 
-      if (duplicatePlateNo) {
-        const productName = duplicatePlateNo.productName.toLowerCase();
-
-        if (!productName.includes("cpo") && !productName.includes("pko")) {
-          const swalResult = await Swal.fire({
-            title: "Truk Masih di Dalam",
-            text: "Apakah Anda ingin keluar?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#1976d2",
-            confirmButtonText: "Ya",
-            cancelButtonText: "Tidak",
-          });
-
-          const response = await transactionAPI.getById(id);
-
-          setOpenedTransaction(response.data.transaction);
-          setIsLoading(false);
-
-          if (swalResult.isConfirmed) {
-            navigate("/wb/pks/manualentry-Out");
-          }
-        }
-        return;
-      }
-
-      const data = { wbTransaction: { ...tempTrans } };
-
-      const response = await transactionAPI.create(data);
+      const response = await transactionAPI.ManualEntryPksInTbs(data);
 
       if (!response.status) throw new Error(response?.message);
 
       // setWbTransaction(response.data.transaction);
       clearOpenedTransaction();
+      handleClose();
       setValues({ ...response.data.transaction });
       setIsSubmitted(true);
 
@@ -131,6 +113,21 @@ const PksManualEntryTbsIn = (props) => {
       return toast.error(`${error.message}.`);
     }
   };
+
+  useEffect(() => {
+    setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
+    setSidebar({ selected: "Transaksi WB PKS" });
+
+    return () => {
+      // console.clear();
+    };
+  }, []);
+
+  //validasi form
+  const validateForm = () => {
+    return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
+  };
+
   //weight wb
   useEffect(() => {
     setWbTransaction({ originWeighInKg: wb.weight });
@@ -157,35 +154,17 @@ const PksManualEntryTbsIn = (props) => {
   // }, []);
 
   useEffect(() => {
-    setValues(openedTransaction);
-
-    return () => {
-      // console.clear();
-    };
+    setValues({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
   }, []);
 
-  // useEffect(() => {
-  //   if (dataValues.originWeighInKg < WBMS.WB_MIN_WEIGHT || dataValues.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
-  //     setOriginWeighNetto(0);
-  //   } else {
-  //     let total =
-  //       Math.abs(dataValues.originWeighInKg - dataValues.originWeighOutKg) -
-  //       dataValues.potonganWajib -
-  //       dataValues.potonganLain;
-  //     setOriginWeighNetto(total);
-  //   }
-  // }, [WBMS.WB_MIN_WEIGHT, dataValues]);
-
-  // // Untuk validasi field
-  // useEffect(() => {
-  //   let cSubmit = false;
-
-  //   if (values.originWeighInKg >= WBMS.WB_MIN_WEIGHT) {
-  //     cSubmit = true;
-  //   }
-
-  //   setCanSubmit(cSubmit);
-  // }, [values]);
+  useEffect(() => {
+    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+      setOriginWeighNetto(0);
+    } else {
+      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      setOriginWeighNetto(total);
+    }
+  }, [wbTransaction]);
 
   return (
     <>
@@ -205,15 +184,27 @@ const PksManualEntryTbsIn = (props) => {
               value={values?.bonTripNo || ""}
               inputProps={{ readOnly: true }}
             />
-            <TextField
-              name="kebun"
-              label="Kebun"
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              onChange={handleChange}
+            <Autocomplete
+              id="autocomplete"
+              freeSolo
+              options={dtDrivers?.records || []}
+              getOptionLabel={(option) => option.name}
+              onInputChange={(event, inputValue) => {
+                setValues({ ...values, driverName: inputValue.toUpperCase() });
+              }}
               sx={{ mt: 2 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Nama Supir"
+                  variant="outlined"
+                  size="small"
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { textTransform: "uppercase" },
+                  }}
+                />
+              )}
             />
             <TextField
               name="afdeling"
@@ -225,6 +216,23 @@ const PksManualEntryTbsIn = (props) => {
               onChange={handleChange}
               value={values?.afdeling}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
+            />
+            <TextField
+              name="kebun"
+              label="Kebun"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={values?.kebun}
+              onChange={handleChange}
+              sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
               name="blok"
@@ -234,55 +242,51 @@ const PksManualEntryTbsIn = (props) => {
               size="small"
               fullWidth
               onChange={handleChange}
+              value={values?.blok}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
-              name="qtyTbs"
+              name="janjang"
               label="Janjang/Sak"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
-              value={values?.qtyTbs}
+              value={values?.janjang}
               sx={{ mt: 2 }}
             />
             <TextField
-              name="driverName"
-              label="Nama Supir"
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              onChange={handleChange}
-              value={values?.driverName}
-              sx={{ mt: 2 }}
-            />
-            <TextField
-              name="deliveryOrderNo"
+              name="npb"
               label="NPB/BE"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
-              value={values?.deliveryOrderNo}
+              value={values?.npb}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
             <TextField
               name="tahun"
               label="Tahun"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
               value={values?.tahun}
-              sx={{ mt: 2, mb: 2.5 }}
+              sx={{ mt: 2, mb: 2 }}
             />
-                 <Grid item xs={12}>
-            <Divider>SPTBS</Divider>
-          </Grid>
+            <Grid item xs={12}>
+              <Divider>SPTBS</Divider>
+            </Grid>
 
             <TextField
               name="sptbs"
@@ -293,7 +297,7 @@ const PksManualEntryTbsIn = (props) => {
               fullWidth
               onChange={handleChange}
               value={values?.sptbs}
-              sx={{ mt: 2.5 }}
+              sx={{ mt: 1}}
             />
           </Grid>
         </Grid>
@@ -383,7 +387,7 @@ const PksManualEntryTbsIn = (props) => {
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
-              inputProps={{ readOnly: true }}
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -451,9 +455,12 @@ const PksManualEntryTbsIn = (props) => {
             <Button
               variant="contained"
               fullWidth
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2,
+              }}
+              hide={true}
               onClick={handleSubmit}
-              // disabled={!(canSubmit && !isSubmitted && wb?.isStable)}
+              disabled={!(validateForm() && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
             >
               Simpan
             </Button>

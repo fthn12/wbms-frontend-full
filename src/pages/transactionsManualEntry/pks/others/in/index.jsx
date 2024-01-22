@@ -12,7 +12,6 @@ import { TransactionAPI } from "../../../../../apis";
 
 import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
-
 const PksManualEntryOthersIn = (props) => {
   const {
     ProductId,
@@ -55,10 +54,6 @@ const PksManualEntryOthersIn = (props) => {
     }));
   };
 
-  const validateForm = () => {
-    return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  };
-
   const handleClose = () => {
     clearOpenedTransaction();
 
@@ -77,7 +72,7 @@ const PksManualEntryOthersIn = (props) => {
       values.transporterCompanyId = TransporterId;
       values.transporterCompanyName = TransporterCompanyName;
       values.transporterCompanyCode = TransporterCompanyCode;
-      values.transportVehiclePlateNo = PlateNo;
+      values.transportVehiclePlateNo = PlateNo.toUpperCase();
       values.originWeighInTimestamp = moment().toDate();
       values.originWeighInOperatorName = user.name.toUpperCase();
       values.dtTransaction = moment()
@@ -111,6 +106,11 @@ const PksManualEntryOthersIn = (props) => {
       // console.clear();
     };
   }, []);
+
+  //validasi form
+  const validateForm = () => {
+    return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
+  };
 
   //weight wb
   useEffect(() => {
@@ -176,7 +176,7 @@ const PksManualEntryOthersIn = (props) => {
               options={dtDrivers?.records || []}
               getOptionLabel={(option) => option.name}
               onInputChange={(event, inputValue) => {
-                setValues({ ...values, driverName: inputValue });
+                setValues({ ...values, driverName: inputValue.toUpperCase() });
               }}
               sx={{ mt: 2 }}
               renderInput={(params) => (
@@ -365,7 +365,7 @@ const PksManualEntryOthersIn = (props) => {
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
-              inputProps={{ readOnly: true }}
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -378,6 +378,7 @@ const PksManualEntryOthersIn = (props) => {
               label="Operator WB-OUT"
               name="originWeighOutOperatorName"
               inputProps={{ readOnly: true }}
+              value="-"
             />
           </Grid>
           <Grid item xs={12}>
@@ -406,7 +407,6 @@ const PksManualEntryOthersIn = (props) => {
               fullWidth
               sx={{
                 mt: 2,
-                display: false ? "none" : "",
               }}
               hide={true}
               onClick={handleSubmit}

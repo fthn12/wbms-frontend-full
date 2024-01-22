@@ -90,6 +90,7 @@ const PksManualEntryWBIn = () => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
+
         <Button variant="contained" onClick={handleClose}>
           TUTUP
         </Button>

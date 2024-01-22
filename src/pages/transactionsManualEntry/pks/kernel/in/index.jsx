@@ -91,7 +91,7 @@ const PksManualEntryKernelIn = (props) => {
       values.transporterCompanyId = TransporterId;
       values.transporterCompanyName = TransporterCompanyName;
       values.transporterCompanyCode = TransporterCompanyCode;
-      values.transportVehiclePlateNo = PlateNo;
+      values.transportVehiclePlateNo = PlateNo.toUpperCase();
       values.originWeighInTimestamp = moment().toDate();
       values.originWeighInOperatorName = user.name.toUpperCase();
       values.dtTransaction = moment()
@@ -192,7 +192,7 @@ const PksManualEntryKernelIn = (props) => {
               options={dtDrivers?.records || []}
               getOptionLabel={(option) => option.name}
               onInputChange={(event, inputValue) => {
-                setValues({ ...values, driverName: inputValue });
+                setValues({ ...values, driverName: inputValue.toUpperCase() });
               }}
               sx={{ mt: 2 }}
               renderInput={(params) => (
@@ -389,8 +389,8 @@ const PksManualEntryKernelIn = (props) => {
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Operator WB-IN"
               name="originWeighInOperatorName"
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
               value={user.name}
-              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>

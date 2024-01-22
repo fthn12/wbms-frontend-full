@@ -20,7 +20,9 @@ const DashboardAll = lazy(() => import("../pages/dashboard/dashboard-all"));
 const Transactions = lazy(() => import("../pages/transactions"));
 
 const PksManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/pks/wb-in"));
-const PksManualEntryOut = lazy(() => import("../pages/transactionsManualEntry/pks/wb-out"));
+const PksManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/pks/others/out"));
+const PksManualEntryOutKernel = lazy(() => import("../pages/transactionsManualEntry/pks/kernel/out"));
+const PksManualEntryOutTbs = lazy(() => import("../pages/transactionsManualEntry/pks/tbs/out"));
 
 const PksNormalIn = lazy(() => import("../pages/transactions/pks/NormalIn"));
 const PksNormalOut = lazy(() => import("../pages/transactions/pks/NormalOut"));
@@ -112,8 +114,22 @@ const routes = () => {
 
           <Route path="transactions/pks-new" element={<PksEDispatchNew />} />
 
-          <Route path="pks/manualentry-in" name="PksManualEntryWbIn" element={<PksManualEntryIn />} />
-          <Route path="pks/manualentry-out" name="PksManualEntryWbOut" element={<PksManualEntryOut />} />
+          <Route path="transactions/pks/manualentry-in" name="PksManualEntryWbIn" element={<PksManualEntryIn />} />
+          <Route
+            path="transactions/pks/manual-entry-others-out/:id"
+            name="PksManualEntryOutOthers"
+            element={<PksManualEntryOutOthers />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-kernel-out/:id"
+            name="PksManualEntryOutKernel"
+            element={<PksManualEntryOutKernel />}
+          />
+            <Route
+            path="transactions/pks/manual-entry-tbs-out/:id"
+            name="PksManualEntryOutTbs"
+            element={<PksManualEntryOutTbs />}
+          />
 
           <Route path="transactions/t30-edispatch-normal-in" element={<T30NormalIn />} />
           <Route path="transactions/t30-edispatch-normal-out" element={<T30NormalOut />} />

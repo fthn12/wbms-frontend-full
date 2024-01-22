@@ -64,13 +64,13 @@ const TransactionPks = () => {
               variant="contained"
               sx={{ mr: 0.5 }}
               onClick={() => {
-                const newTransaction = {
-                  ...transactionAPI.InitialData,
-                  bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,
-                };
+                // const newTransaction = {
+                //   ...transactionAPI.InitialData,
+                //   bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,
+                // };
 
-                setOpenedTransaction(newTransaction);
-                navigate("/wb/pks/manualentry-in");
+                // setOpenedTransaction(newTransaction);
+                navigate("/wb/transactions/pks/manualentry-in");
               }}
             >
               Buat Baru

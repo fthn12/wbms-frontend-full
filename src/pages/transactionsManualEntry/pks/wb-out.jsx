@@ -46,7 +46,6 @@ const PksManualEntryWBOut = () => {
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
-
   const { data: dtProduct } = useGetProductQuery();
 
   const [canSubmit, setCanSubmit] = useState(false);

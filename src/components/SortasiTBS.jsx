@@ -1,6 +1,6 @@
-import React from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, InputAdornment, Divider, Checkbox, TextField } from "@mui/material";
+import { Box, Button, FormControlLabel, Grid, InputAdornment, Divider, Checkbox, TextField } from "@mui/material";
 
 import { useForm } from "../utils/useForm";
 
@@ -9,6 +9,7 @@ import { TransactionAPI } from "../apis";
 export const SortasiTBS = (props) => {
   const { isReadOnly, isBgcolor } = props;
   const transactionAPI = TransactionAPI();
+  const [checked, setChecked] = useState([true, false]);
 
   const { values, setValues } = useForm({
     ...transactionAPI.InitialData,
@@ -20,6 +21,18 @@ export const SortasiTBS = (props) => {
       ...preValues,
       [name]: value,
     }));
+  };
+
+  const handleChange1 = (event) => {
+    setChecked([event.target.checked, event.target.checked]);
+  };
+
+  const handleChange2 = (event) => {
+    setChecked([event.target.checked, checked[1]]);
+  };
+
+  const handleChange3 = (event) => {
+    setChecked([checked[0], event.target.checked]);
   };
 
   return (
@@ -492,6 +505,19 @@ export const SortasiTBS = (props) => {
           Pilih Semua Sebagai Potongan/Pengurangan Tonase ?
         </span>
       </Grid>
+      {/* <FormControlLabel
+        label="Parent"
+        control={
+          <Checkbox
+            checked={checked[0] && checked[1]}
+            indeterminate={checked[0] !== checked[1]}
+            onChange={handleChange1}
+          />
+        }
+      /> */}
+
+      {/* <FormControlLabel label="Child 1" control={<Checkbox checked={checked[0]} onChange={handleChange2} />} />
+      <FormControlLabel label="Child 2" control={<Checkbox checked={checked[1]} onChange={handleChange3} />} /> */}
     </>
   );
 };
