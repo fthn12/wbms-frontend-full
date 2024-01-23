@@ -282,7 +282,7 @@ const PksManualEntryTbsIn = (props) => {
               fullWidth
               onChange={handleChange}
               value={values?.tahun}
-              sx={{ mt: 2, mb: 2 }}
+              sx={{ mt: 2, mb: 2.5 }}
             />
             <Grid item xs={12}>
               <Divider>SPTBS</Divider>
@@ -291,13 +291,13 @@ const PksManualEntryTbsIn = (props) => {
             <TextField
               name="sptbs"
               label="SPTBS"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
               onChange={handleChange}
               value={values?.sptbs}
-              sx={{ mt: 1}}
+              sx={{ mt: 2.5 }}
             />
           </Grid>
         </Grid>
@@ -333,19 +333,6 @@ const PksManualEntryTbsIn = (props) => {
           </Grid>
           <Grid item xs={6}>
             <TextField
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              value={dtTrx || "-"}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
               type="number"
               variant="outlined"
               size="small"
@@ -357,6 +344,19 @@ const PksManualEntryTbsIn = (props) => {
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
               value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>{" "}
+          <Grid item xs={6}>
+            <TextField
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={dtTrx || "-"}
               inputProps={{ readOnly: true }}
             />
           </Grid>

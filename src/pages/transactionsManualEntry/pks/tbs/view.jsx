@@ -14,12 +14,12 @@ import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
-import BonTripPrint from "../../../../../components/BonTripPrint";
+import Header from "../../../../components/layout/signed/HeaderTransaction";
+import BonTripPrint from "../../../../components/BontripManualEntry";
+import SortasiTBS from "../../../../components/SortasiTBS";
 
-import { TransactionAPI } from "../../../../../apis";
+import { TransactionAPI } from "../../../../apis";
 
 import {
   useAuth,
@@ -31,9 +31,9 @@ import {
   useWeighbridge,
   useTransportVehicle,
   useApp,
-} from "../../../../../hooks";
+} from "../../../../hooks";
 
-const PksManualEntryOthersOut = (props) => {
+const PksManualEntryTbsView = (props) => {
   // const {
   //   ProductId,
   //   ProductName,
@@ -102,60 +102,52 @@ const PksManualEntryOthersOut = (props) => {
     navigate("/wb/transactions");
   };
 
-  const handleFormikSubmit = async (values) => {
-    let tempTrans = { ...values };
+  //   const handleFormikSubmit = async (values) => {
+  //     let tempTrans = { ...values };
 
-    setIsLoading(true);
+  //     setIsLoading(true);
 
-    try {
-      tempTrans.progressStatus = 40;
-      tempTrans.originWeighOutKg = wb.weight;
-      tempTrans.originWeighOutTimestamp = moment().toDate();
-      tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
+  //     try {
+  //       tempTrans.progressStatus = 40;
+  //       tempTrans.originWeighOutKg = wb.weight;
+  //       tempTrans.originWeighOutTimestamp = moment().toDate();
+  //       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
+  //       tempTrans.dtTransaction = moment()
+  //         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+  //         .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+  //       const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
 
-      if (!response.status) throw new Error(response?.message);
+  //       if (!response.status) throw new Error(response?.message);
 
-      clearWbTransaction();
-      setIsLoading(false);
+  //       clearWbTransaction();
+  //       setIsLoading(false);
 
-      toast.success(`Transaksi WB-OUT telah tersimpan.`);
-      // redirect ke form view
-      const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
+  //       toast.success(`Transaksi WB-OUT telah tersimpan.`);
+  //     } catch (error) {
+  //       return toast.error(`${error.message}.`);
+  //     }
+  //   };
 
-      return;
-    } catch (error) {
-      setIsLoading(false);
-      toast.error(`${error.message}.`);
+  //   useEffect(() => {
+  //     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
+  //     setSidebar({ selected: "Transaksi WB PKS" });
 
-      return;
-    }
-  };
+  //     return () => {
+  //       // console.clear();
+  //     };
+  //   }, []);
 
-  useEffect(() => {
-    setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
-    setSidebar({ selected: "Transaksi WB PKS" });
-
-    return () => {
-      // console.clear();
-    };
-  }, []);
-
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
+  //   //validasi form
+  //   // const validateForm = () => {
+  //   //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
+  //   // };
 
   //weight wb
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  //   useEffect(() => {
+  //     setWbTransaction({ originWeighOutKg: wb.weight });
+  //   }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -190,31 +182,31 @@ const PksManualEntryOthersOut = (props) => {
 
   return (
     <Box>
-    <Header title="TRANSAKSI PKS" subtitle="Transaksi Manual Entry WB OUT" />
+      <Header title="TANSAKSI PKS" subtitle="DATA TIMBANGAN MANUAL ENTRY" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
-          onSubmit={handleFormikSubmit}
+          //   onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue } = props;
+            const { values, isValid, handleChange, setFieldValue } = props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     type="submit"
                     variant="contained"
-                    sx={{ mr: 1 }}
+                    sx={{mr:1}}
                     disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
                   >
                     SIMPAN
-                  </Button>
-                  {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
+                  </Button> */}
+                  <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -242,6 +234,7 @@ const PksManualEntryOthersOut = (props) => {
                         variant="outlined"
                         fullWidth
                         freeSolo
+                        readOnly={true}
                         disableClearable
                         options={dtTransport?.records || []}
                         value={
@@ -250,13 +243,19 @@ const PksManualEntryOthersOut = (props) => {
                           }
                         }
                         getOptionLabel={(option) => (option ? option.plateNo : "")}
-                        onInputChange={(event, InputValue, reason) => {
-                          if (reason !== "reset") {
-                            setFieldValue("transportVehiclePlateNo", InputValue);
-                          }
-                        }}
+                        // onInputChange={(event, InputValue, reason) => {
+                        //   if (reason !== "reset") {
+                        //     setFieldValue("transportVehiclePlateNo", InputValue);
+                        //   }
+                        // }}
                         renderInput={(params) => (
-                          <TextFieldMUI {...params} label="Nomor Plat" name="transportVehiclePlateNo" size="small" />
+                          <TextFieldMUI
+                            {...params}
+                            label="Nomor Plat"
+                            name="transportVehiclePlateNo"
+                            sx={{ backgroundColor: "whitesmoke" }}
+                            size="small"
+                          />
                         )}
                       />
 
@@ -268,18 +267,19 @@ const PksManualEntryOthersOut = (props) => {
                         options={dtCompany?.records || []}
                         getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
                         value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
-                        onChange={(event, newValue) => {
-                          setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                          setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                          setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                        }}
+                        // onChange={(event, newValue) => {
+                        //   setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+                        //   setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+                        //   setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                        // }}
+                        readOnly={true}
                         renderInput={(params) => (
                           <TextFieldMUI
                             {...params}
                             name="transporterCompanyName"
                             label="Cust/Vendor transport"
                             size="small"
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                           />
                         )}
                       />
@@ -296,21 +296,22 @@ const PksManualEntryOthersOut = (props) => {
                         )}
                         getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
                         value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
-                        onChange={(event, newValue) => {
-                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
-                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                          setFieldValue("productName", newValue ? newValue.name : "");
-                          setFieldValue("productId", newValue ? newValue.id : "");
-                          setFieldValue("productCode", newValue ? newValue.code : "");
-                        }}
+                        // onChange={(event, newValue) => {
+                        //   setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                        //   setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                        //   setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+                        //   setFieldValue("productName", newValue ? newValue.name : "");
+                        //   setFieldValue("productId", newValue ? newValue.id : "");
+                        //   setFieldValue("productCode", newValue ? newValue.code : "");
+                        // }}
+                        readOnly={true}
                         renderInput={(params) => (
                           <TextFieldMUI
                             {...params}
                             name="productName"
                             label="Nama Produk"
                             size="small"
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                           />
                         )}
                       />
@@ -347,18 +348,20 @@ const PksManualEntryOthersOut = (props) => {
                               }
                             }
                             getOptionLabel={(option) => option.name}
-                            onInputChange={(event, InputValue, reason) => {
-                              if (reason !== "reset") {
-                                setFieldValue("driverName", InputValue);
-                              }
-                            }}
+                            // onInputChange={(event, InputValue, reason) => {
+                            //   if (reason !== "reset") {
+                            //     setFieldValue("driverName", InputValue);
+                            //   }
+                            // }}
+
+                            readOnly={true}
                             renderInput={(params) => (
                               <TextFieldMUI
                                 {...params}
                                 name="driverName"
                                 size="small"
                                 label="Nama Supir"
-                                sx={{ mt: 2 }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                               />
                             )}
                           />
@@ -372,10 +375,8 @@ const PksManualEntryOthersOut = (props) => {
                             component={TextField}
                             fullWidth
                             value={values?.afdeling}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                           <Field
                             name="kebun"
@@ -386,10 +387,8 @@ const PksManualEntryOthersOut = (props) => {
                             fullWidth
                             component={TextField}
                             value={values?.kebun}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                           <Field
                             name="blok"
@@ -400,10 +399,8 @@ const PksManualEntryOthersOut = (props) => {
                             component={TextField}
                             fullWidth
                             value={values?.blok}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                           <Field
                             name="janjang"
@@ -414,7 +411,8 @@ const PksManualEntryOthersOut = (props) => {
                             component={TextField}
                             fullWidth
                             value={values?.janjang}
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                           <Field
                             name="npb"
@@ -425,10 +423,8 @@ const PksManualEntryOthersOut = (props) => {
                             component={TextField}
                             fullWidth
                             value={values?.npb}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                           <Field
                             name="tahun"
@@ -438,26 +434,33 @@ const PksManualEntryOthersOut = (props) => {
                             size="small"
                             component={TextField}
                             fullWidth
-                            value={values?.tahun}
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, mb: 2.5, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
-                          {/* 
-            <Field
-              name="sptbs"
-              label="SPTBS"
-              type="text"
-              variant="outlined"
-              size="small"
-              component={TextField}
-              fullWidth
-              
-              value={values?.sptbs}
-              sx={{ mt: 2 }}
-               inputProps={{
-                style: { textTransform: "uppercase" },
-              }}
-            /> */}
+                          <Grid item xs={12}>
+                            <Divider>SPTBS</Divider>
+                          </Grid>
+                          <Field
+                            name="sptbs"
+                            label="SPTBS"
+                            type="text"
+                            variant="outlined"
+                            size="small"
+                            component={TextField}
+                            fullWidth
+                            value={values?.sptbs}
+                            sx={{ mt: 2, mb: 2.5, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
                         </Grid>
+                      </Grid>
+                    </Grid>{" "}
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12}>
+                          <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+                        </Grid>
+                        <SortasiTBS isReadOnly={true} />
                       </Grid>
                     </Grid>
                     <Grid item xs={12} sm={6} lg={3}>
@@ -469,9 +472,9 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="number"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
+                            component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">kg</InputAdornment>,
@@ -486,9 +489,9 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="text"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
+                            component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             label="Waktu WB-IN"
                             name="originWeighInTimestamp"
@@ -504,9 +507,9 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="number"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
+                            component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">kg</InputAdornment>,
@@ -521,9 +524,9 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="text"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
+                            component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             label="Waktu WB-Out"
                             name="originWeighOutTimestamp"
@@ -535,9 +538,9 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="text"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
+                            component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             label="Operator WB-IN"
                             name="originWeighInOperatorName"
@@ -549,10 +552,10 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="text"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
+                            component={TextField}
+                            sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
                             label="Operator WB-OUT"
                             value={user.name}
                             name="originWeighOutOperatorName"
@@ -566,16 +569,48 @@ const PksManualEntryOthersOut = (props) => {
                           <Field
                             type="number"
                             variant="outlined"
-                            component={TextField}
                             size="small"
                             fullWidth
-                            sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+                            component={TextField}
+                            sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                             }}
-                            label="TOTAL"
+                            label="TOTAL SEBELUM"
                             name="weightNetto"
                             value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label={<span style={{ color: "red" }}>POTONGAN</span>}
+                            name="weightNetto"
+                            value={0}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="TOTAL SESUDAH"
+                            name="weightNetto"
+                            value={0}
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>
@@ -616,4 +651,4 @@ const PksManualEntryOthersOut = (props) => {
   );
 };
 
-export default PksManualEntryOthersOut;
+export default PksManualEntryTbsView;

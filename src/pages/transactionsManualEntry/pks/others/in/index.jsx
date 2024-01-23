@@ -66,6 +66,9 @@ const PksManualEntryOthersIn = (props) => {
       // values.transportVehicleId = ProductId;
       // values.transportVehicleProductName = ProductName;
       // values.transportVehicleProductCode = ProductCode;
+      values.transportVehicleId = ProductId;
+      values.transportVehicleProductName = ProductName;
+      values.transportVehicleProductCode = ProductCode;
       values.productId = ProductId;
       values.productName = ProductName;
       values.productCode = ProductCode;
@@ -311,19 +314,6 @@ const PksManualEntryOthersIn = (props) => {
           </Grid>
           <Grid item xs={6}>
             <TextField
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              value={dtTrx || "-"}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
               type="number"
               variant="outlined"
               size="small"
@@ -335,6 +325,19 @@ const PksManualEntryOthersIn = (props) => {
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
               value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={dtTrx || "-"}
               inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -400,7 +403,6 @@ const PksManualEntryOthersIn = (props) => {
               inputProps={{ readOnly: true }}
             />
           </Grid>
-
           <Grid item xs={6}>
             <Button
               variant="contained"

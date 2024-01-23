@@ -95,6 +95,12 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
+        } else if (progressStatus === 40) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
+        } else if (progressStatus === 41) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }

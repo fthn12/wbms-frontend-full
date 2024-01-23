@@ -16,7 +16,7 @@ const AreaCharts = () => {
       typeSite: +WBMS.SITE_TYPE,
       OR: [
         {
-          progressStatus: { in: [21] },
+          progressStatus: { in: [21,40,41,42] },
         },
       ],
     },

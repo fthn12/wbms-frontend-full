@@ -7,7 +7,7 @@ import { useForm } from "../utils/useForm";
 import { TransactionAPI } from "../apis";
 
 export const SortasiTBS = (props) => {
-  const { isReadOnly, isBgcolor } = props;
+  const { isReadOnly } = props;
   const transactionAPI = TransactionAPI();
   const [checked, setChecked] = useState([true, false]);
 
@@ -49,7 +49,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -93,7 +93,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -137,7 +137,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -181,7 +181,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -225,7 +225,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -269,7 +269,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -313,7 +313,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -357,7 +357,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -401,7 +401,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -445,7 +445,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -480,7 +480,7 @@ export const SortasiTBS = (props) => {
           sx={{ mt: 1 }}
           inputProps={{
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}

@@ -4,7 +4,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, 
 import useMediaQuery from "@mui/material/useMediaQuery";
 import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
-const BonTripPrint = (props) => {
+const BonTripPrintManualEntry = (props) => {
   const { dtTrans, isDisable, ...others } = props;
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,14 +46,15 @@ const BonTripPrint = (props) => {
     <>
       <Button
         variant="contained"
-        disabled={isDisable}
+        // disabled={isDisable}
         sx={{ mt: 2 }}
         {...others}
         onClick={() => {
           setIsOpen(true);
         }}
-      ><PrintOutlinedIcon sx={{ mr: 1 }} />
-        Print Bontrip
+      >
+        <PrintOutlinedIcon sx={{ mr: 1 }} />
+        Cetak Slip
       </Button>
       <Dialog open={isOpen} fullWidth maxWidth={"md"}>
         <DialogTitle>Print Bontrip</DialogTitle>
@@ -100,25 +101,34 @@ const BonTripPrint = (props) => {
 
                     <tr>
                       <td height="25" width="100">
-                        Customer
+                        Kebun
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.transporterCompanyName}</td>
+                      <td className="nota-text">{dtTrans.kebun}</td>
                     </tr>
                     <tr>
                       <td height="25" width="100">
-                        Dikirim ke
+                        Afdeling
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text"> {dtTrans.destinationSiteName}</td>
+                      <td className="nota-text"> {dtTrans.afdeling}</td>
                     </tr>
                     <tr>
                       <td height="25" width="100">
-                        No. Do
+                        Field
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.deliveryOrderNo}</td>
+                      <td className="nota-text">{dtTrans.blok}</td>
                     </tr>
+
+                    <tr>
+                      <td height="25" width="100">
+                        Jml. Tandan
+                      </td>
+                      <td width="10">:</td>
+                      <td className="nota-text">{dtTrans.janjang}</td>
+                    </tr>
+                    <br />
                     <tr>
                       <td height="25" width="100">
                         No. Kend
@@ -133,6 +143,13 @@ const BonTripPrint = (props) => {
                       <td width="10">:</td>
                       <td className="nota-text">{dtTrans.driverName}</td>
                     </tr>
+                    <tr>
+                      <td height="25" width="100">
+                        SPTBS
+                      </td>
+                      <td width="10">:</td>
+                      <td className="nota-text">{dtTrans.sptbs}</td>
+                    </tr>
                   </Typography>
                 </tbody>
               </Table>
@@ -141,56 +158,56 @@ const BonTripPrint = (props) => {
                 <tbody>
                   <Typography fontSize="15px">
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Jenis Barang
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.transportVehicleProductName}</td>
+                      <td className="nota-text">{dtTrans.productName}</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Jam Masuk
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{jamMasuk}</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         1st Weight
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{dtTrans.originWeighInKg} KG</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Jam Keluar
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{jamKeluar}</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         2st Weight
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{dtTrans.originWeighOutKg} KG</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Net Weight
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{dtTrans.originWeighOutKg - dtTrans.originWeighInKg} KG</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Potongan
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">{dtTrans.potonganWajib + dtTrans.potonganLain}</td>
                     </tr>
                     <tr>
-                      <td height="20" width="100">
+                      <td height="30" width="100">
                         Netto A G
                       </td>
                       <td width="10">:</td>
@@ -375,4 +392,4 @@ const BonTripPrint = (props) => {
   );
 };
 
-export default BonTripPrint;
+export default BonTripPrintManualEntry;

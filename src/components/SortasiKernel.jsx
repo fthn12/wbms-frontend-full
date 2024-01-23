@@ -7,7 +7,7 @@ import { useForm } from "../utils/useForm";
 import { TransactionAPI } from "../apis";
 
 export const SortasiKernel = (props) => {
-  const { isReadOnly, isBgcolor } = props;
+  const { isReadOnly } = props;
   const transactionAPI = TransactionAPI();
 
   const { values, setValues } = useForm({
@@ -33,7 +33,7 @@ export const SortasiKernel = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -68,7 +68,7 @@ export const SortasiKernel = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -103,7 +103,7 @@ export const SortasiKernel = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">%</InputAdornment>,
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
@@ -119,7 +119,7 @@ export const SortasiKernel = (props) => {
           variant="outlined"
           size="small"
           fullWidth
-          sx={{ mt: 2,mb:1.5, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
@@ -128,7 +128,7 @@ export const SortasiKernel = (props) => {
           inputProps={{ readOnly: true }}
         />
       </Grid>
-    
+
       <Grid item xs={12}>
         <Divider>TOTAL POTONGAN</Divider>
       </Grid>
@@ -141,11 +141,10 @@ export const SortasiKernel = (props) => {
           sx={{ mt: 1.5 }}
           inputProps={{
             style: {
-              backgroundColor: isBgcolor ? "whitesmoke" : "",
+              backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             readOnly: isReadOnly,
           }}
-        
           onChange={handleChange}
           label="Total Potongan [KG]"
           name="TangkaiPanjang"
