@@ -20,47 +20,18 @@ import BonTripPrint from "../../../../components/BontripManualEntry";
 
 import { TransactionAPI } from "../../../../apis";
 
-import {
-  useAuth,
-  useConfig,
-  useTransaction,
-  useCompany,
-  useProduct,
-  useDriver,
-  useWeighbridge,
-  useTransportVehicle,
-  useApp,
-} from "../../../../hooks";
+import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
 
-const PksManualEntryOthersView = (props) => {
-  // const {
-  //   ProductId,
-  //   ProductName,
-  //   ProductCode,
-  //   TransporterId,
-  //   TransporterCompanyName,
-  //   TransporterCompanyCode,
-  //   PlateNo,
-  // } = props;
+const PksManualEntryOthersView = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const transactionAPI = TransactionAPI();
-  const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, SCC_MODEL } = useConfig();
-  const {
-    openedTransaction,
-    wbTransaction,
-    setOpenedTransaction,
-    clearWbTransaction,
-    setWbTransaction,
-    clearOpenedTransaction,
-  } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
@@ -69,84 +40,13 @@ const PksManualEntryOthersView = (props) => {
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const [dtTrx, setDtTrx] = useState(null);
-
-  // const { values, setValues } = useForm({
-  //   ...TransactionAPI.InitialData,
-  // });
-
-  const validationSchema = yup.object().shape({
-    // tidak bisa dari sini, karena ada pengaruh dari external form
-    // originWeighOutKg: yup.number().required("Wajib diisi.").min(WBMS.WB_MIN_WEIGHT),
-    // originSourceStorageTankId: yup.string().required("Wajib diisi."),
-    // loadedSeal1: yup.string().required("Wajib diisi."),
-    // loadedSeal2: yup.string().required("Wajib diisi."),
-  });
-
-  // const handleChange = (event) => {
-  //   const { name, value } = event.target;
-  //   setValues((preValues) => ({
-  //     ...preValues,
-  //     [name]: value,
-  //   }));
-  // };
 
   const handleClose = () => {
     clearOpenedTransaction();
 
     navigate("/wb/transactions");
   };
-
-  //   const handleFormikSubmit = async (values) => {
-  //     let tempTrans = { ...values };
-
-  //     setIsLoading(true);
-
-  //     try {
-  //       tempTrans.progressStatus = 40;
-  //       tempTrans.originWeighOutKg = wb.weight;
-  //       tempTrans.originWeighOutTimestamp = moment().toDate();
-  //       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
-  //       tempTrans.dtTransaction = moment()
-  //         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-  //         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-  //         .format();
-
-  //       const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
-
-  //       if (!response.status) throw new Error(response?.message);
-
-  //       clearWbTransaction();
-  //       setIsLoading(false);
-
-  //       toast.success(`Transaksi WB-OUT telah tersimpan.`);
-  //     } catch (error) {
-  //       return toast.error(`${error.message}.`);
-  //     }
-  //   };
-
-  //   useEffect(() => {
-  //     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
-  //     setSidebar({ selected: "Transaksi WB PKS" });
-
-  //     return () => {
-  //       // console.clear();
-  //     };
-  //   }, []);
-
-  //   //validasi form
-  //   // const validateForm = () => {
-  //   //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  //   // };
-
-  //weight wb
-  //   useEffect(() => {
-  //     setWbTransaction({ originWeighOutKg: wb.weight });
-  //   }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -187,7 +87,6 @@ const PksManualEntryOthersView = (props) => {
           // enableReinitialize
           //   onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
-          validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
@@ -226,7 +125,17 @@ const PksManualEntryOthersView = (props) => {
                       <Grid item xs={12}>
                         <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
                       </Grid>
-
+                      <Field
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        sx={{ backgroundColor: "whitesmoke", mb: 2 }}
+                        label="NO BONTRIP"
+                        name="bonTripNo"
+                        component={TextField}
+                        value={values?.bonTripNo || ""}
+                        inputProps={{ readOnly: true }}
+                      />
                       <Field
                         name="transportVehiclePlateNo"
                         component={Autocomplete}
@@ -235,13 +144,7 @@ const PksManualEntryOthersView = (props) => {
                         freeSolo
                         readOnly={true}
                         disableClearable
-                        options={dtTransport?.records || []}
-                        value={
-                          dtTransport?.records?.find((item) => item.plateNo === values?.transportVehiclePlateNo) || {
-                            plateNo: values?.transportVehiclePlateNo,
-                          }
-                        }
-                        getOptionLabel={(option) => (option ? option.plateNo : "")}
+                        options={dtTransport?.records.map((record) => record.plateNo)}
                         // onInputChange={(event, InputValue, reason) => {
                         //   if (reason !== "reset") {
                         //     setFieldValue("transportVehiclePlateNo", InputValue);
@@ -322,31 +225,13 @@ const PksManualEntryOthersView = (props) => {
                         </Grid>
                         <Grid item xs={12}>
                           <Field
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ backgroundColor: "whitesmoke", mt: 2 }}
-                            label="NO BONTRIP"
-                            name="bonTripNo"
-                            component={TextField}
-                            value={values?.bonTripNo || ""}
-                            inputProps={{ readOnly: true }}
-                          />
-
-                          <Field
                             name="driverName"
                             component={Autocomplete}
                             variant="outlined"
                             fullWidth
                             freeSolo
                             disableClearable
-                            options={dtDrivers?.records || []}
-                            value={
-                              dtDrivers?.records?.find((item) => item.name === values?.driverName) || {
-                                name: values?.driverName,
-                              }
-                            }
-                            getOptionLabel={(option) => option.name}
+                            options={dtDrivers?.records.map((record) => record.name)}
                             // onInputChange={(event, InputValue, reason) => {
                             //   if (reason !== "reset") {
                             //     setFieldValue("driverName", InputValue);
@@ -462,19 +347,30 @@ const PksManualEntryOthersView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            type="number"
+                            type="text"
                             variant="outlined"
                             component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT MASUK - IN"
-                            name="originWeighInKg"
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            label="Operator WB-IN"
+                            name="originWeighInOperatorName"
+                            value={values?.originWeighInOperatorName}
                             inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Operator WB-OUT"
+                            value={values?.originWeighOutOperatorName}
+                            name="originWeighOutOperatorName"
+                            inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -497,23 +393,6 @@ const PksManualEntryOthersView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            type="number"
-                            variant="outlined"
-                            component={TextField}
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT KELUAR - OUT"
-                            name="originWeighOutKg"
-                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
                             type="text"
                             variant="outlined"
                             component={TextField}
@@ -532,30 +411,36 @@ const PksManualEntryOthersView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            type="text"
+                            type="number"
                             variant="outlined"
                             component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Operator WB-IN"
-                            name="originWeighInOperatorName"
-                            value={values?.originWeighInOperatorName}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="BERAT MASUK - IN"
+                            name="originWeighInKg"
+                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            type="text"
+                            type="number"
                             variant="outlined"
                             component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
-                            label="Operator WB-OUT"
-                            value={values?.originWeighOutOperatorName}
-                            name="originWeighOutOperatorName"
-                            inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="BERAT KELUAR - OUT"
+                            name="originWeighOutKg"
+                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={12}>

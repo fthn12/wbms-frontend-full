@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import ReactToPrint from "react-to-print";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 
 const BonTripPrint = (props) => {
   const { dtTrans, isDisable, ...others } = props;
@@ -52,7 +51,7 @@ const BonTripPrint = (props) => {
         onClick={() => {
           setIsOpen(true);
         }}
-      ><PrintOutlinedIcon sx={{ mr: 1 }} />
+      >
         Print Bontrip
       </Button>
       <Dialog open={isOpen} fullWidth maxWidth={"md"}>

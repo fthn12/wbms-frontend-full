@@ -1,27 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControlLabel, Grid, InputAdornment, Divider, Checkbox, TextField } from "@mui/material";
-
-import { useForm } from "../utils/useForm";
-
-import { TransactionAPI } from "../apis";
+import { Grid, InputAdornment, Checkbox, TextField as TextFieldMUI } from "@mui/material";
+import { Field } from "formik";
+import { TextField } from "formik-mui";
 
 export const SortasiTBS = (props) => {
   const { isReadOnly } = props;
-  const transactionAPI = TransactionAPI();
   const [checked, setChecked] = useState([true, false]);
-
-  const { values, setValues } = useForm({
-    ...transactionAPI.InitialData,
-  });
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setValues((preValues) => ({
-      ...preValues,
-      [name]: value,
-    }));
-  };
 
   const handleChange1 = (event) => {
     setChecked([event.target.checked, event.target.checked]);
@@ -38,10 +22,10 @@ export const SortasiTBS = (props) => {
   return (
     <>
       <Grid item xs={1.1}>
-        <Checkbox size="medium" disabled={isReadOnly} />
+        <Checkbox size="medium" disabled={isReadOnly} name="unRipeChecked " />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -51,31 +35,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Buah Mentah"
-          name="Buah Mentah"
-
-          // value={values.BuahMentah}
+          name="unRipePercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
+          name="unripeKg"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // value={potBMKG}
-          inputProps={{ readOnly: true }}
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="underRipeChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -84,7 +69,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -95,31 +80,31 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Buah Lewat Matang"
-          name="BuahLewatMatang"
-          // value={values.BuahLewatMatang}
+          name="underRipePercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          // name="originWeighInKg"
-          // value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="underRipeKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="longStalkChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -128,7 +113,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -139,31 +124,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Tangkai Panjang"
-          name="TangkaiPanjang"
-          value={values?.TangkaiPanjang}
+          name="longStalkPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="longStalkKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="emptyBunchChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -172,7 +158,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -183,31 +169,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Tandan Kosong"
-          name="tandankosong"
-          value={values?.tandankosong}
+          name="emptyBunchPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="emptyBunchKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="garbageDirtChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -216,7 +203,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -227,31 +214,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Sampah"
-          name="sampah"
-          value={values?.sampah}
+          name="garbageDirtPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="garbageDirtKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="waterChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -260,7 +248,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -271,31 +259,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Air"
-          name="air"
-          value={values?.air}
+          name="waterPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="waterKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="parthenocarpyChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -304,7 +293,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -315,31 +304,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Parteno"
-          name="parteno"
-          value={values?.parteno}
+          name="parthenocarpyPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="parthenocarpyKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="looseFruitChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -348,7 +338,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -359,31 +349,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Brondolan"
-          name="brondolan"
-          value={values?.brondolan}
+          name="looseFruitPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="looseFruitKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name="mandatoryDeductionChecked"
           size="medium"
           sx={{
             mt: 1,
@@ -392,7 +383,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -402,32 +393,34 @@ export const SortasiTBS = (props) => {
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
+              color: isReadOnly ? "transparent" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Pot. Wajib Vendor"
-          name="potonganwajib"
-          value={values?.potonganwajib}
+          name="mandatoryDeductionPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="mandatoryDeductionKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
+          name=""
           size="medium"
           sx={{
             mt: 1,
@@ -436,7 +429,7 @@ export const SortasiTBS = (props) => {
         />
       </Grid>
       <Grid item xs={6.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -447,32 +440,32 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Pot. Lainnya"
-          name="potonganlainnya"
-          value={values?.potonganlainnya}
+          name="othersPercentage"
         />
       </Grid>
       <Grid item xs={4}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="othersKg"
         />
       </Grid>
       <Grid item xs={1.1}></Grid>
       <Grid item xs={10.9}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -482,17 +475,18 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: isReadOnly,
+            // readOnly: isReadOnly,
+            readOnly: true,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Total Potongan"
           name="TangkaiPanjang"
-          value={values?.TangkaiPanjang}
         />
       </Grid>
 
       <Grid item xs={1.1}>
         <Checkbox
+          name=""
           size="medium"
           sx={{
             mt: 1,

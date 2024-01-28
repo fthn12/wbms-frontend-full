@@ -1,31 +1,15 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, InputAdornment, Divider, Checkbox, TextField } from "@mui/material";
-
-import { useForm } from "../utils/useForm";
-
-import { TransactionAPI } from "../apis";
+import { Grid, InputAdornment, Divider, Checkbox, Field as FieldMUI } from "@mui/material";
+import { Field } from "formik";
+import { TextField } from "formik-mui";
 
 export const SortasiKernel = (props) => {
   const { isReadOnly } = props;
-  const transactionAPI = TransactionAPI();
-
-  const { values, setValues } = useForm({
-    ...transactionAPI.InitialData,
-  });
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setValues((preValues) => ({
-      ...preValues,
-      [name]: value,
-    }));
-  };
 
   return (
     <>
       <Grid item xs={7}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -37,29 +21,28 @@ export const SortasiKernel = (props) => {
             },
             readOnly: isReadOnly,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Moisture"
           name="Moisture"
-
-          // value={values.BuahMentah}
         />
       </Grid>
       <Grid item xs={5}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // value={potBMKG}
-          inputProps={{ readOnly: true }}
+          name="Moisture"
         />
       </Grid>
       <Grid item xs={7}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -72,29 +55,28 @@ export const SortasiKernel = (props) => {
             },
             readOnly: isReadOnly,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Dirt"
           name="BuahLewatMatang"
-          // value={values.BuahLewatMatang}
         />
       </Grid>
       <Grid item xs={5}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 2, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="originWeighInKg"
-          // value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="Moisture"
         />
       </Grid>
       <Grid item xs={7}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -107,25 +89,24 @@ export const SortasiKernel = (props) => {
             },
             readOnly: isReadOnly,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Stone"
           name="TangkaiPanjang"
-          value={values?.TangkaiPanjang}
         />
       </Grid>
       <Grid item xs={5}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
           fullWidth
+          component={TextField}
           sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
-          // name="weightNetto"
-          // value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-          inputProps={{ readOnly: true }}
+          name="Moisture"
         />
       </Grid>
 
@@ -133,7 +114,7 @@ export const SortasiKernel = (props) => {
         <Divider>TOTAL POTONGAN</Divider>
       </Grid>
       <Grid item xs={12}>
-        <TextField
+        <Field
           type="number"
           variant="outlined"
           size="small"
@@ -145,10 +126,9 @@ export const SortasiKernel = (props) => {
             },
             readOnly: isReadOnly,
           }}
-          onChange={handleChange}
+          component={TextField}
           label="Total Potongan [KG]"
           name="TangkaiPanjang"
-          value={values?.TangkaiPanjang}
         />
       </Grid>
     </>

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Box, IconButton, Typography, Paper } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/EqualizerOutlined";
-import PieChartOutlinedIcon from "@mui/icons-material/PieChartOutlined";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useConfig, useTransaction } from "../../../hooks";
 import Header from "../../../components/layout/signed/Header";
+import moment from "moment";
 
-import AreaCharts from "../../../components/areaChart";
-import PieCharts from "../../../components/pieChart";
+import BarCharts from "../../../components/BarChart";
+import TrukPending from "../../../components/TrukPending";
 
 import { useApp } from "../../../hooks";
 
@@ -19,12 +20,23 @@ const DashboardAll = () => {
   const [TBSProduct, setTBSProduct] = useState(0);
   const [OtherProduct, setOtherProduct] = useState(0);
 
+  const startOf = moment().startOf("day").toISOString();
+  const endOf = moment().endOf("day").toISOString();
+
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
       OR: [
         {
-          progressStatus: { in: [21,40,41,42] },
+          progressStatus: { in: [21, 40, 41, 42] },
+        },
+      ],
+      AND: [
+        {
+          dtTransaction: {
+            gte: startOf,
+            lte: endOf,
+          },
         },
       ],
     },
@@ -62,7 +74,7 @@ const DashboardAll = () => {
       <Box mb={3}>
         <Header title="DASHBOARD" subtitle="WBMS Dashboard" />
       </Box>
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="20px">
+      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="10px">
         <Box
           gridColumn="span 3"
           display="flex"
@@ -152,25 +164,10 @@ const DashboardAll = () => {
           <BarChartIcon sx={{ fontSize: 90, color: "#b71c1c", mr: 2 }} />
         </Box>
         <Box gridColumn="span 8" pt={3}>
-          <Paper elevation={5} sx={{ p: 3, mx: 1, borderRadius: "10px" }}>
-            <div style={{ width: "auto", height: "auto" }}>
-              <AreaCharts />
-            </div>
-          </Paper>
+          <BarCharts />
         </Box>
         <Box gridColumn="span 4" pt={3}>
-          <Paper elevation={5} sx={{ p: 3, mx: 1, borderRadius: "10px" }}>
-            <div style={{ width: "auto", height: "auto" }}>
-              <Box display="flex">
-                <PieChartOutlinedIcon sx={{ mr: 1 }} />
-                <Typography fontSize="18px" mb={2}>
-                  Sales Chart
-                </Typography>
-              </Box>
-              <hr />
-              <PieCharts />
-            </div>
-          </Paper>
+          <TrukPending />
         </Box>
       </Box>
     </div>

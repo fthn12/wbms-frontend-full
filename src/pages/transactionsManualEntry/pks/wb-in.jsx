@@ -1,28 +1,40 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, Autocomplete, Divider, Paper, TextField } from "@mui/material";
-import { useForm } from "../../../utils/useForm";
-import * as yup from "yup";
+import { Box, Button, CircularProgress, Grid, Divider, Paper, TextField as TextFieldMUI } from "@mui/material";
+import { Formik, Form, Field } from "formik";
+import { TextField, Autocomplete } from "formik-mui";
 import { toast } from "react-toastify";
-import moment from "moment";
-import numeral from "numeral";
+import * as Yup from "yup";
 import TBS from "./tbs/in";
 import OTHERS from "./others/in";
 import KERNEL from "./kernel/in";
 import Header from "../../../components/layout/signed/HeaderTransaction";
-import BonTripPrint from "../../../components/BonTripPrint";
-
+import moment from "moment";
 import { TransactionAPI } from "../../../apis";
 
-import { useConfig, useTransaction, useCompany, useWeighbridge, useProduct, useTransportVehicle } from "../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useCompany,
+  useWeighbridge,
+  useProduct,
+  useTransportVehicle,
+} from "../../../hooks";
 
 const PksManualEntryWBIn = () => {
   const navigate = useNavigate();
-
+  const initialValues = {
+    transportVehiclePlateNo: "",
+    transporterCompanyName: "",
+    productName: "",
+    driverName: "",
+  };
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
+  const { user } = useAuth();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
@@ -32,20 +44,15 @@ const PksManualEntryWBIn = () => {
   const { data: dtProduct } = useGetProductsQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
 
-  const { values, setValues } = useForm({ ...transactionAPI.InitialData });
-
-  // const handleChange = (event) => {
-  //   setValues({
-  //     ...values,
-  //     [event.target.name]: event.target.value,
-  //   });
-  // };
+  const validationSchema = Yup.object().shape({
+    transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
+    transporterCompanyName: Yup.string().required("Wajib diisi"),
+    productName: Yup.string().required("Wajib diisi"),
+    driverName: Yup.string().required("Wajib diisi"),
+  });
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -53,186 +60,357 @@ const PksManualEntryWBIn = () => {
     navigate("/wb/transactions");
   };
 
-  // useEffect(() => {
-  //   if (!openedTransaction)
-  //     // return handleClose();
+  const handleOthersSubmit = async (values) => {
+    let tempTrans = { ...values };
 
-  //     return () => {
-  //       // console.clear();
-  //     };
-  // }, []);
+    setIsLoading(true);
+    try {
+      if (tempTrans.afdeling) {
+        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+      } else if (tempTrans.kebun) {
+        tempTrans.kebun = tempTrans.kebun.toUpperCase();
+      } else if (tempTrans.blok) {
+        tempTrans.blok = tempTrans.blok.toUpperCase();
+      } else if (tempTrans.npb) {
+        tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
 
-  // useEffect(() => {
-  //   if (dataValues.originWeighInKg < WBMS.WB_MIN_WEIGHT || dataValues.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
-  //     setOriginWeighNetto(0);
-  //   } else {
-  //     let total =
-  //       Math.abs(dataValues.originWeighInKg - dataValues.originWeighOutKg) -
-  //       dataValues.potonganWajib -
-  //       dataValues.potonganLain;
-  //     setOriginWeighNetto(total);
-  //   }
-  // }, [WBMS.WB_MIN_WEIGHT, dataValues]);
+      tempTrans.originWeighInKg = wb.weight;
+      tempTrans.originWeighInTimestamp = moment().toDate();
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
 
-  // // Untuk validasi field
-  // useEffect(() => {
-  //   let cSubmit = false;
+      const response = await transactionAPI.ManualEntryPksInOthers(tempTrans);
 
-  //   if (dataValues.originWeighInKg >= WBMS.WB_MIN_WEIGHT && dataValues.originWeighOutKg >= WBMS.WB_MIN_WEIGHT)
-  //     cSubmit = true;
+      if (!response.status) throw new Error(response?.message);
 
-  //   setCanSubmit(cSubmit);
-  // }, [WBMS.WB_MIN_WEIGHT, dataValues]);
+      clearOpenedTransaction();
+      handleClose();
+      setWbTransaction({ ...response.data.transaction });
+      setIsLoading(false);
+
+      toast.success(`Transaksi WB-IN telah tersimpan.`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
+    }
+  };
+
+  const handleKernelSubmit = async (values) => {
+    let tempTrans = { ...values };
+
+    setIsLoading(true);
+    try {
+      if (tempTrans.afdeling) {
+        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+      } else if (tempTrans.kebun) {
+        tempTrans.kebun = tempTrans.kebun.toUpperCase();
+      } else if (tempTrans.blok) {
+        tempTrans.blok = tempTrans.blok.toUpperCase();
+      } else if (tempTrans.npb) {
+        tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
+
+      tempTrans.originWeighInKg = wb.weight;
+      tempTrans.originWeighInTimestamp = moment().toDate();
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+
+      const response = await transactionAPI.ManualEntryPksInKernel(tempTrans);
+
+      if (!response.status) throw new Error(response?.message);
+
+      clearOpenedTransaction();
+      handleClose();
+      setWbTransaction({ ...response.data.transaction });
+
+      setIsLoading(false);
+
+      toast.success(`Transaksi WB-IN telah tersimpan.`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
+    }
+  };
+
+  const handleTbsSubmit = async (values) => {
+    let tempTrans = { ...values };
+
+    setIsLoading(true);
+    try {
+      if (tempTrans.afdeling) {
+        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+      } else if (tempTrans.kebun) {
+        tempTrans.kebun = tempTrans.kebun.toUpperCase();
+      } else if (tempTrans.blok) {
+        tempTrans.blok = tempTrans.blok.toUpperCase();
+      } else if (tempTrans.npb) {
+        tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
+
+      tempTrans.originWeighInKg = wb.weight;
+      tempTrans.originWeighInTimestamp = moment().toDate();
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+
+      const response = await transactionAPI.ManualEntryPksInTbs(tempTrans);
+
+      if (!response.status) throw new Error(response?.message);
+
+      clearOpenedTransaction();
+      handleClose();
+      setWbTransaction({ ...response.data.transaction });
+
+      setIsLoading(false);
+
+      toast.success(`Transaksi WB-IN telah tersimpan.`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
+    }
+  };
+
+  useEffect(() => {
+    setWbTransaction({ originWeighInKg: wb.weight });
+  }, [wb.weight]);
+
+  useEffect(() => {
+    setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
+  }, []);
 
   return (
     <Box>
       <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry PKS" />
+      {wbTransaction && (
+        <Formik
+          enableReinitialize
+          onSubmit={(values) => {
+            if (selectedOption === "Others") {
+              handleOthersSubmit(values);
+            } else if (selectedOption === "Kernel") {
+              handleKernelSubmit(values);
+            } else if (selectedOption === "Tbs") {
+              handleTbsSubmit(values);
+            }
+          }}
+          initialValues={wbTransaction}
+          isInitialValid={false}
+          validationSchema={validationSchema}
+        >
+          {(props) => {
+            const { values, isValid, submitForm, setFieldValue } = props;
+            // console.log("Formik props:", props);
 
-      <Box display="flex" sx={{ mt: 3 }}>
-        <Box flex={1}></Box>
+            const handleOtrSubmit = () => {
+              submitForm();
+            };
 
-        <Button variant="contained" onClick={handleClose}>
-          TUTUP
-        </Button>
-      </Box>
-      <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={6} lg={3}>
-            <Grid item xs={12}>
-              <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
-            </Grid>
-            {/* <TextField
-              variant="outlined"
-              size="small"
-              fullWidth
-              label="Nomor Plat"
-              name="transportVehiclePlateNo"
-              value={values?.transportVehiclePlateNo}
-              onChange={handleChange}
-            /> */}
-            <Autocomplete
-              id="autocomplete"
-              freeSolo
-              options={dtTransport?.records || []}
-              getOptionLabel={(option) => option.plateNo}
-              onInputChange={(event, InputValue) => {
-                setValues({ ...values, transportVehiclePlateNo: InputValue });
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Nomor Plat"
-                  variant="outlined"
-                  size="small"
-                  inputProps={{
-                    ...params.inputProps,
-                    style: { textTransform: "uppercase" },
-                  }}
-                />
-              )}
-            />
+            const handleKrlSubmit = () => {
+              submitForm();
+            };
+            const handleTbsSubmit = () => {
+              submitForm();
+            };
 
-            <Autocomplete
-              id="select-label"
-              options={dtCompany?.records || []}
-              getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-              value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
-              onChange={(event, newValue) => {
-                setValues((prevValues) => ({
-                  ...prevValues,
-                  transporterCompanyId: newValue ? newValue.id : "",
-                  transporterCompanyName: newValue ? newValue.name : "",
-                  transporterCompanyCode: newValue ? newValue.code : "",
-                }));
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  sx={{
-                    mt: 2,
-                  }}
-                  label="Cust/Vendor transport"
-                  variant="outlined"
-                  size="small"
-                />
-              )}
-            />
-            <Autocomplete
-              id="select-label"
-              options={(dtProduct?.records || []).filter(
-                (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-              )}
-              getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-              value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
-              onChange={(event, newValue) => {
-                if (!newValue) {
-                  setSelectedOption("");
-                } else {
-                  setValues((prevValues) => ({
-                    ...prevValues,
-                    productId: newValue.id,
-                    productName: newValue.name,
-                    productCode: newValue.code,
-                  }));
+            return (
+              <Form>
+                <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  {selectedOption === "Others" && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      onClick={() => handleOtrSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === "Kernel" && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      onClick={() => handleKrlSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
 
-                  const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
-                    ? "Kernel"
-                    : (newValue?.name || "").toLowerCase().includes("tbs")
-                    ? "Tbs"
-                    : "Others";
+                  {selectedOption === "Tbs" && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      onClick={() => handleTbsSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
+                  <Button variant="contained" onClick={handleClose}>
+                    TUTUP
+                  </Button>
+                  {/* <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={() => {
+                      console.log("Form:", props);
+                    }}
+                  >
+                    DEBUG
+                  </Button> */}
+                </Box>
+                <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid item xs={12}>
+                        <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
+                      </Grid>
 
-                  setSelectedOption(filterOption);
-                }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} sx={{ mt: 2 }} label="Product" variant="outlined" size="small" />
-              )}
-            />
-          </Grid>
-          {/* TBS */}
+                      <Field
+                        name="bonTripNo"
+                        label="NO BONTRIP"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        inputProps={{ readOnly: true }}
+                      />
+                      <Field
+                        name="transportVehiclePlateNo"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        freeSolo
+                        disableClearable
+                        options={dtTransport?.records.map((record) => record.plateNo)}
+                        onInputChange={(event, InputValue, reason) => {
+                          if (reason !== "reset") {
+                            setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
+                            label="Nomor Plat"
+                            name="transportVehiclePlateNo"
+                            size="small"
+                            inputProps={{
+                              ...params.inputProps,
+                              style: { textTransform: "uppercase" },
+                            }}
+                          />
+                        )}
+                      />
 
-          {selectedOption === "Tbs" && (
-            <TBS
-              ProductId={values?.productId}
-              ProductName={values?.productName}
-              ProductCode={values?.productCode}
-              TransporterId={values?.transporterCompanyId}
-              TransporterCompanyName={values?.transporterCompanyName}
-              TransporterCompanyCode={values?.transporterCompanyCode}
-              PlateNo={values?.transportVehiclePlateNo}
-            />
-          )}
+                      <Field
+                        name="transporterCompanyName"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        options={dtCompany?.records || []}
+                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                        value={
+                          (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
+                          null
+                        }
+                        onChange={(event, newValue) => {
+                          setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+                          setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+                          setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                          setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
+                            name="transporterCompanyName"
+                            label="Cust/Vendor transport"
+                            size="small"
+                            sx={{ mt: 2 }}
+                          />
+                        )}
+                      />
 
-          {/* Others*/}
+                      <Field
+                        name="productName"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        // freeSolo
+                        // disableClearable
+                        options={(dtProduct?.records || []).filter(
+                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+                        )}
+                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                        value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
+                        onChange={(event, newValue) => {
+                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+                          setFieldValue("productName", newValue ? newValue.name : "");
+                          setFieldValue("productId", newValue ? newValue.id : "");
+                          setFieldValue("productCode", newValue ? newValue.code : "");
+                          if (!newValue) {
+                            setSelectedOption("");
+                          } else {
+                            const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
+                              ? "Kernel"
+                              : (newValue?.name || "").toLowerCase().includes("tbs")
+                              ? "Tbs"
+                              : "Others";
 
-          {selectedOption === "Others" && (
-            <OTHERS
-              ProductId={values?.productId}
-              ProductName={values?.productName}
-              ProductCode={values?.productCode}
-              TransporterId={values?.transporterCompanyId}
-              TransporterCompanyName={values?.transporterCompanyName}
-              TransporterCompanyCode={values?.transporterCompanyCode}
-              PlateNo={values?.transportVehiclePlateNo}
-            />
-          )}
+                            setSelectedOption(filterOption);
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
+                            name="productName"
+                            label="Nama Produk"
+                            size="small"
+                            sx={{ mt: 2 }}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    {/* TBS */}
 
-          {/* KERNEL*/}
+                    {selectedOption === "Tbs" && <TBS setFieldValue={setFieldValue} values={values} />}
 
-          {selectedOption === "Kernel" && (
-            <KERNEL
-              ProductId={values?.productId}
-              ProductName={values?.productName}
-              ProductCode={values?.productCode}
-              TransporterId={values?.transporterCompanyId}
-              TransporterCompanyName={values?.transporterCompanyName}
-              TransporterCompanyCode={values?.transporterCompanyCode}
-              PlateNo={values?.transportVehiclePlateNo}
-            />
-          )}
-        </Grid>
-      </Paper>
-      {isLoading && (
+                    {/* Others*/}
+
+                    {selectedOption === "Others" && <OTHERS setFieldValue={setFieldValue} values={values} />}
+
+                    {/* KERNEL*/}
+
+                    {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />}
+                  </Grid>
+                </Paper>
+                {/* {isLoading && (
+                  <CircularProgress
+                    size={50}
+                    sx={{
+                      color: "goldenrod",
+                      position: "absolute",
+                      top: "50%",
+                      left: "48.5%",
+                    }}
+                  />
+                )} */}
+              </Form>
+            );
+          }}
+        </Formik>
+      )}
+      {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{
@@ -240,6 +418,7 @@ const PksManualEntryWBIn = () => {
             position: "absolute",
             top: "50%",
             left: "48.5%",
+            zIndex: 999,
           }}
         />
       )}

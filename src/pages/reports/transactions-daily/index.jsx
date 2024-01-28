@@ -41,7 +41,7 @@ const ReportTransactionDaily = () => {
       typeSite: +WBMS.SITE_TYPE,
       progressStatus: { in: [21, 26, 31, 100, 40,41,42] },
     },
-    orderBy: { bonTripNo: "desc" },
+    orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
 
   const { data: dtTransaction, refetch: refetchDtTransaction } = useFindManyTransactionQuery(data);
@@ -69,8 +69,22 @@ const ReportTransactionDaily = () => {
           urlPath = "/wb/transactions/pks-edispatch-reject-bulking-in";
         } else if (progressStatus === 11) {
           urlPath = "/wb/transactions/pks-edispatch-reject-t300-in";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
+        } else if (progressStatus === 35) {
+          urlPath = "/wb/transactions/pks/manual-entry-others-out";
+        } else if (progressStatus === 36) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
+        } else if (progressStatus === 40) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
+        } else if (progressStatus === 41) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }

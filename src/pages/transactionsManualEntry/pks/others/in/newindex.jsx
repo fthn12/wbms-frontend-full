@@ -1,44 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Grid,
-  InputAdornment,
-  Divider,
-  Paper,
-  TextField as TextFieldMUI,
-} from "@mui/material";
+import { Autocomplete, Button, CircularProgress, Grid, InputAdornment, Divider, Paper, TextField } from "@mui/material";
 import * as yup from "yup";
-import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-mui";
 import { toast } from "react-toastify";
 import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
 import BonTripPrint from "../../../../../components/BonTripPrint";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useTransportVehicle, useWeighbridge, useApp } from "../../../../../hooks";
-
-const validationSchema = yup.object().shape({
-  // username: yup.string().required("Wajib diisi."),
-  // password: yup
-  //   .string()
-  //   .min(8, "Panjang password minimal 8 karakter dan maksimal 20 karakter.")
-  //   .max(20, "Panjang password minimal 8 karakter dan maksimal 20 karakter.")
-  //   .required("Wajib diisi."),
-  // passwordConfirm: yup.string().oneOf([yup.ref("password"), null], "Password harus sama."),
-  // email: yup.string().email("Email tidak valid.").required("Wajib diisi."),
-  // npk: yup.string().required("Wajib diisi."),
-  // nik: yup.string().required("Wajib diisi."),
-  // name: yup.string().required("Wajib diisi."),
-  // division: yup.string().required("Wajib diisi."),
-  // position: yup.string().required("Wajib diisi."),
-  // role: yup.number().required("Wajib diisi."),
-});
+import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
 const PksManualEntryOthersIn = (props) => {
   const {
@@ -57,11 +28,12 @@ const PksManualEntryOthersIn = (props) => {
   const { WBMS, SCC_MODEL } = useConfig();
   const { openedTransaction, wbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { useGetDriversQuery } = useDriver();
   const { setSidebar } = useApp();
+
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
-  const { data: dtTransportVehicles } = useGetTransportVehiclesQuery();
+  const { data: dtDrivers } = useGetDriversQuery();
 
   const [canSubmit, setCanSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +42,7 @@ const PksManualEntryOthersIn = (props) => {
   const [dtTrx, setDtTrx] = useState(null);
 
   const { values, setValues } = useForm({
-    ...TransactionAPI.InitialData,
+    ...transactionAPI.InitialData,
   });
 
   const handleChange = (event) => {
@@ -88,35 +60,37 @@ const PksManualEntryOthersIn = (props) => {
   };
 
   const handleSubmit = async () => {
-    let tempTrans = { ...values };
-
     try {
-      // tempTrans.originWeighInTimestamp = SemaiUtils.GetDateStr();
-      // tempTrans.progressStatus = 1;
-      // tempTrans.typeTransaction = 2;
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.transportVehicleId = ProductId;
-      tempTrans.transportVehicleProductName = ProductName;
-      tempTrans.transportVehicleProductCode = ProductCode;
-      tempTrans.transporterCompanyId = TransporterId;
-      tempTrans.transporterCompanyName = TransporterCompanyName;
-      tempTrans.transporterCompanyCode = TransporterCompanyCode;
-      tempTrans.transportVehiclePlateNo = PlateNo.toUpperCase();
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
+      values.originWeighInKg = wb.weight;
+      // values.transportVehicleId = ProductId;
+      // values.transportVehicleProductName = ProductName;
+      // values.transportVehicleProductCode = ProductCode;
+      values.transportVehicleId = ProductId;
+      values.transportVehicleProductName = ProductName;
+      values.transportVehicleProductCode = ProductCode;
+      values.productId = ProductId;
+      values.productName = ProductName;
+      values.productCode = ProductCode;
+      values.transporterCompanyId = TransporterId;
+      values.transporterCompanyName = TransporterCompanyName;
+      values.transporterCompanyCode = TransporterCompanyCode;
+      values.transportVehiclePlateNo = PlateNo.toUpperCase();
+      values.originWeighInTimestamp = moment().toDate();
+      values.originWeighInOperatorName = user.name.toUpperCase();
+      values.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { tempTrans };
+      const data = { ...values };
 
-      const response = await transactionAPI.create(data);
+      const response = await transactionAPI.ManualEntryPksInOthers(data);
 
       if (!response.status) throw new Error(response?.message);
 
       // setWbTransaction(response.data.transaction);
       clearOpenedTransaction();
+      handleClose();
       setValues({ ...response.data.transaction });
       setIsSubmitted(true);
 
@@ -135,6 +109,11 @@ const PksManualEntryOthersIn = (props) => {
     };
   }, []);
 
+  //validasi form
+  const validateForm = () => {
+    return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
+  };
+
   //weight wb
   useEffect(() => {
     setWbTransaction({ originWeighInKg: wb.weight });
@@ -151,18 +130,10 @@ const PksManualEntryOthersIn = (props) => {
   //   };
   // }, []);
 
-  // useEffect(() => {
-  //   setValues({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
-  //   // setValues(openedTransaction);
-  //   // console.log(openedTransaction, "hai");
-  // }, []);
-  // useEffect(() => {
-  //   if (!openedTransaction) console.log(!openedTransaction, "hai");
+  useEffect(() => {
+    setValues({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
+  }, []);
 
-  //   return () => {
-  //     // console.clear();
-  //   };
-  // }, []);
   useEffect(() => {
     if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
       setOriginWeighNetto(0);
@@ -173,26 +144,71 @@ const PksManualEntryOthersIn = (props) => {
   }, [wbTransaction]);
 
   return (
-    <Box>
+    <>
       <Grid item xs={12} sm={6} lg={3}>
         <Grid container columnSpacing={1}>
           <Grid item xs={12}>
             <Divider>DATA SUPIR & MUATAN</Divider>
           </Grid>
           <Grid item xs={12}>
-            <Field
-              name="bonTripNo"
-              label="NO BONTRIP"
-              type="text"
-              required={true}
-              component={TextField}
+            {/* <TextField
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              inputProps={{ readOnly: true }}
+              sx={{ backgroundColor: "whitesmoke", mt: 2 }}
+              label="NO BONTRIP"
+              name="bonTripNo"
+              value={values?.bonTripNo}
+              inputProps={{ readOnly: true }} 
+            />*/}
+            {/* <TextField
+              name="driverName"
+              label="Nama Supir"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              onChange={handleChange}
+              value={values?.driverName}
+              sx={{ mt: 2 }}
+            /> */}
+            <Autocomplete
+              id="autocomplete"
+              freeSolo
+              options={dtDrivers?.records || []}
+              getOptionLabel={(option) => option.name}
+              onInputChange={(event, inputValue) => {
+                setValues({ ...values, driverName: inputValue.toUpperCase() });
+              }}
+              sx={{ mt: 2 }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Nama Supir"
+                  variant="outlined"
+                  size="small"
+                  inputProps={{
+                    ...params.inputProps,
+                    style: { textTransform: "uppercase" },
+                  }}
+                />
+              )}
             />
-            <Field
+            <TextField
+              name="afdeling"
+              label="Afdeling"
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              onChange={handleChange}
+              value={values?.afdeling}
+              sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
+            />
+            <TextField
               name="kebun"
               label="Kebun"
               type="text"
@@ -200,94 +216,76 @@ const PksManualEntryOthersIn = (props) => {
               size="small"
               fullWidth
               value={values?.kebun}
-              required={true}
-              component={TextField}
+              onChange={handleChange}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
-            <Field
-              name="afdeling"
-              label="Afdeling"
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              required={true}
-              component={TextField}
-              value={values?.afdeling}
-              sx={{ mt: 2 }}
-            />
-            <Field
+            <TextField
               name="blok"
               label="Blok"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
-              required={true}
-              component={TextField}
+              onChange={handleChange}
               value={values?.blok}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
-            <Field
+            <TextField
               name="janjang"
               label="Janjang/Sak"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
-              required={true}
-              component={TextField}
+              onChange={handleChange}
               value={values?.janjang}
               sx={{ mt: 2 }}
             />
-            <Field
-              name="driverName"
-              label="Nama Supir"
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              required={true}
-              component={TextField}
-              value={values?.driverName}
-              sx={{ mt: 2 }}
-            />
-            <Field
+            <TextField
               name="npb"
               label="NPB/BE"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
-              required={true}
-              component={TextField}
+              onChange={handleChange}
               value={values?.npb}
               sx={{ mt: 2 }}
+              inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             />
-            <Field
+            <TextField
               name="tahun"
               label="Tahun"
-              type="text"
+              type="number"
               variant="outlined"
               size="small"
               fullWidth
-              required={true}
-              component={TextField}
+              onChange={handleChange}
               value={values?.tahun}
               sx={{ mt: 2 }}
             />
             {/* 
-            <Field
+            <TextField
               name="sptbs"
               label="SPTBS"
               type="text"
               variant="outlined"
               size="small"
               fullWidth
-                required={true}
-                  component={TextField}
+              onChange={handleChange}
               value={values?.sptbs}
               sx={{ mt: 2 }}
+               inputProps={{
+                style: { textTransform: "uppercase" },
+              }}
             /> */}
           </Grid>
         </Grid>
@@ -298,9 +296,8 @@ const PksManualEntryOthersIn = (props) => {
             <Divider>DATA TIMBANG KENDARAAN</Divider>
           </Grid>
           <Grid item xs={6}>
-            <Field
+            <TextField
               type="number"
-              component={TextField}
               variant="outlined"
               size="small"
               fullWidth
@@ -315,23 +312,8 @@ const PksManualEntryOthersIn = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Field
-              type="text"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              value={dtTrx || "-"}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Field
+            <TextField
               type="number"
-              component={TextField}
               variant="outlined"
               size="small"
               fullWidth
@@ -346,9 +328,21 @@ const PksManualEntryOthersIn = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Field
+            <TextField
               type="text"
-              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={dtTrx || "-"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              type="text"
               variant="outlined"
               size="small"
               fullWidth
@@ -364,9 +358,8 @@ const PksManualEntryOthersIn = (props) => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Field
+            <TextField
               type="text"
-              component={TextField}
               variant="outlined"
               size="small"
               fullWidth
@@ -374,30 +367,28 @@ const PksManualEntryOthersIn = (props) => {
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
-              inputProps={{ readOnly: true }}
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
           <Grid item xs={6}>
-            <Field
+            <TextField
               type="text"
-              component={TextField}
               variant="outlined"
               size="small"
               fullWidth
               sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
               label="Operator WB-OUT"
               name="originWeighOutOperatorName"
-              value="-"
               inputProps={{ readOnly: true }}
+              value="-"
             />
           </Grid>
           <Grid item xs={12}>
             <Divider>TOTAL</Divider>
           </Grid>
           <Grid item xs={12}>
-            <Field
+            <TextField
               type="number"
-              component={TextField}
               variant="outlined"
               size="small"
               fullWidth
@@ -411,24 +402,22 @@ const PksManualEntryOthersIn = (props) => {
               inputProps={{ readOnly: true }}
             />
           </Grid>
-
           <Grid item xs={6}>
             <Button
               variant="contained"
               fullWidth
               sx={{
                 mt: 2,
-                display: false ? "none" : "",
               }}
               hide={true}
               onClick={handleSubmit}
-              disabled={!(wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+              disabled={!(validateForm() && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
             >
               Simpan
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} />
+            <BonTripPrint dtTrans={{ ...values }} disabled={true} />
           </Grid>
         </Grid>
       </Grid>
@@ -443,7 +432,7 @@ const PksManualEntryOthersIn = (props) => {
           }}
         />
       )}
-      {!wbTransaction && (
+      {/* {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{
@@ -454,8 +443,8 @@ const PksManualEntryOthersIn = (props) => {
             zIndex: 999,
           }}
         />
-      )}
-    </Box>
+      )} */}
+    </>
   );
 };
 

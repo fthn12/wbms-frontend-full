@@ -12,12 +12,11 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
-import * as yup from "yup";
+import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
 import Header from "../../../../../components/layout/signed/HeaderTransaction";
-import BonTripPrint from "../../../../../components/BonTripPrint";
+import SortasiTBS from "../../../../../components/SortasiTBS";
 import SortasiKernel from "../../../../../components/SortasiKernel";
 
 import { TransactionAPI } from "../../../../../apis";
@@ -34,7 +33,7 @@ import {
   useApp,
 } from "../../../../../hooks";
 
-const PksManualEntryOthersOut = () => {
+const PksManualEntryKernelOut = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -49,15 +48,22 @@ const PksManualEntryOthersOut = () => {
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
 
-  const [originWeighNetto, setOriginWeighNetto] = useState(0);
-
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
+  const [selectedOption, setSelectedOption] = useState("");
+  const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [dtTrx, setDtTrx] = useState(null);
+
+  const validationSchema = Yup.object().shape({
+    transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
+    transporterCompanyName: Yup.string().required("Wajib diisi"),
+    productName: Yup.string().required("Wajib diisi"),
+    driverName: Yup.string().required("Wajib diisi"),
+  });
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -71,7 +77,29 @@ const PksManualEntryOthersOut = () => {
     setIsLoading(true);
 
     try {
-      tempTrans.progressStatus = 42;
+      if (tempTrans.sptbs) {
+        tempTrans.sptbs = parseInt(tempTrans.sptbs);
+      }
+
+      if (tempTrans.afdeling) {
+        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+      } else if (tempTrans.kebun) {
+        tempTrans.kebun = tempTrans.kebun.toUpperCase();
+      } else if (tempTrans.blok) {
+        tempTrans.blok = tempTrans.blok.toUpperCase();
+      } else if (tempTrans.npb) {
+        tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
+
+      if (selectedOption === "Others") {
+        tempTrans.progressStatus = 40;
+      } else if (selectedOption === "Tbs") {
+        tempTrans.progressStatus = 41;
+      } else if (selectedOption === "Kernel") {
+        tempTrans.progressStatus = 42;
+      }
+
+      // tempTrans.progressStatus = 42;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -90,7 +118,13 @@ const PksManualEntryOthersOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
+      if (selectedOption === "Others") {
+        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
+      } else if (selectedOption === "Kernel") {
+        navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
+      } else if (selectedOption === "Tbs") {
+        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
+      }
 
       return;
     } catch (error) {
@@ -127,6 +161,14 @@ const PksManualEntryOthersOut = () => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
+        const productName = res.data.transaction.productName.toLowerCase();
+        if (productName.includes("tbs")) {
+          setSelectedOption("Tbs");
+        } else if (productName.includes("kernel")) {
+          setSelectedOption("Kernel");
+        } else {
+          setSelectedOption("Others");
+        }
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -159,7 +201,7 @@ const PksManualEntryOthersOut = () => {
           // enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
-          // validationSchema={validationSchema}
+          validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
@@ -197,7 +239,16 @@ const PksManualEntryOthersOut = () => {
                       <Grid item xs={12}>
                         <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
                       </Grid>
-
+                      <Field
+                        variant="outlined"
+                        size="small"
+                        fullWidth
+                        sx={{ backgroundColor: "whitesmoke", mb: 2 }}
+                        label="NO BONTRIP"
+                        name="bonTripNo"
+                        component={TextField}
+                        inputProps={{ readOnly: true }}
+                      />
                       <Field
                         name="transportVehiclePlateNo"
                         component={Autocomplete}
@@ -205,20 +256,23 @@ const PksManualEntryOthersOut = () => {
                         fullWidth
                         freeSolo
                         disableClearable
-                        options={dtTransport?.records || []}
-                        value={
-                          dtTransport?.records?.find((item) => item.plateNo === values?.transportVehiclePlateNo) || {
-                            plateNo: values?.transportVehiclePlateNo,
-                          }
-                        }
-                        getOptionLabel={(option) => (option ? option.plateNo : "")}
+                        options={dtTransport?.records.map((record) => record.plateNo)}
                         onInputChange={(event, InputValue, reason) => {
                           if (reason !== "reset") {
-                            setFieldValue("transportVehiclePlateNo", InputValue);
+                            setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
                           }
                         }}
                         renderInput={(params) => (
-                          <TextFieldMUI {...params} label="Nomor Plat" name="transportVehiclePlateNo" size="small" />
+                          <TextFieldMUI
+                            {...params}
+                            label="Nomor Plat"
+                            name="transportVehiclePlateNo"
+                            size="small"
+                            inputProps={{
+                              ...params.inputProps,
+                              style: { textTransform: "uppercase" },
+                            }}
+                          />
                         )}
                       />
 
@@ -234,6 +288,7 @@ const PksManualEntryOthersOut = () => {
                           setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
                           setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
                           setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                          setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
                         }}
                         renderInput={(params) => (
                           <TextFieldMUI
@@ -246,7 +301,7 @@ const PksManualEntryOthersOut = () => {
                         )}
                       />
 
-                      <Field
+                      {/* <Field
                         name="productName"
                         component={Autocomplete}
                         variant="outlined"
@@ -275,6 +330,47 @@ const PksManualEntryOthersOut = () => {
                             sx={{ mt: 2 }}
                           />
                         )}
+                      /> */}
+                      <Field
+                        name="productName"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        // freeSolo
+                        // disableClearable
+                        options={(dtProduct?.records || []).filter(
+                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+                        )}
+                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                        value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
+                        onChange={(event, newValue) => {
+                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+                          setFieldValue("productName", newValue ? newValue.name : "");
+                          setFieldValue("productId", newValue ? newValue.id : "");
+                          setFieldValue("productCode", newValue ? newValue.code : "");
+                          if (!newValue) {
+                            setSelectedOption("Kernel");
+                          } else {
+                            const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
+                              ? "Kernel"
+                              : (newValue?.name || "").toLowerCase().includes("tbs")
+                              ? "Tbs"
+                              : "Others";
+
+                            setSelectedOption(filterOption);
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
+                            name="productName"
+                            label="Nama Produk"
+                            size="small"
+                            sx={{ mt: 2 }}
+                          />
+                        )}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6} lg={3}>
@@ -284,34 +380,16 @@ const PksManualEntryOthersOut = () => {
                         </Grid>
                         <Grid item xs={12}>
                           <Field
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ backgroundColor: "whitesmoke", mt: 2 }}
-                            label="NO BONTRIP"
-                            name="bonTripNo"
-                            component={TextField}
-                            value={values?.bonTripNo || ""}
-                            inputProps={{ readOnly: true }}
-                          />
-
-                          <Field
                             name="driverName"
                             component={Autocomplete}
                             variant="outlined"
                             fullWidth
                             freeSolo
                             disableClearable
-                            options={dtDrivers?.records || []}
-                            value={
-                              dtDrivers?.records?.find((item) => item.name === values?.driverName) || {
-                                name: values?.driverName,
-                              }
-                            }
-                            getOptionLabel={(option) => option.name}
+                            options={dtDrivers?.records.map((record) => record.name)}
                             onInputChange={(event, InputValue, reason) => {
                               if (reason !== "reset") {
-                                setFieldValue("driverName", InputValue);
+                                setFieldValue("driverName", InputValue.toUpperCase());
                               }
                             }}
                             renderInput={(params) => (
@@ -321,6 +399,10 @@ const PksManualEntryOthersOut = () => {
                                 size="small"
                                 label="Nama Supir"
                                 sx={{ mt: 2 }}
+                                inputProps={{
+                                  ...params.inputProps,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             )}
                           />
@@ -401,105 +483,53 @@ const PksManualEntryOthersOut = () => {
                             component={TextField}
                             fullWidth
                             value={values?.tahun}
-                            sx={{ mt: 2 }}
+                            sx={{ mt: 2, mb: 2.5 }}
                           />
-                          {/* 
-            <Field
-              name="sptbs"
-              label="SPTBS"
-              type="text"
-              variant="outlined"
-              size="small"
-              component={TextField}
-              fullWidth
-              
-              value={values?.sptbs}
-              sx={{ mt: 2 }}
-               inputProps={{
-                style: { textTransform: "uppercase" },
-              }}
-            /> */}
+                          {selectedOption === "Tbs" && (
+                            <>
+                              <Grid item xs={12}>
+                                <Divider>SPTBS</Divider>
+                              </Grid>
+                              <Field
+                                name="sptbs"
+                                label="SPTBS"
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.sptbs}
+                                sx={{ mt: 2.5 }}
+                              />
+                            </>
+                          )}
                         </Grid>
                       </Grid>
                     </Grid>
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
-                          <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+                    {selectedOption === "Kernel" && (
+                      <Grid item xs={12} sm={6} lg={3}>
+                        <Grid container columnSpacing={1}>
+                          <Grid item xs={12}>
+                            <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+                          </Grid>
+                          <SortasiKernel isReadOnly={false} />
                         </Grid>
-                        <SortasiKernel isReadOnly={false} />
                       </Grid>
-                    </Grid>
+                    )}
+                    {selectedOption === "Tbs" && (
+                      <Grid item xs={12} sm={6} lg={3}>
+                        <Grid container columnSpacing={1}>
+                          <Grid item xs={12}>
+                            <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
+                          </Grid>
+                          <SortasiTBS isReadOnly={false} isBgcolor={true} />
+                        </Grid>
+                      </Grid>
+                    )}
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
                           <Divider>DATA TIMBANG KENDARAAN</Divider>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT MASUK - IN"
-                            name="originWeighInKg"
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-IN"
-                            name="originWeighInTimestamp"
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                                : "-"
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT KELUAR - OUT"
-                            name="originWeighOutKg"
-                            value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-Out"
-                            name="originWeighOutTimestamp"
-                            inputProps={{ readOnly: true }}
-                            value={dtTrx || "-"}
-                          />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -522,64 +552,204 @@ const PksManualEntryOthersOut = () => {
                             size="small"
                             fullWidth
                             component={TextField}
-                            sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             label="Operator WB-OUT"
                             value={user.name}
                             name="originWeighOutOperatorName"
                             inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
                           />
                         </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-IN"
+                            name="originWeighInTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.originWeighInTimestamp
+                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-Out"
+                            name="originWeighOutTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={dtTrx || "-"}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="BERAT MASUK - IN"
+                            name="originWeighInKg"
+                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="BERAT KELUAR - OUT"
+                            name="originWeighOutKg"
+                            value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
                         <Grid item xs={12}>
                           <Divider>TOTAL</Divider>
                         </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="TOTAL SEBELUM"
-                            name="weightNetto"
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="POTONGAN"
-                            name="weightNetto"
-                            value={0}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="TOTAL SESUDAH"
-                            name="weightNetto"
-                            value={0}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
+                        {selectedOption === "Others" && (
+                          <Grid item xs={12}>
+                            <Field
+                              type="number"
+                              variant="outlined"
+                              component={TextField}
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
+                              InputProps={{
+                                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              }}
+                              label="TOTAL"
+                              name="weightNetto"
+                              value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            />
+                          </Grid>
+                        )}
+                        {selectedOption === "Kernel" && (
+                          <>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="TOTAL SEBELUM"
+                                name="weightNetto"
+                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label="POTONGAN"
+                                name="weightNetto"
+                                value={0}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="TOTAL SESUDAH"
+                                name="weightNetto"
+                                value={0}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                          </>
+                        )}
+                        {selectedOption === "Tbs" && (
+                          <>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="TOTAL SEBELUM"
+                                name="weightNetto"
+                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label={<span style={{ color: "red" }}>POTONGAN</span>}
+                                name="weightNetto"
+                                value={0}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="TOTAL SESUDAH"
+                                name="weightNetto"
+                                value={0}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                          </>
+                        )}
                       </Grid>
                     </Grid>
                   </Grid>
@@ -617,4 +787,4 @@ const PksManualEntryOthersOut = () => {
   );
 };
 
-export default PksManualEntryOthersOut;
+export default PksManualEntryKernelOut;
