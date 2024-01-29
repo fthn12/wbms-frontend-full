@@ -67,19 +67,19 @@ const TransactionPending = () => {
           </Box>
           <hr />
 
-          <Grid container spacing={2}>
+          <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={3}>
-              <span style={{ color: "#0B63F6", fontWeight: "bold" }}> CPO : {CPOlength}</span>
+              <span style={{ color: "#283593", fontWeight: "bold" }}> CPO : {CPOlength}</span>
             </Grid>
 
             <Grid item xs={3}>
-              <span style={{ color: "#33cc33", fontWeight: "bold" }}> PKO : {PKOLength}</span>
+              <span style={{ color: "#2e7d32", fontWeight: "bold" }}> PKO : {PKOLength}</span>
             </Grid>
             <Grid item xs={3}>
-              <span style={{ color: "#ffc107", fontWeight: "bold" }}> TBS : {TBSLength}</span>
+              <span style={{ color: "#ff8f00", fontWeight: "bold" }}> TBS : {TBSLength}</span>
             </Grid>
             <Grid item xs={3}>
-              <span style={{ color: "#f44336", fontWeight: "bold" }}>OTHERS : {OtherLength}</span>
+              <span style={{ color: "#b71c1c", fontWeight: "bold" }}>OTHERS : {OtherLength}</span>
             </Grid>
 
             <Grid item xs={3}>

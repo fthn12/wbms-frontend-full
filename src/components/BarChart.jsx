@@ -98,7 +98,7 @@ const BarChartComponent = () => {
           <Box display="flex">
             <BarChartIcon sx={{ mr: 1, fontSize: 30 }} />
             <Typography variant="h4" fontWeight="bold" mt="5px">
-            Total Transaksi Pertahun
+            Total Transaksi Perbulan
             </Typography>
           </Box>
           <FormControl
