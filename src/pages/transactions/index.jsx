@@ -58,40 +58,31 @@ const TransactionPks = () => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        {WBMS.SITE_TYPE === 1 && (
-          <>
-            <Button
-              variant="contained"
-              sx={{ mr: 0.5 }}
-              onClick={() => {
-                // const newTransaction = {
-                //   ...transactionAPI.InitialData,
-                //   bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,
-                // };
+        <Button
+          variant="contained"
+          sx={{ mr: 0.5 }}
+          onClick={() => {
+            // navigate("/wb/transactions/pks/manual-entry-in");
+            if (WBMS.SITE_TYPE === 1) {
+              navigate(`/wb/transactions/pks/manual-entry-in`);
+            } else if (WBMS.SITE_TYPE === 2) {
+              navigate(`/wb/transactions/t30/manual-entry-in`);
+            } else if (WBMS.SITE_TYPE === 3) {
+              navigate(`/wb/transactions/bulking/manual-entry-in`);
+            }
+          }}
+        >
+          Buat Baru
+        </Button>
 
-                // setOpenedTransaction(newTransaction);
-                navigate("/wb/transactions/pks/manualentry-in");
-              }}
-            >
-              Buat Baru
-            </Button>
-            <Button
-              variant="contained"
-              k
-              onClick={() => {
-                const newTransaction = {
-                  ...TransactionAPI.InitialData,
-                  bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment().format("YYMMDDHHmmss")}`,
-                };
-
-                setOpenedTransaction(newTransaction);
-                navigate("/wb/pks/new");
-              }}
-            >
-              Form
-            </Button>
-          </>
-        )}
+        <Button
+          variant="contained"
+          onClick={() => {
+            navigate("/wb/transactions/pks-new-backdate");
+          }}
+        >
+          Form
+        </Button>
       </Box>
 
       <Paper sx={{ mt: 1, p: 2, minHeight: "75vh" }}>

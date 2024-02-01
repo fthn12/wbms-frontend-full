@@ -130,12 +130,6 @@ export const TransactionAPI = () => {
     return response;
   };
 
-  const ManualEntryPksOutOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-pks-out-others`, data).then((res) => res.data);
-
-    return response;
-  };
-
   const ManualEntryPksInKernel = async (data) => {
     const response = await axios.post(`${endpoint}/manual-entry-pks-in-kernel`, data).then((res) => res.data);
 
@@ -148,6 +142,24 @@ export const TransactionAPI = () => {
     return response;
   };
 
+  const ManualEntryT30InOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-t30-in-others`, data).then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBulkingInOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-bulking-in-others`, data).then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDate = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-backdate`, data).then((res) => res.data);
+
+    return response;
+  };
+
   return {
     getById,
     GetByPlateNo,
@@ -155,12 +167,15 @@ export const TransactionAPI = () => {
     findMany,
     updateById,
 
+    ManualEntryBackDate,
+
     ManualEntryPksInOthers,
-    ManualEntryPksOutOthers,
-
     ManualEntryPksInKernel,
-
     ManualEntryPksInTbs,
+
+    ManualEntryT30InOthers,
+
+    ManualEntryBulkingInOthers,
 
     eDispatchFindOrCreateByQrcode,
 

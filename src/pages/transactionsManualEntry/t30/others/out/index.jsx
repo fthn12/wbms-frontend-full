@@ -33,7 +33,7 @@ import {
   useApp,
 } from "../../../../../hooks";
 
-const PksManualEntryKernelOut = () => {
+const PksManualEntryOthersOut = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -53,7 +53,6 @@ const PksManualEntryKernelOut = () => {
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [selectedOption, setSelectedOption] = useState("");
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [dtTrx, setDtTrx] = useState(null);
@@ -77,10 +76,6 @@ const PksManualEntryKernelOut = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.sptbs) {
-        tempTrans.sptbs = parseInt(tempTrans.sptbs);
-      }
-
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
       } else if (tempTrans.kebun) {
@@ -91,15 +86,7 @@ const PksManualEntryKernelOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      if (selectedOption === "Others") {
-        tempTrans.progressStatus = 40;
-      } else if (selectedOption === "Tbs") {
-        tempTrans.progressStatus = 41;
-      } else if (selectedOption === "Kernel") {
-        tempTrans.progressStatus = 42;
-      }
-
-      // tempTrans.progressStatus = 42;
+      tempTrans.progressStatus = 40;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -118,13 +105,7 @@ const PksManualEntryKernelOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      if (selectedOption === "Others") {
-        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
-      } else if (selectedOption === "Kernel") {
-        navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
-      } else if (selectedOption === "Tbs") {
-        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
-      }
+      navigate(`/wb/transactions/t30/manual-entry-other-view/${id}`);
 
       return;
     } catch (error) {
@@ -161,14 +142,6 @@ const PksManualEntryKernelOut = () => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
-        const productName = res.data.transaction.productName.toLowerCase();
-        if (productName.includes("tbs")) {
-          setSelectedOption("Tbs");
-        } else if (productName.includes("kernel")) {
-          setSelectedOption("Kernel");
-        } else {
-          setSelectedOption("Others");
-        }
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -195,7 +168,7 @@ const PksManualEntryKernelOut = () => {
 
   return (
     <Box>
-      <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -301,7 +274,7 @@ const PksManualEntryKernelOut = () => {
                         )}
                       />
 
-                      {/* <Field
+                      <Field
                         name="productName"
                         component={Autocomplete}
                         variant="outlined"
@@ -320,47 +293,6 @@ const PksManualEntryKernelOut = () => {
                           setFieldValue("productName", newValue ? newValue.name : "");
                           setFieldValue("productId", newValue ? newValue.id : "");
                           setFieldValue("productCode", newValue ? newValue.code : "");
-                        }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
-                            name="productName"
-                            label="Nama Produk"
-                            size="small"
-                            sx={{ mt: 2 }}
-                          />
-                        )}
-                      /> */}
-                      <Field
-                        name="productName"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        // freeSolo
-                        // disableClearable
-                        options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-                        )}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
-                        onChange={(event, newValue) => {
-                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
-                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                          setFieldValue("productName", newValue ? newValue.name : "");
-                          setFieldValue("productId", newValue ? newValue.id : "");
-                          setFieldValue("productCode", newValue ? newValue.code : "");
-                          if (!newValue) {
-                            setSelectedOption("Kernel");
-                          } else {
-                            const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
-                              ? "Kernel"
-                              : (newValue?.name || "").toLowerCase().includes("tbs")
-                              ? "Tbs"
-                              : "Others";
-
-                            setSelectedOption(filterOption);
-                          }
                         }}
                         renderInput={(params) => (
                           <TextFieldMUI
@@ -483,49 +415,12 @@ const PksManualEntryKernelOut = () => {
                             component={TextField}
                             fullWidth
                             value={values?.tahun}
-                            sx={{ mt: 2, mb: 2.5 }}
+                            sx={{ mt: 2 }}
                           />
-                          {selectedOption === "Tbs" && (
-                            <>
-                              <Grid item xs={12}>
-                                <Divider>SPTBS</Divider>
-                              </Grid>
-                              <Field
-                                name="sptbs"
-                                label="SPTBS"
-                                type="text"
-                                variant="outlined"
-                                size="small"
-                                component={TextField}
-                                fullWidth
-                                value={values?.sptbs}
-                                sx={{ mt: 2.5 }}
-                              />
-                            </>
-                          )}
                         </Grid>
                       </Grid>
                     </Grid>
-                    {selectedOption === "Kernel" && (
-                      <Grid item xs={12} sm={6} lg={3}>
-                        <Grid container columnSpacing={1}>
-                          <Grid item xs={12}>
-                            <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
-                          </Grid>
-                          <SortasiKernel isReadOnly={false} />
-                        </Grid>
-                      </Grid>
-                    )}
-                    {selectedOption === "Tbs" && (
-                      <Grid item xs={12} sm={6} lg={3}>
-                        <Grid container columnSpacing={1}>
-                          <Grid item xs={12}>
-                            <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
-                          </Grid>
-                          <SortasiTBS isReadOnly={false} isBgcolor={true} />
-                        </Grid>
-                      </Grid>
-                    )}
+
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
@@ -615,7 +510,7 @@ const PksManualEntryKernelOut = () => {
                             size="small"
                             fullWidth
                             component={TextField}
-                            sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
                             InputProps={{
                               endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                             }}
@@ -628,128 +523,23 @@ const PksManualEntryKernelOut = () => {
                         <Grid item xs={12}>
                           <Divider>TOTAL</Divider>
                         </Grid>
-                        {selectedOption === "Others" && (
-                          <Grid item xs={12}>
-                            <Field
-                              type="number"
-                              variant="outlined"
-                              component={TextField}
-                              size="small"
-                              fullWidth
-                              sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
-                              InputProps={{
-                                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                              }}
-                              label="TOTAL"
-                              name="weightNetto"
-                              value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                            />
-                          </Grid>
-                        )}
-                        {selectedOption === "Kernel" && (
-                          <>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                }}
-                                label="TOTAL SEBELUM"
-                                name="weightNetto"
-                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                label="POTONGAN"
-                                name="weightNetto"
-                                value={0}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                }}
-                                label="TOTAL SESUDAH"
-                                name="weightNetto"
-                                value={0}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                          </>
-                        )}
-                        {selectedOption === "Tbs" && (
-                          <>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                }}
-                                label="TOTAL SEBELUM"
-                                name="weightNetto"
-                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                label={<span style={{ color: "red" }}>POTONGAN</span>}
-                                name="weightNetto"
-                                value={0}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={12}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                }}
-                                label="TOTAL SESUDAH"
-                                name="weightNetto"
-                                value={0}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                          </>
-                        )}
+
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                            }}
+                            label="TOTAL"
+                            name="weightNetto"
+                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                          />
+                        </Grid>
                       </Grid>
                     </Grid>
                   </Grid>
@@ -787,4 +577,4 @@ const PksManualEntryKernelOut = () => {
   );
 };
 
-export default PksManualEntryKernelOut;
+export default PksManualEntryOthersOut;

@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
-import * as yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
@@ -22,7 +21,7 @@ import { TransactionAPI } from "../../../../apis";
 
 import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
 
-const PksManualEntryOthersView = () => {
+const T30ManualEntryOthersView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
@@ -79,7 +78,7 @@ const PksManualEntryOthersView = () => {
 
   return (
     <Box>
-      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
+      <Header title="Transaksi T30" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -485,4 +484,4 @@ const PksManualEntryOthersView = () => {
   );
 };
 
-export default PksManualEntryOthersView;
+export default T30ManualEntryOthersView;

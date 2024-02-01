@@ -41,10 +41,6 @@ const PksManualEntryTbsView = () => {
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [canSubmit, setCanSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
   const handleClose = () => {
     clearOpenedTransaction();
 
@@ -84,7 +80,7 @@ const PksManualEntryTbsView = () => {
 
   return (
     <Box>
-      <Header title="TANSAKSI PKS" subtitle="DATA TIMBANGAN MANUAL ENTRY" />
+      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -107,7 +103,7 @@ const PksManualEntryTbsView = () => {
                   >
                     SIMPAN
                   </Button> */}
-                  <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} />
+                  <BonTripPrint dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -336,7 +332,7 @@ const PksManualEntryTbsView = () => {
                             component={TextField}
                             fullWidth
                             value={values?.sptbs}
-                            sx={{ mt: 2,backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -345,7 +341,7 @@ const PksManualEntryTbsView = () => {
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+                          <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                         </Grid>
                         <SortasiTBS isReadOnly={true} />
                       </Grid>
@@ -508,19 +504,6 @@ const PksManualEntryTbsView = () => {
                     </Grid>
                   </Grid>
                 </Paper>
-
-                {isLoading && (
-                  <CircularProgress
-                    size={50}
-                    sx={{
-                      color: "goldenrod",
-                      position: "absolute",
-                      top: "50%",
-                      left: "48.5%",
-                      zIndex: 999,
-                    }}
-                  />
-                )}
               </Form>
             );
           }}

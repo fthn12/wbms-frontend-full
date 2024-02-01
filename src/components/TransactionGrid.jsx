@@ -85,8 +85,6 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks-edispatch-reject-bulking-in";
         } else if (progressStatus === 11) {
           urlPath = "/wb/transactions/pks-edispatch-reject-t300-in";
-        } else if (progressStatus === 100) {
-          urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
         } else if (progressStatus === 35) {
@@ -101,6 +99,8 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
         } else if (progressStatus === 42) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -113,6 +113,10 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/t30-edispatch-cancel-in";
         } else if (progressStatus === 26) {
           urlPath = "/wb/transactions/t30-edispatch-cancel-out";
+        } else if (progressStatus === 35) {
+          urlPath = "/wb/transactions/t30/manual-entry-others-out";
+        } else if (progressStatus === 40) {
+          urlPath = "/wb/transactions/t30/manual-entry-other-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -125,6 +129,10 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/bulking-edispatch-out";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/bulking-edispatch-out";
+        } else if (progressStatus === 35) {
+          urlPath = "/wb/transactions/bulking/manual-entry-others-out";
+        } else if (progressStatus === 40) {
+          urlPath = "/wb/transactions/bulking/manual-entry-other-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }

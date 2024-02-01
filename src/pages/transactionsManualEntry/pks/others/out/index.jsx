@@ -99,7 +99,7 @@ const PksManualEntryOthersOut = () => {
         tempTrans.progressStatus = 42;
       }
 
-      // tempTrans.progressStatus = 42;
+      // tempTrans.progressStatus = 40;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -195,7 +195,7 @@ const PksManualEntryOthersOut = () => {
 
   return (
     <Box>
-      <Header title="TRANSAKSI PKS" subtitle="Transaksi Manual Entry WB OUT" />
+      <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-OUT" />
       {openedTransaction && (
         <Formik
           // enableReinitialize

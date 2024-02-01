@@ -47,12 +47,12 @@ const BarChartComponent = () => {
       ? transactions.filter(
           (transaction) =>
             (selectedProduct === "TBS" && transaction.productName === "TBS") ||
-            (selectedProduct === "Other" && !["CPO", "PKO", "TBS"].includes(transaction.productName)) ||
-            (selectedProduct !== "TBS" && selectedProduct !== "Other" && transaction.productName === selectedProduct),
+            (selectedProduct === "Others" && !["CPO", "PKO", "TBS"].includes(transaction.productName)) ||
+            (selectedProduct !== "TBS" && selectedProduct !== "Others" && transaction.productName === selectedProduct),
         )
       : transactions;
 
-  const productNames = ["CPO", "PKO", "TBS", "Other"];
+  const productNames = ["CPO", "PKO", "TBS", "Others"];
 
   const monthlyData = monthNames.map((monthName, monthIndex) => {
     const monthTotal = { name: monthName };
@@ -62,7 +62,7 @@ const BarChartComponent = () => {
     });
 
     const monthTransactions = filteredData.filter(
-      (transaction) => new Date(transaction.dtCreated).getMonth() === monthIndex,
+      (transaction) => new Date(transaction.dtTransaction).getMonth() === monthIndex,
     );
 
     monthTransactions.forEach((transaction) => {
@@ -71,7 +71,7 @@ const BarChartComponent = () => {
       } else if (productNames.includes(transaction.productName)) {
         monthTotal[transaction.productName] += 1;
       } else {
-        monthTotal["Other"] += 1;
+        monthTotal["Others"] += 1;
       }
     });
 
@@ -95,17 +95,14 @@ const BarChartComponent = () => {
     <Paper elevation={5} sx={{ p: 3, mx: 1, borderRadius: "10px" }}>
       <div style={{ width: "auto", height: "auto" }}>
         <div className="grafik">
-          <Box display="flex">
-            <BarChartIcon sx={{ mr: 1, fontSize: 30 }} />
-            <Typography variant="h4" fontWeight="bold" mt="5px">
-            Total Transaksi Perbulan
+          <Box display="flex" mt={1}>
+            <BarChartIcon sx={{ mr: 1,  fontSize: "23px" }} />
+            <Typography variant="h5" mt={0.1} >
+              Total Transaksi Per Bulan
             </Typography>
           </Box>
           <FormControl
-            sx={{
-              mt: "auto",
-              minWidth: 200,
-            }}
+  
             size="small"
           >
             <Select
@@ -114,7 +111,7 @@ const BarChartComponent = () => {
               displayEmpty
               sx={{
                 color: selectedProduct === "" ? "gray" : "black",
-                fontSize: "15px",
+                // fontSize: "15px",
                 borderRadius: "10px",
               }}
             >
@@ -122,7 +119,7 @@ const BarChartComponent = () => {
               <MenuItem value="CPO">CPO</MenuItem>
               <MenuItem value="PKO">PKO</MenuItem>
               <MenuItem value="TBS">TBS</MenuItem>
-              <MenuItem value="Other">Others</MenuItem>
+              <MenuItem value="Others">Others</MenuItem>
             </Select>
           </FormControl>
           <div className="barChart">

@@ -62,6 +62,14 @@ const PksManualEntryOthersIn = (props) => {
       setOriginWeighNetto(total);
     }
   }, [wbTransaction]);
+  useEffect(() => {
+    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+      setOriginWeighNetto(0);
+    } else {
+      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      setOriginWeighNetto(total);
+    }
+  }, [wbTransaction]);
 
   return (
     <>

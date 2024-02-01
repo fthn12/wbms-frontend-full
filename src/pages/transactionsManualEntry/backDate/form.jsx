@@ -5,9 +5,9 @@ import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import TBS from "./tbs/in";
-import OTHERS from "./others/in";
-import KERNEL from "./kernel/in";
+import TBS from "./tbs";
+import OTHERS from "./others";
+import KERNEL from "./kernel";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import moment from "moment";
 import { TransactionAPI } from "../../../apis";
@@ -22,14 +22,15 @@ import {
   useTransportVehicle,
 } from "../../../hooks";
 
-const PksManualEntryWBIn = () => {
+const PksManualEntryBackDate = () => {
   const navigate = useNavigate();
 
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
   const { user } = useAuth();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
+
+  const { setWbTransaction, wbTransaction, clearOpenedTransaction, useFindManyTransactionQuery } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
@@ -39,14 +40,27 @@ const PksManualEntryWBIn = () => {
   const { data: dtProduct } = useGetProductsQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
+  const data = {
+    where: {
+      typeSite: +WBMS.SITE_TYPE,
+      // bonTripNo:
+    },
+  };
+  const { data: results } = useFindManyTransactionQuery(data);
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const validationSchema = Yup.object().shape({
-    transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
-    transporterCompanyName: Yup.string().required("Wajib diisi"),
-    productName: Yup.string().required("Wajib diisi"),
-    driverName: Yup.string().required("Wajib diisi"),
+    // transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
+    // transporterCompanyName: Yup.string().required("Wajib diisi"),
+    // productName: Yup.string().required("Wajib diisi"),
+    // driverName: Yup.string().required("Wajib diisi"),
+    // originWeighInTimestamp: Yup.string().required("Wajib diisi"),
+    // originWeighOutTimestamp: Yup.string().required("Wajib diisi"),
+    // originWeighInKg: Yup.string().required("Wajib diisi"),
+    // originWeighOutKg: Yup.string().required("Wajib diisi"),
   });
 
   const handleClose = () => {
@@ -70,28 +84,31 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.originWeighInTimestamp = moment().toDate();
+      // tempTrans.typeSite = +WBMS.SITE_TYPE;
+      tempTrans.progressStatus = 40;
+      // tempTrans.typeTransaction = 5;
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryPksInOthers(tempTrans);
+      const response = await transactionAPI.ManualEntryBackDate(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
       clearOpenedTransaction();
       handleClose();
       setWbTransaction({ ...response.data.transaction });
-
-      toast.success(`Transaksi WB-IN telah tersimpan.`);
-    } catch (error) {
       setIsLoading(false);
-      toast.error(`${error.message}.`);
 
-      return;
+      toast.success(`Data Transaksi Lampau telah tersimpan.`);
+      // redirect ke form view
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
     }
   };
 
@@ -99,7 +116,6 @@ const PksManualEntryWBIn = () => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
-
     try {
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
@@ -111,8 +127,8 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.originWeighInTimestamp = moment().toDate();
+      // tempTrans.originWeighInKg = wb.weight;
+      // tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
@@ -127,12 +143,14 @@ const PksManualEntryWBIn = () => {
       handleClose();
       setWbTransaction({ ...response.data.transaction });
 
-      toast.success(`Transaksi WB-IN telah tersimpan.`);
-    } catch (error) {
       setIsLoading(false);
-      toast.error(`${error.message}.`);
 
-      return;
+      toast.success(`Data Transaksi Lampau telah tersimpan.`);
+      // redirect ke form view
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
     }
   };
 
@@ -140,7 +158,6 @@ const PksManualEntryWBIn = () => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
-
     try {
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
@@ -152,8 +169,8 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.originWeighInTimestamp = moment().toDate();
+      // tempTrans.originWeighInKg = wb.weight;
+      // tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
@@ -168,22 +185,27 @@ const PksManualEntryWBIn = () => {
       handleClose();
       setWbTransaction({ ...response.data.transaction });
 
-      toast.success(`Transaksi WB-IN telah tersimpan.`);
-    } catch (error) {
       setIsLoading(false);
-      toast.error(`${error.message}.`);
 
-      return;
+      toast.success(`Data Transaksi Lampau telah tersimpan.`);
+      // redirect ke form view
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/pks/manual-entry-tbs-view/${id}`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
     }
   };
 
-  useEffect(() => {
-    setWbTransaction({ originWeighInKg: wb.weight });
-  }, [wb.weight]);
+  let count = 1;
 
   useEffect(() => {
-    setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
-  }, []);
+    count = 1;
+    const sixDigits = String(count).padStart(6, "0");
+    setWbTransaction({
+      bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_FORM}${moment(selectedDate).format("YYMMDD")}${sixDigits}`,
+    });
+    count += 1;
+  }, [selectedDate]);
 
   return (
     <Box>
@@ -205,7 +227,7 @@ const PksManualEntryWBIn = () => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, isValid, submitForm, setFieldValue } = props;
+            const { values, isValid, submitForm, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             const handleOtrSubmit = () => {
@@ -273,6 +295,23 @@ const PksManualEntryWBIn = () => {
                       <Grid item xs={12}>
                         <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
                       </Grid>
+                      <Field
+                        type="date"
+                        variant="outlined"
+                        component={TextField}
+                        size="small"
+                        fullWidth
+                        name
+                        sx={{ mb: 2 }}
+                        label="Tanggal Bontrip"
+                        value={moment(selectedDate).format("YYYY-MM-DD")}
+                        onChange={(e) => {
+                          setSelectedDate(e.target.value);
+                        }}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
 
                       <Field
                         name="bonTripNo"
@@ -388,7 +427,9 @@ const PksManualEntryWBIn = () => {
 
                     {/* Others*/}
 
-                    {selectedOption === "Others" && <OTHERS setFieldValue={setFieldValue} values={values} />}
+                    {selectedOption === "Others" && (
+                      <OTHERS setFieldValue={setFieldValue} values={values} handleChange={handleChange} />
+                    )}
 
                     {/* KERNEL*/}
 
@@ -427,4 +468,4 @@ const PksManualEntryWBIn = () => {
   );
 };
 
-export default PksManualEntryWBIn;
+export default PksManualEntryBackDate;

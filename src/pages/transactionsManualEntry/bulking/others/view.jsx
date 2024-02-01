@@ -22,7 +22,7 @@ import { TransactionAPI } from "../../../../apis";
 
 import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
 
-const PksManualEntryOthersView = () => {
+const BulkingManualEntryOthersView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
@@ -39,6 +39,8 @@ const PksManualEntryOthersView = () => {
   const { data: dtProduct } = useGetProductsQuery();
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
+
+
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -79,7 +81,7 @@ const PksManualEntryOthersView = () => {
 
   return (
     <Box>
-      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
+      <Header title="Transaksi Bulking" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -464,6 +466,8 @@ const PksManualEntryOthersView = () => {
                     </Grid>
                   </Grid>
                 </Paper>
+
+              
               </Form>
             );
           }}
@@ -485,4 +489,4 @@ const PksManualEntryOthersView = () => {
   );
 };
 
-export default PksManualEntryOthersView;
+export default BulkingManualEntryOthersView;

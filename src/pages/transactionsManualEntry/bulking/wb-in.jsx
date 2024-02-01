@@ -5,9 +5,7 @@ import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import TBS from "./tbs/in";
 import OTHERS from "./others/in";
-import KERNEL from "./kernel/in";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import moment from "moment";
 import { TransactionAPI } from "../../../apis";
@@ -22,7 +20,7 @@ import {
   useTransportVehicle,
 } from "../../../hooks";
 
-const PksManualEntryWBIn = () => {
+const BulkingManualEntryWBIn = () => {
   const navigate = useNavigate();
 
   const transactionAPI = TransactionAPI();
@@ -78,104 +76,98 @@ const PksManualEntryWBIn = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryPksInOthers(tempTrans);
+      const response = await transactionAPI.ManualEntryBulkingInOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
       clearOpenedTransaction();
       handleClose();
       setWbTransaction({ ...response.data.transaction });
+      setIsLoading(false);
 
       toast.success(`Transaksi WB-IN telah tersimpan.`);
     } catch (error) {
-      setIsLoading(false);
-      toast.error(`${error.message}.`);
-
-      return;
+      return toast.error(`${error.message}.`);
     }
   };
 
-  const handleKernelSubmit = async (values) => {
-    let tempTrans = { ...values };
+  //   const handleKernelSubmit = async (values) => {
+  //     let tempTrans = { ...values };
 
-    setIsLoading(true);
+  //     setIsLoading(true);
+  //     try {
+  //       if (tempTrans.afdeling) {
+  //         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+  //       } else if (tempTrans.kebun) {
+  //         tempTrans.kebun = tempTrans.kebun.toUpperCase();
+  //       } else if (tempTrans.blok) {
+  //         tempTrans.blok = tempTrans.blok.toUpperCase();
+  //       } else if (tempTrans.npb) {
+  //         tempTrans.npb = tempTrans.npb.toUpperCase();
+  //       }
 
-    try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
+  //       tempTrans.originWeighInKg = wb.weight;
+  //       tempTrans.originWeighInTimestamp = moment().toDate();
+  //       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+  //       tempTrans.dtTransaction = moment()
+  //         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+  //         .format();
 
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
+  //       const response = await transactionAPI.ManualEntryInKernel(tempTrans);
 
-      const response = await transactionAPI.ManualEntryPksInKernel(tempTrans);
+  //       if (!response.status) throw new Error(response?.message);
 
-      if (!response.status) throw new Error(response?.message);
+  //       clearOpenedTransaction();
+  //       handleClose();
+  //       setWbTransaction({ ...response.data.transaction });
 
-      clearOpenedTransaction();
-      handleClose();
-      setWbTransaction({ ...response.data.transaction });
+  //       setIsLoading(false);
 
-      toast.success(`Transaksi WB-IN telah tersimpan.`);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error(`${error.message}.`);
+  //       toast.success(`Transaksi WB-IN telah tersimpan.`);
+  //     } catch (error) {
+  //       return toast.error(`${error.message}.`);
+  //     }
+  //   };
 
-      return;
-    }
-  };
+  //   const handleTbsSubmit = async (values) => {
+  //     let tempTrans = { ...values };
 
-  const handleTbsSubmit = async (values) => {
-    let tempTrans = { ...values };
+  //     setIsLoading(true);
+  //     try {
+  //       if (tempTrans.afdeling) {
+  //         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
+  //       } else if (tempTrans.kebun) {
+  //         tempTrans.kebun = tempTrans.kebun.toUpperCase();
+  //       } else if (tempTrans.blok) {
+  //         tempTrans.blok = tempTrans.blok.toUpperCase();
+  //       } else if (tempTrans.npb) {
+  //         tempTrans.npb = tempTrans.npb.toUpperCase();
+  //       }
 
-    setIsLoading(true);
+  //       tempTrans.originWeighInKg = wb.weight;
+  //       tempTrans.originWeighInTimestamp = moment().toDate();
+  //       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+  //       tempTrans.dtTransaction = moment()
+  //         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+  //         .format();
 
-    try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
+  //       const response = await transactionAPI.ManualEntryInTbs(tempTrans);
 
-      tempTrans.originWeighInKg = wb.weight;
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
+  //       if (!response.status) throw new Error(response?.message);
 
-      const response = await transactionAPI.ManualEntryPksInTbs(tempTrans);
+  //       clearOpenedTransaction();
+  //       handleClose();
+  //       setWbTransaction({ ...response.data.transaction });
 
-      if (!response.status) throw new Error(response?.message);
+  //       setIsLoading(false);
 
-      clearOpenedTransaction();
-      handleClose();
-      setWbTransaction({ ...response.data.transaction });
-
-      toast.success(`Transaksi WB-IN telah tersimpan.`);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error(`${error.message}.`);
-
-      return;
-    }
-  };
+  //       toast.success(`Transaksi WB-IN telah tersimpan.`);
+  //     } catch (error) {
+  //       return toast.error(`${error.message}.`);
+  //     }
+  //   };
 
   useEffect(() => {
     setWbTransaction({ originWeighInKg: wb.weight });
@@ -187,18 +179,18 @@ const PksManualEntryWBIn = () => {
 
   return (
     <Box>
-      <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-IN" />
+      <Header title="Transaksi Bulking" subtitle="Transaksi Manual Entry WB-IN" />
       {wbTransaction && (
         <Formik
           enableReinitialize
           onSubmit={(values) => {
             if (selectedOption === "Others") {
               handleOthersSubmit(values);
-            } else if (selectedOption === "Kernel") {
-              handleKernelSubmit(values);
-            } else if (selectedOption === "Tbs") {
-              handleTbsSubmit(values);
-            }
+            } //else if (selectedOption === "Kernel") {
+            //   handleKernelSubmit(values);
+            // } else if (selectedOption === "Tbs") {
+            //   handleTbsSubmit(values);
+            // }
           }}
           initialValues={wbTransaction}
           isInitialValid={false}
@@ -232,7 +224,7 @@ const PksManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === "Kernel" && (
+                  {/* {selectedOption === "Kernel" && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -252,7 +244,7 @@ const PksManualEntryWBIn = () => {
                     >
                       SIMPAN
                     </Button>
-                  )}
+                  )} */}
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
@@ -327,7 +319,6 @@ const PksManualEntryWBIn = () => {
                           setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
                           setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
                           setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                          setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
                         }}
                         renderInput={(params) => (
                           <TextFieldMUI
@@ -347,9 +338,7 @@ const PksManualEntryWBIn = () => {
                         fullWidth
                         // freeSolo
                         // disableClearable
-                        options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-                        )}
+                        options={dtProduct?.records || []}
                         getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
                         value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
                         onChange={(event, newValue) => {
@@ -362,7 +351,11 @@ const PksManualEntryWBIn = () => {
                           if (!newValue) {
                             setSelectedOption("");
                           } else {
-                            const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
+                            const filterOption = (newValue?.name || "").toLowerCase().includes("cpo")
+                              ? "CPO"
+                              : (newValue?.name || "").toLowerCase().includes("pko")
+                              ? "PKO"
+                              : (newValue?.name || "").toLowerCase().includes("kernel")
                               ? "Kernel"
                               : (newValue?.name || "").toLowerCase().includes("tbs")
                               ? "Tbs"
@@ -383,16 +376,13 @@ const PksManualEntryWBIn = () => {
                       />
                     </Grid>
                     {/* TBS */}
-
-                    {selectedOption === "Tbs" && <TBS setFieldValue={setFieldValue} values={values} />}
+                    {/* {selectedOption === "Tbs" && <TBS setFieldValue={setFieldValue} values={values} />}
 
                     {/* Others*/}
-
                     {selectedOption === "Others" && <OTHERS setFieldValue={setFieldValue} values={values} />}
 
                     {/* KERNEL*/}
-
-                    {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />}
+                    {/* {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />} */}
                   </Grid>
                 </Paper>
                 {/* {isLoading && (
@@ -427,4 +417,4 @@ const PksManualEntryWBIn = () => {
   );
 };
 
-export default PksManualEntryWBIn;
+export default BulkingManualEntryWBIn;

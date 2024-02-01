@@ -1,36 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
-  Box,
   Button,
   CircularProgress,
   Grid,
   InputAdornment,
   Divider,
-  Paper,
+  Checkbox,
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { TextField, Autocomplete } from "formik-mui";
-import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
-import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
 
-import { TransactionAPI } from "../../../../../apis";
+import { SortasiKernel } from "../../../../components/SortasiKernel";
 
-import {
-  useAuth,
-  useDriver,
-  useConfig,
-  useTransaction,
-  useTransportVehicle,
-  useWeighbridge,
-  useApp,
-} from "../../../../../hooks";
+import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../hooks";
 
-const PksManualEntryOthersIn = (props) => {
+const PksManualEntryKernelIn = (props) => {
   const { setFieldValue, values } = props;
   console.clear();
   const { user } = useAuth();
@@ -39,9 +25,9 @@ const PksManualEntryOthersIn = (props) => {
   const { wbTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { setSidebar } = useApp();
-  const [originWeighNetto, setOriginWeighNetto] = useState(0);
-
   const { data: dtDrivers } = useGetDriversQuery();
+
+  const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const [dtTrx, setDtTrx] = useState(null);
 
@@ -183,15 +169,23 @@ const PksManualEntryOthersIn = (props) => {
       <Grid item xs={12} sm={6} lg={3}>
         <Grid container columnSpacing={1}>
           <Grid item xs={12}>
+            <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+          </Grid>
+          <SortasiKernel isReadOnly={true} isBgcolor={true} />
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sm={6} lg={3}>
+        <Grid container columnSpacing={1}>
+          <Grid item xs={12}>
             <Divider>DATA TIMBANG KENDARAAN</Divider>
           </Grid>
           <Grid item xs={6}>
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Operator WB-IN"
               name="originWeighInOperatorName"
@@ -203,12 +197,12 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Operator WB-OUT"
-              value={values?.originWeighOutOperatorName || "-"}
+              value="-"
               name="originWeighOutOperatorName"
               inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
@@ -217,23 +211,23 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Waktu WB-IN"
               name="originWeighInTimestamp"
-              inputProps={{ readOnly: true }}
               value={dtTrx || "-"}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Waktu WB-Out"
               name="originWeighOutTimestamp"
@@ -249,9 +243,9 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
@@ -266,16 +260,16 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
+              component={TextField}
+              sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
-              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
+              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
               inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -286,16 +280,48 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+              component={TextField}
+              sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
-              label="TOTAL"
+              label="TOTAL SEBELUM"
               name="weightNetto"
               value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="POTONGAN"
+              name="weightNetto"
+              value={0}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+              }}
+              label="TOTAL SESUDAH"
+              name="weightNetto"
+              value={0}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
         </Grid>
@@ -317,4 +343,4 @@ const PksManualEntryOthersIn = (props) => {
   );
 };
 
-export default PksManualEntryOthersIn;
+export default PksManualEntryKernelIn;

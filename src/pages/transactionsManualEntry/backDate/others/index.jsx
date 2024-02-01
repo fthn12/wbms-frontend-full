@@ -11,30 +11,15 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { TextField, Autocomplete } from "formik-mui";
-import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
-import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
 
-import { TransactionAPI } from "../../../../../apis";
-
-import {
-  useAuth,
-  useDriver,
-  useConfig,
-  useTransaction,
-  useTransportVehicle,
-  useWeighbridge,
-  useApp,
-} from "../../../../../hooks";
+import { useAuth, useDriver, useConfig, useTransaction, useApp } from "../../../../hooks";
 
 const PksManualEntryOthersIn = (props) => {
-  const { setFieldValue, values } = props;
+  const { setFieldValue, values, handleChange } = props;
   console.clear();
   const { user } = useAuth();
-  const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
   const { wbTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
@@ -55,13 +40,14 @@ const PksManualEntryOthersIn = (props) => {
   }, []);
 
   useEffect(() => {
-    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (values?.originWeighInKg < WBMS.WB_MIN_WEIGHT || values?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      let total = Math.abs(values?.originWeighInKg - values?.originWeighOutKg);
       setOriginWeighNetto(total);
     }
-  }, [wbTransaction]);
+  }, [values]);
+  console.log(moment(values?.originWeighInTimestamp).format("YYYY-MM-DDTHH:mm:ssZ"));
 
   return (
     <>
@@ -196,20 +182,6 @@ const PksManualEntryOthersIn = (props) => {
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Field
-              type="text"
-              variant="outlined"
-              component={TextField}
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Operator WB-OUT"
-              value={values?.originWeighOutOperatorName || "-"}
-              name="originWeighOutOperatorName"
               inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
@@ -221,30 +193,52 @@ const PksManualEntryOthersIn = (props) => {
               size="small"
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              inputProps={{ readOnly: true }}
-              value={dtTrx || "-"}
+              label="Operator WB-OUT"
+              value={user.name}
+              name="originWeighOutOperatorName"
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
-              type="text"
+              type="datetime-local"
               variant="outlined"
               component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-Out"
-              name="originWeighOutTimestamp"
-              inputProps={{ readOnly: true }}
+              sx={{ mt: 2 }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
               value={
-                values?.originWeighOutTimestamp
-                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                  : "-"
+                values?.originWeighInTimestamp ? moment(values?.originWeighInTimestamp).format("YYYY-MM-DDTHH:mm") : ""
               }
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </Grid>
+          {/* <Grid item xs={6}>
+            <Field
+              type="datetime-local"
+              variant="outlined"
+              component={TextField}
+              size="small"
+              fullWidth
+              sx={{ mt: 2 }}
+              label="Waktu WB-Out"
+              name="originWeighOutTimestamp"
+              value={
+                values?.originWeighOutTimestamp
+                  ? moment(values?.originWeighOutTimestamp).format("YYYY-MM-DDTHH:mm")
+                  : ""
+              }
+              onChange={handleChange}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid> */}
+
           <Grid item xs={6}>
             <Field
               type="number"
@@ -252,14 +246,13 @@ const PksManualEntryOthersIn = (props) => {
               component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              sx={{ mt: 2 }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
               label="BERAT MASUK - IN"
               name="originWeighInKg"
-              value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-              inputProps={{ readOnly: true }}
+              value={values?.originWeighInKg ?? 0}
             />
           </Grid>
           <Grid item xs={6}>
@@ -269,14 +262,13 @@ const PksManualEntryOthersIn = (props) => {
               component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
+              sx={{ mt: 2, mb: 3 }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
-              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              value={values?.originWeighOutKg ?? 0}
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
-              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={12}>

@@ -40,10 +40,6 @@ const PksManualEntryKernelView = () => {
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [canSubmit, setCanSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
   const handleClose = () => {
     clearOpenedTransaction();
 
@@ -83,7 +79,7 @@ const PksManualEntryKernelView = () => {
 
   return (
     <Box>
-      <Header title="TANSAKSI PKS" subtitle="DATA TIMBANGAN MANUAL ENTRY" />
+      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -106,7 +102,7 @@ const PksManualEntryKernelView = () => {
                   >
                     SIMPAN
                   </Button> */}
-                  <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} />
+                  <BonTripPrint dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -509,18 +505,7 @@ const PksManualEntryKernelView = () => {
                   </Grid>
                 </Paper>
 
-                {isLoading && (
-                  <CircularProgress
-                    size={50}
-                    sx={{
-                      color: "goldenrod",
-                      position: "absolute",
-                      top: "50%",
-                      left: "48.5%",
-                      zIndex: 999,
-                    }}
-                  />
-                )}
+          
               </Form>
             );
           }}
