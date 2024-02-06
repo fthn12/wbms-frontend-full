@@ -124,32 +124,20 @@ export const TransactionAPI = () => {
     return response;
   };
 
-  const ManualEntryPksInOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-pks-in-others`, data).then((res) => res.data);
+  const ManualEntryInOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-others`, data).then((res) => res.data);
 
     return response;
   };
 
-  const ManualEntryPksInKernel = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-pks-in-kernel`, data).then((res) => res.data);
+  const ManualEntryInKernel = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-kernel`, data).then((res) => res.data);
 
     return response;
   };
 
-  const ManualEntryPksInTbs = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-pks-in-tbs`, data).then((res) => res.data);
-
-    return response;
-  };
-
-  const ManualEntryT30InOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-t30-in-others`, data).then((res) => res.data);
-
-    return response;
-  };
-
-  const ManualEntryBulkingInOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-bulking-in-others`, data).then((res) => res.data);
+  const ManualEntryInTbs = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-tbs`, data).then((res) => res.data);
 
     return response;
   };
@@ -169,13 +157,9 @@ export const TransactionAPI = () => {
 
     ManualEntryBackDate,
 
-    ManualEntryPksInOthers,
-    ManualEntryPksInKernel,
-    ManualEntryPksInTbs,
-
-    ManualEntryT30InOthers,
-
-    ManualEntryBulkingInOthers,
+    ManualEntryInOthers,
+    ManualEntryInKernel,
+    ManualEntryInTbs,
 
     eDispatchFindOrCreateByQrcode,
 

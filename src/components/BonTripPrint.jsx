@@ -2,44 +2,23 @@ import { useState, useEffect, useRef } from "react";
 import ReactToPrint from "react-to-print";
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import moment from "moment";
+
+import { useAuth, useConfig } from "../hooks";
 
 const BonTripPrint = (props) => {
   const { dtTrans, isDisable, ...others } = props;
+  const { user } = useAuth();
+  const { WBMS } = useConfig();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const formRef = useRef();
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
-  const timestampMasuk = dtTrans.originWeighInTimestamp;
-  const timestampKeluar = dtTrans.originWeighOutTimestamp;
-
-  // Membuat objek Date dari timestampMasuk
-  const dateObjMasuk = new Date(timestampMasuk);
-
-  // Mendapatkan komponen jam masuk
-  const hoursMasuk = dateObjMasuk.getHours();
-  const minutesMasuk = dateObjMasuk.getMinutes();
-  const secondsMasuk = dateObjMasuk.getSeconds();
-  const jamMasuk = `${hoursMasuk}:${minutesMasuk}:${secondsMasuk}`;
-
-  // Membuat objek Date dari timestamp keluar
-  const dateObjKeluar = new Date(timestampKeluar);
-
-  // Mendapatkan komponen jam keluar
-  const hoursKeluar = dateObjKeluar.getHours();
-  const minutesKeluar = dateObjKeluar.getMinutes();
-  const secondsKeluar = dateObjKeluar.getSeconds();
-  const jamKeluar = `${hoursKeluar}:${minutesKeluar}:${secondsKeluar}`;
-
-  const dateObj = new Date(timestampMasuk);
-
-  // Mendapatkan komponen tanggal
-  const year = dateObj.getFullYear();
-  const month = dateObj.getMonth() + 1; // Perhatikan bahwa bulan dimulai dari 0 (Januari adalah 0)
-  const date = dateObj.getDate();
-  const tanggal = `${date}-${month}-${year}`;
-
-  useEffect(() => {}, [isOpen]);
+  const jamMasuk = moment(dtTrans.originWeighInTimestamp).format("HH:mm:ss");
+  const jamKeluar = moment(dtTrans.originWeighOutTimestamp).format("HH:mm:ss");
+  const tanggal = moment(dtTrans.originWeighOutTimestamp).format("DD- MM-YYYY");
 
   return (
     <>
@@ -158,7 +137,7 @@ const BonTripPrint = (props) => {
                         1st Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.originWeighInKg} KG</td>
+                      <td className="nota-text">{dtTrans.originWeighInKg.toLocaleString()} KG</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
@@ -172,21 +151,25 @@ const BonTripPrint = (props) => {
                         2st Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.originWeighOutKg} KG</td>
+                      <td className="nota-text">{dtTrans.originWeighOutKg.toLocaleString()} KG</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Net Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.originWeighOutKg - dtTrans.originWeighInKg} KG</td>
+                      <td className="nota-text">
+                        {Math.abs(dtTrans.originWeighOutKg - dtTrans.originWeighInKg).toLocaleString()} KG
+                      </td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Potongan
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.potonganWajib + dtTrans.potonganLain}</td>
+                      <td className="nota-text">
+                        {Math.abs(dtTrans.mandatoryDeductionKg + dtTrans.othersKg).toLocaleString()}
+                      </td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
@@ -194,10 +177,12 @@ const BonTripPrint = (props) => {
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">
-                        {dtTrans.originWeighOutKg -
-                          dtTrans.originWeighInKg -
-                          dtTrans.potonganWajib -
-                          dtTrans.potonganLain}
+                        {Math.abs(
+                          dtTrans.originWeighOutKg -
+                            dtTrans.originWeighInKg -
+                            dtTrans.mandatoryDeductionKg -
+                            dtTrans.othersKg,
+                        ).toLocaleString()}
                         KG
                       </td>
                     </tr>
@@ -298,21 +283,27 @@ const BonTripPrint = (props) => {
                           color: "grey",
                           padding: "35px",
                         }}
-                      ></td>
+                      >
+                        {user.name}
+                      </td>
                       <td
                         style={{
                           borderCollapse: "collapse",
                           border: "1px solid black",
                           color: "grey",
                         }}
-                      ></td>
+                      >
+                        {WBMS.BT_APPROVAL_1}
+                      </td>
                       <td
                         style={{
                           borderCollapse: "collapse",
                           border: "1px solid black",
                           color: "grey",
                         }}
-                      ></td>
+                      >
+                        {WBMS.BT_APPROVAL_2}
+                      </td>
                     </tr>
                     <tr>
                       <td

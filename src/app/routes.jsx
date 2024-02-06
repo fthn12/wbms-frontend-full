@@ -18,8 +18,19 @@ const Page500 = lazy(() => import("../pages/Page500"));
 const DashboardAll = lazy(() => import("../pages/dashboard/dashboard-all"));
 
 const Transactions = lazy(() => import("../pages/transactions"));
+const TransactionsManualEntry = lazy(() => import("../pages/transactionsManualEntryNetto"));
 
-const PksManualEntryBackDate = lazy(() => import("../pages/transactionsManualEntry/backDate/form"));
+const ManualEntryBackDate = lazy(() => import("../pages/transactionsManualEntryNetto/backDate/form"));
+
+const PksManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/pks/wb-in"));
+
+const PksManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/pks/others/out"));
+const PksManualEntryNettoOutKernel = lazy(() => import("../pages/transactionsManualEntryNetto/pks/kernel/out"));
+const PksManualEntryNettoOutTbs = lazy(() => import("../pages/transactionsManualEntryNetto/pks/tbs/out"));
+
+const PksManualEntryNettoOthersView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/others/view"));
+const PksManualEntryNettoTbsView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/tbs/view"));
+const PksManualEntryNettoKernelView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/kernel/view"));
 
 const PksManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/pks/wb-in"));
 
@@ -48,10 +59,12 @@ const PksRejectBulkingInView = lazy(() => import("../pages/transactions/pks/Reje
 const PksRejectOutView = lazy(() => import("../pages/transactions/pks/RejectOut/view"));
 const PksEDispatchNew = lazy(() => import("../pages/transactions/pks/new"));
 
+const T30ManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/t30/wb-in"));
+const T30ManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/t30/others/out"));
+const T30ManualEntryNettoOthersView = lazy(() => import("../pages/transactionsManualEntryNetto/t30/others/view"));
+
 const T30ManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/t30/wb-in"));
-
 const T30ManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/t30/others/out"));
-
 const T30ManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/t30/others/view"));
 
 const T30NormalIn = lazy(() => import("../pages/transactions/t30/NormalIn"));
@@ -65,10 +78,14 @@ const T30CancelInView = lazy(() => import("../pages/transactions/t30/CancelIn/vi
 const T30CancelOutView = lazy(() => import("../pages/transactions/t30/CancelOut/view"));
 const T30DeletedView = lazy(() => import("../pages/transactions/t30/Deleted/view"));
 
+const BulkingManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/bulking/wb-in"));
+const BulkingManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/bulking/others/out"));
+const BulkingManualEntryNettoOthersView = lazy(() =>
+  import("../pages/transactionsManualEntryNetto/bulking/others/view"),
+);
+
 const BulkingManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/bulking/wb-in"));
-
 const BulkingManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/bulking/others/out"));
-
 const BulkingManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/bulking/others/view"));
 
 const BulkingIn = lazy(() => import("../pages/transactions/bulking/In"));
@@ -114,6 +131,7 @@ const routes = () => {
           <Route path="dashboard/labanan" element={<div>Dashboard Labanan</div>} />
 
           <Route path="transactions" element={<Transactions />} />
+          <Route path="transactions/manual-entry" element={<TransactionsManualEntry />} />
 
           <Route path="transactions/pks-edispatch-normal-in" element={<PksNormalIn />} />
           <Route path="transactions/pks-edispatch-normal-out" element={<PksNormalOut />} />
@@ -133,7 +151,45 @@ const routes = () => {
 
           <Route path="transactions/pks-new" element={<PksEDispatchNew />} />
 
-          <Route path="transactions/pks-new-backdate" element={<PksManualEntryBackDate />} />
+          <Route path="transactions/pks-new-backdate" element={<ManualEntryBackDate />} />
+
+          <Route
+            path="transactions/pks/manual-entry-netto-in"
+            name="PksManualEntryNettoWbIn"
+            element={<PksManualEntryNettoIn />}
+          />
+
+          <Route
+            path="transactions/pks/manual-entry-others-netto-out/:id"
+            name="PksManualEntryNettoOutOthers"
+            element={<PksManualEntryNettoOutOthers />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-kernel-netto-out/:id"
+            name="PksManualEntryNettoOutKernel"
+            element={<PksManualEntryNettoOutKernel />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-tbs-netto-out/:id"
+            name="PksManualEntryNettoOutTbs"
+            element={<PksManualEntryNettoOutTbs />}
+          />
+
+          <Route
+            path="transactions/pks/manual-entry-other-netto-view/:id"
+            name="PksManualEntryNettoOthersView"
+            element={<PksManualEntryNettoOthersView />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-tbs-netto-view/:id"
+            name="PksManualEntryNettoTbsView"
+            element={<PksManualEntryNettoTbsView />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-kernel-netto-view/:id"
+            name="PksManualEntryNettoKernelView"
+            element={<PksManualEntryNettoKernelView />}
+          />
 
           <Route path="transactions/pks/manual-entry-in" name="PksManualEntryWbIn" element={<PksManualEntryIn />} />
 
@@ -169,16 +225,30 @@ const routes = () => {
             element={<PksManualEntryKernelView />}
           />
 
-          <Route path="transactions/t30/manual-entry-in" name="T30ManualEntryWbIn" element={<T30ManualEntryIn />} />
+          <Route
+            path="transactions/t30/manual-entry-netto-in"
+            name="T30ManualEntryNettoWbIn"
+            element={<T30ManualEntryNettoIn />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-others-netto-out/:id"
+            name="T30ManualEntryNettoOutOthers"
+            element={<T30ManualEntryNettoOutOthers />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-others-netto-view/:id"
+            name="T30ManualEntryNettoOthersView"
+            element={<T30ManualEntryNettoOthersView />}
+          />
 
+          <Route path="transactions/t30/manual-entry-in" name="T30ManualEntryWbIn" element={<T30ManualEntryIn />} />
           <Route
             path="transactions/t30/manual-entry-others-out/:id"
             name="T30ManualEntryOutOthers"
             element={<T30ManualEntryOutOthers />}
           />
-
           <Route
-            path="transactions/t30/manual-entry-other-view/:id"
+            path="transactions/t30/manual-entry-others-view/:id"
             name="T30ManualEntryOthersView"
             element={<T30ManualEntryOthersView />}
           />
@@ -195,19 +265,33 @@ const routes = () => {
           <Route path="transactions/t30-edispatch-deleted/:id" element={<T30DeletedView />} />
 
           <Route
+            path="transactions/bulking/manual-entry-netto-in"
+            name="BulkingManualEntryWbIn"
+            element={<BulkingManualEntryNettoIn />}
+          />
+          <Route
+            path="transactions/bulking/manual-entry-others-netto-out/:id"
+            name="BulkingManualEntryNettoOutOthers"
+            element={<BulkingManualEntryNettoOutOthers />}
+          />
+          <Route
+            path="transactions/bulking/manual-entry-others-netto-view/:id"
+            name="BulkingManualEntryNettoOthersView"
+            element={<BulkingManualEntryNettoOthersView />}
+          />
+
+          <Route
             path="transactions/bulking/manual-entry-in"
             name="BulkingManualEntryWbIn"
             element={<BulkingManualEntryIn />}
           />
-
           <Route
             path="transactions/bulking/manual-entry-others-out/:id"
             name="BulkingManualEntryOutOthers"
             element={<BulkingManualEntryOutOthers />}
           />
-
           <Route
-            path="transactions/bulking/manual-entry-other-view/:id"
+            path="transactions/bulking/manual-entry-others-view/:id"
             name="BulkingManualEntryOthersView"
             element={<BulkingManualEntryOthersView />}
           />

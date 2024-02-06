@@ -10,6 +10,7 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -259,6 +260,7 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             )}
+
             {/* <Item
               title="Approval Request"
               to="#"
@@ -346,6 +348,15 @@ const Sidebar = () => {
 
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Administrasi" icon={<DisplaySettingsOutlinedIcon />}>
+                <SubMenu label="Manual Entry" icon={<LocalShippingIcon />}>
+                  <Item
+                    title="Transaksi Manual"
+                    to="/wb/transactions/manual-entry"
+                    icon={<ArrowRightOutlinedIcon />}
+                    selected={sidebar.selected}
+                    setSelected={setSelected}
+                  />
+                </SubMenu>
                 <SubMenu label="User Management" icon={<PeopleOutlinedIcon />}>
                   <Item
                     title="User List"

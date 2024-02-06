@@ -33,7 +33,6 @@ const PksManualEntryWBIn = () => {
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
@@ -55,10 +54,11 @@ const PksManualEntryWBIn = () => {
     navigate("/wb/transactions");
   };
 
-  const handleOthersSubmit = async (values) => {
+  const handleTbsSubmit = async (values) => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
+
     try {
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
@@ -70,6 +70,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.typeTransaction = 2;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
@@ -78,7 +79,7 @@ const PksManualEntryWBIn = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryPksInOthers(tempTrans);
+      const response = await transactionAPI.ManualEntryInTbs(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -111,15 +112,16 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.typeTransaction = 3;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_HOU, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryPksInKernel(tempTrans);
+      const response = await transactionAPI.ManualEntryInKernel(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -136,11 +138,10 @@ const PksManualEntryWBIn = () => {
     }
   };
 
-  const handleTbsSubmit = async (values) => {
+  const handleOthersSubmit = async (values) => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
-
     try {
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
@@ -152,6 +153,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.typeTransaction = 4;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
@@ -160,7 +162,7 @@ const PksManualEntryWBIn = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryPksInTbs(tempTrans);
+      const response = await transactionAPI.ManualEntryInOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -347,9 +349,10 @@ const PksManualEntryWBIn = () => {
                         fullWidth
                         // freeSolo
                         // disableClearable
-                        options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-                        )}
+                        // options={(dtProduct?.records || []).filter(
+                        //   (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+                        // )}
+                        options={dtProduct?.records || []}
                         getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
                         value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
                         onChange={(event, newValue) => {
@@ -362,7 +365,11 @@ const PksManualEntryWBIn = () => {
                           if (!newValue) {
                             setSelectedOption("");
                           } else {
-                            const filterOption = (newValue?.name || "").toLowerCase().includes("kernel")
+                            const filterOption = (newValue?.name || "").toLowerCase().includes("cpo")
+                              ? "CPO"
+                              : (newValue?.name || "").toLowerCase().includes("pko")
+                              ? "PKO"
+                              : (newValue?.name || "").toLowerCase().includes("kernel")
                               ? "Kernel"
                               : (newValue?.name || "").toLowerCase().includes("tbs")
                               ? "Tbs"
@@ -395,7 +402,7 @@ const PksManualEntryWBIn = () => {
                     {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />}
                   </Grid>
                 </Paper>
-                {/* {isLoading && (
+                {isLoading && (
                   <CircularProgress
                     size={50}
                     sx={{
@@ -405,7 +412,7 @@ const PksManualEntryWBIn = () => {
                       left: "48.5%",
                     }}
                   />
-                )} */}
+                )}
               </Form>
             );
           }}

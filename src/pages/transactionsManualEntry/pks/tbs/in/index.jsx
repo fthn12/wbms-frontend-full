@@ -18,7 +18,7 @@ import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp }
 
 const PksManualEntryTbsIn = (props) => {
   const { setFieldValue, values } = props;
-  console.clear();
+
   const { user } = useAuth();
   const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
@@ -197,7 +197,7 @@ const PksManualEntryTbsIn = (props) => {
           <Grid item xs={12}>
             <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
           </Grid>
-          <SortasiTBS isReadOnly={true} />
+          <SortasiTBS values={values} isReadOnly={true} />
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>

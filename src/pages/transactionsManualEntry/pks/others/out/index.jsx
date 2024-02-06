@@ -91,15 +91,15 @@ const PksManualEntryOthersOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      if (selectedOption === "Others") {
+      if (selectedOption === "Tbs") {
         tempTrans.progressStatus = 40;
-      } else if (selectedOption === "Tbs") {
-        tempTrans.progressStatus = 41;
       } else if (selectedOption === "Kernel") {
+        tempTrans.progressStatus = 41;
+      } else if (selectedOption === "Others") {
         tempTrans.progressStatus = 42;
       }
 
-      // tempTrans.progressStatus = 40;
+      // tempTrans.progressStatus = 42;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -118,12 +118,12 @@ const PksManualEntryOthersOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      if (selectedOption === "Others") {
-        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
+      if (selectedOption === "Tbs") {
+        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
       } else if (selectedOption === "Kernel") {
         navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
-      } else if (selectedOption === "Tbs") {
-        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
+      } else if (selectedOption === "Others") {
+        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
       }
 
       return;
@@ -215,7 +215,9 @@ const PksManualEntryOthersOut = () => {
                     type="submit"
                     variant="contained"
                     sx={{ mr: 1 }}
-                    disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                    disabled={
+                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
+                    }
                   >
                     SIMPAN
                   </Button>
@@ -522,7 +524,7 @@ const PksManualEntryOthersOut = () => {
                           <Grid item xs={12}>
                             <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                           </Grid>
-                          <SortasiTBS isReadOnly={false} isBgcolor={true} />
+                          <SortasiTBS values={values} setFieldValue={setFieldValue} isReadOnly={false} />
                         </Grid>
                       </Grid>
                     )}

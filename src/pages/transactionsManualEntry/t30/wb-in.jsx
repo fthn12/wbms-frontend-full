@@ -76,6 +76,7 @@ const T30ManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.typeTransaction = 2;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
@@ -84,7 +85,7 @@ const T30ManualEntryWBIn = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryT30InOthers(tempTrans);
+      const response = await transactionAPI.ManualEntryInOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -284,80 +285,69 @@ const T30ManualEntryWBIn = () => {
                         sx={{ backgroundColor: "whitesmoke" }}
                         inputProps={{ readOnly: true }}
                       />
-                      {selectedOption === "Others" && (
-                        <>
-                          <Field
-                            name="transportVehiclePlateNo"
-                            component={Autocomplete}
-                            variant="outlined"
-                            fullWidth
-                            freeSolo
-                            disableClearable
-                            options={dtTransport?.records.map((record) => record.plateNo)}
-                            onInputChange={(event, InputValue, reason) => {
-                              if (reason !== "reset") {
-                                setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
-                              }
-                            }}
-                            renderInput={(params) => (
-                              <TextFieldMUI
-                                {...params}
-                                label="Nomor Plat"
-                                name="transportVehiclePlateNo"
-                                size="small"
-                                sx={{ mt: 2 }}
-                                inputProps={{
-                                  ...params.inputProps,
-                                  style: { textTransform: "uppercase" },
-                                }}
-                              />
-                            )}
-                          />
 
-                          <Field
-                            name="transporterCompanyName"
-                            component={Autocomplete}
-                            variant="outlined"
-                            fullWidth
-                            options={dtCompany?.records || []}
-                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                            value={
-                              (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
-                              null
-                            }
-                            onChange={(event, newValue) => {
-                              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                            }}
-                            renderInput={(params) => (
-                              <TextFieldMUI
-                                {...params}
-                                name="transporterCompanyName"
-                                label="Cust/Vendor transport"
-                                size="small"
-                                sx={{ mt: 2 }}
-                              />
-                            )}
-                          />
-                        </>
-                      )}
-                      {selectedOption === "CPO" || selectedOption === "PKO" ? (
-                        <>
-                          <TransportVehicleAC
+                      <Field
+                        name="transportVehiclePlateNo"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        freeSolo
+                        disableClearable
+                        options={dtTransport?.records.map((record) => record.plateNo)}
+                        onInputChange={(event, InputValue, reason) => {
+                          if (reason !== "reset") {
+                            setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
+                            label="Nomor Plat"
                             name="transportVehiclePlateNo"
-                            label="Nomor Plat Kendaraan"
-                            isReadOnly={false}
+                            size="small"
                             sx={{ mt: 2 }}
+                            inputProps={{
+                              ...params.inputProps,
+                              style: { textTransform: "uppercase" },
+                            }}
                           />
-                          <CompanyAC
+                        )}
+                      />
+
+                      <Field
+                        name="transporterCompanyName"
+                        component={Autocomplete}
+                        variant="outlined"
+                        fullWidth
+                        options={dtCompany?.records || []}
+                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                        value={
+                          (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
+                          null
+                        }
+                        onChange={(event, newValue) => {
+                          setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+                          setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+                          setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                        }}
+                        renderInput={(params) => (
+                          <TextFieldMUI
+                            {...params}
                             name="transporterCompanyName"
-                            label="Nama Vendor"
-                            isReadOnly={false}
+                            label="Cust/Vendor transport"
+                            size="small"
                             sx={{ mt: 2 }}
                           />
-                        </>
-                      ) : null}
+                        )}
+                      />
+
+                      <TransportVehicleAC
+                        name="transportVehiclePlateNo"
+                        label="Nomor Plat Kendaraan"
+                        isReadOnly={false}
+                        sx={{ mt: 2 }}
+                      />
+                      <CompanyAC name="transporterCompanyName" label="Nama Vendor" isReadOnly={false} sx={{ mt: 2 }} />
 
                       <Field
                         name="productName"
@@ -413,7 +403,7 @@ const T30ManualEntryWBIn = () => {
                     {/* {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />} */}
                   </Grid>
                 </Paper>
-                {/* {isLoading && (
+                {isLoading && (
                   <CircularProgress
                     size={50}
                     sx={{
@@ -423,7 +413,7 @@ const T30ManualEntryWBIn = () => {
                       left: "48.5%",
                     }}
                   />
-                )} */}
+                )}
               </Form>
             );
           }}

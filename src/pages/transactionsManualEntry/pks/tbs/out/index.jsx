@@ -46,7 +46,7 @@ const PksManualEntryTbsOut = () => {
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
+  const { setSidebar, urlPrev, setUrlPrev } = useApp();
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
@@ -66,9 +66,12 @@ const PksManualEntryTbsOut = () => {
   });
 
   const handleClose = () => {
-    clearOpenedTransaction();
+    clearWbTransaction();
 
-    navigate("/wb/transactions");
+    const url = urlPrev;
+    setUrlPrev("");
+
+    url ? navigate(url) : navigate("/wb/transactions");
   };
 
   const handleFormikSubmit = async (values) => {
@@ -91,15 +94,15 @@ const PksManualEntryTbsOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      if (selectedOption === "Others") {
+      if (selectedOption === "Tbs") {
         tempTrans.progressStatus = 40;
-      } else if (selectedOption === "Tbs") {
-        tempTrans.progressStatus = 41;
       } else if (selectedOption === "Kernel") {
+        tempTrans.progressStatus = 41;
+      } else if (selectedOption === "Others") {
         tempTrans.progressStatus = 42;
       }
 
-      // tempTrans.progressStatus = 41;
+      // tempTrans.progressStatus = 40;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -118,12 +121,12 @@ const PksManualEntryTbsOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      if (selectedOption === "Others") {
-        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
+      if (selectedOption === "Tbs") {
+        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
       } else if (selectedOption === "Kernel") {
         navigate(`/wb/transactions/pks/manual-entry-kernel-view/${id}`);
-      } else if (selectedOption === "Tbs") {
-        navigate(`/wb/transactions/pks/manual-entry-Tbs-view/${id}`);
+      } else if (selectedOption === "Others") {
+        navigate(`/wb/transactions/pks/manual-entry-other-view/${id}`);
       }
 
       return;
@@ -143,11 +146,6 @@ const PksManualEntryTbsOut = () => {
       // console.clear();
     };
   }, []);
-
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
 
   //weight wb
   useEffect(() => {
@@ -215,10 +213,13 @@ const PksManualEntryTbsOut = () => {
                     type="submit"
                     variant="contained"
                     sx={{ mr: 1 }}
-                    disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                    disabled={
+                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 35)
+                    }
                   >
                     SIMPAN
                   </Button>
+
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
@@ -522,7 +523,7 @@ const PksManualEntryTbsOut = () => {
                           <Grid item xs={12}>
                             <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                           </Grid>
-                          <SortasiTBS isReadOnly={false} />
+                          <SortasiTBS values={values} setFieldValue={setFieldValue} isReadOnly={false} />
                         </Grid>
                       </Grid>
                     )}

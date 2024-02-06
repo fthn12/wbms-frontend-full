@@ -26,6 +26,9 @@ const TransactionPending = () => {
           progressStatus: { in: [1, 6, 11, 35, 36, 37] },
         },
       ],
+      NOT: {
+        typeTransaction: 5,
+      },
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
@@ -64,7 +67,7 @@ const TransactionPending = () => {
             height: "49.5vh",
           }}
         >
-          <Box display="flex" mt={4} >
+          <Box display="flex" mt={4}>
             <LocalShippingIcon sx={{ mr: 2, fontSize: "23px" }} />
             <Typography variant="h5" mb={1}>
               Truk Pending : {TotalPending}

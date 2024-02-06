@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, IconButton, Typography, Paper } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/EqualizerOutlined";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { useConfig, useTransaction } from "../../../hooks";
-import Header from "../../../components/layout/signed/Header";
 import moment from "moment";
 
 import BarCharts from "../../../components/BarChart";
@@ -20,16 +18,8 @@ const DashboardPKS = () => {
   const [TBSProduct, setTBSProduct] = useState(0);
   const [OtherProduct, setOtherProduct] = useState(0);
 
-  const startOf = moment()
-    .startOf("day")
-    .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-    .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-    .toISOString();
-  const endOf = moment()
-    .endOf("day")
-    .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-    .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-    .toISOString();
+  const startOf = moment().startOf("day");
+  const endOf = moment().endOf("day");
 
   const data = {
     where: {
@@ -47,6 +37,9 @@ const DashboardPKS = () => {
           },
         },
       ],
+      NOT: {
+        typeTransaction: 5,
+      },
     },
   };
 

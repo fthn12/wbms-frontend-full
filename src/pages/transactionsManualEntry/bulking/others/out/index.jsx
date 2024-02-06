@@ -84,7 +84,7 @@ const BulkingManualEntryOthersOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      tempTrans.progressStatus = 40;
+      tempTrans.progressStatus = 42;
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -103,7 +103,7 @@ const BulkingManualEntryOthersOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/t30/manual-entry-other-view/${id}`);
+      navigate(`/wb/transactions/bulking/manual-entry-others-view/${id}`);
 
       return;
     } catch (error) {
@@ -186,7 +186,9 @@ const BulkingManualEntryOthersOut = () => {
                     type="submit"
                     variant="contained"
                     sx={{ mr: 1 }}
-                    disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                    disabled={
+                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
+                    }
                   >
                     SIMPAN
                   </Button>

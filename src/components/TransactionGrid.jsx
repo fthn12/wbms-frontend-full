@@ -56,10 +56,12 @@ const TransactionGrid = (props) => {
         { dtModified: { gte: moment().subtract(3, "hours").format() } },
         { progressStatus: { in: [1, 2, 6, 11, 35, 36, 37] } },
       ],
+      NOT: {
+        typeTransaction: 5,
+      },
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
-
   const { data: results, refetch } = useFindManyTransactionQuery(transactionFilter);
 
   const handleViewClick = async (id, progressStatus, bonTripRef) => {
@@ -88,17 +90,17 @@ const TransactionGrid = (props) => {
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
         } else if (progressStatus === 35) {
-          urlPath = "/wb/transactions/pks/manual-entry-others-out";
-        } else if (progressStatus === 36) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
-        } else if (progressStatus === 37) {
+        } else if (progressStatus === 36) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/pks/manual-entry-others-out";
         } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/pks/manual-entry-other-view";
-        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
-        } else if (progressStatus === 42) {
+        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -113,10 +115,10 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/t30-edispatch-cancel-in";
         } else if (progressStatus === 26) {
           urlPath = "/wb/transactions/t30-edispatch-cancel-out";
-        } else if (progressStatus === 35) {
+        } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/t30/manual-entry-others-out";
-        } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/t30/manual-entry-other-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/t30/manual-entry-others-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -129,10 +131,10 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/bulking-edispatch-out";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/bulking-edispatch-out";
-        } else if (progressStatus === 35) {
+        } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/bulking/manual-entry-others-out";
-        } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/bulking/manual-entry-other-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/bulking/manual-entry-others-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }

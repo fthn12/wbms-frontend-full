@@ -3,7 +3,7 @@ import { Box, IconButton, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { GiFuelTank } from "react-icons/gi";
 import TonaseStorageTank from "../../../components/TrukPending";
-import { FaAnglesDown } from "react-icons/fa6";
+import moment from "moment";
 
 import { useConfig, useTransaction, useApp } from "../../../hooks";
 
@@ -22,6 +22,9 @@ const DashboardT30 = () => {
   const [T30PKS11, setT30PKS11] = useState(0);
   const [T30PKO, setT30PKO] = useState(0);
 
+  const startOf = moment().startOf("day");
+  const endOf = moment().endOf("day");
+
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
@@ -29,6 +32,14 @@ const DashboardT30 = () => {
         {
           // progressStatus: { in: [21, 40, 41, 42] },
           progressStatus: { in: [21, 100, 41, 42] },
+        },
+      ],
+      AND: [
+        {
+          dtTransaction: {
+            gte: startOf,
+            lte: endOf,
+          },
         },
       ],
     },
@@ -41,7 +52,6 @@ const DashboardT30 = () => {
   const { data: results, isLoading, isError, refetch } = useFindManyTransactionQuery(data);
 
   useEffect(() => {
-    const lowerCaseSourceStorageTankName = (originSourceStorageTankName) => originSourceStorageTankName.toLowerCase();
     if (!isLoading && !isError && results?.records?.length > 0) {
       const transactions = results.records;
       console.log("datatransaksi:", transactions);
@@ -85,10 +95,6 @@ const DashboardT30 = () => {
           </Typography>
           <Typography variant="h6" mt={1} color="black" display="flex">
             Tonase :
-            <span style={{ color: "#f44336", marginTop: "1px", marginLeft: "7px", marginRight: "7px" }}>
-              <FaAnglesDown />
-            </span>
-            <span style={{ color: "#f44336" }}>5600000</span>
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>
@@ -115,7 +121,7 @@ const DashboardT30 = () => {
             Truck : {T30PKS3}
           </Typography>
           <Typography variant="h6" mt={1} color="black">
-            Tonase : - 84856535335353
+            Tonase :
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>
@@ -142,7 +148,7 @@ const DashboardT30 = () => {
             Truck : {T30PKS4}
           </Typography>
           <Typography variant="h6" mt={1} color="black">
-            Tonase : - 84856535335353
+            Tonase :
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>
@@ -169,7 +175,7 @@ const DashboardT30 = () => {
             Truck : {T30PKS6}
           </Typography>
           <Typography variant="h6" mt={1} color="black">
-            Tonase : - 84856535335353
+            Tonase :
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>
@@ -196,7 +202,7 @@ const DashboardT30 = () => {
             Truck : {T30PKS11}
           </Typography>
           <Typography variant="h6" mt={1} color="black">
-            Tonase : - 84856535335353
+            Tonase :
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>
@@ -223,7 +229,7 @@ const DashboardT30 = () => {
             Truck : {T30PKO}
           </Typography>
           <Typography variant="h6" mt={1} color="black">
-            Tonase : - 84856535335353
+            Tonase :
           </Typography>
         </Box>
         <Box sx={{ marginRight: "20px" }}>

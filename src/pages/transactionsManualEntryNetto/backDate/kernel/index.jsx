@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Button,
   CircularProgress,
@@ -12,21 +11,22 @@ import {
 import { TextField, Autocomplete } from "formik-mui";
 import { Formik, Form, Field } from "formik";
 import moment from "moment";
-import SortasiTBS from "../../../../components/SortasiTBS";
+
+import { SortasiKernel } from "../../../../components/SortasiKernel";
 
 import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../hooks";
 
-const PksManualEntryTbsIn = (props) => {
+const PksManualEntryKernelIn = (props) => {
   const { setFieldValue, values } = props;
   console.clear();
   const { user } = useAuth();
   const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { useGetDriversQuery } = useDriver();
-
   const { wbTransaction } = useTransaction();
-  const { data: dtDrivers } = useGetDriversQuery();
+  const { useGetDriversQuery } = useDriver();
   const { setSidebar } = useApp();
+  const { data: dtDrivers } = useGetDriversQuery();
+
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const [dtTrx, setDtTrx] = useState(null);
@@ -39,17 +39,6 @@ const PksManualEntryTbsIn = (props) => {
       // console.clear();
     };
   }, []);
-
-  // useEffect(() => {
-  //   if (!wbTransaction) return handleClose();
-
-  //   setSidebar({ selected: "Transaksi WB PKS" });
-  //   setValues(wbTransaction);
-
-  //   return () => {
-  //     // console.clear();
-  //   };
-  // }, []);
 
   useEffect(() => {
     if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
@@ -172,22 +161,7 @@ const PksManualEntryTbsIn = (props) => {
               component={TextField}
               fullWidth
               value={values?.tahun}
-              sx={{ mt: 2, mb: 2.5 }}
-            />
-            <Grid item xs={12}>
-              <Divider>SPTBS</Divider>
-            </Grid>
-
-            <Field
-              name="sptbs"
-              label="SPTBS"
-              type="number"
-              variant="outlined"
-              size="small"
-              fullWidth
-              component={TextField}
-              value={values?.sptbs}
-              sx={{ mt: 2.5 }}
+              sx={{ mt: 2 }}
             />
           </Grid>
         </Grid>
@@ -195,9 +169,9 @@ const PksManualEntryTbsIn = (props) => {
       <Grid item xs={12} sm={6} lg={3}>
         <Grid container columnSpacing={1}>
           <Grid item xs={12}>
-            <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
+            <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
           </Grid>
-          <SortasiTBS isReadOnly={true} />
+          <SortasiKernel isReadOnly={true} isBgcolor={true} />
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
@@ -209,27 +183,13 @@ const PksManualEntryTbsIn = (props) => {
             <Field
               type="text"
               variant="outlined"
+              component={TextField}
               size="small"
               fullWidth
-              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Field
-              type="text"
-              variant="outlined"
-              size="small"
-              fullWidth
-              component={TextField}
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Operator WB-OUT"
-              value="-"
-              name="originWeighOutOperatorName"
               inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
@@ -237,66 +197,79 @@ const PksManualEntryTbsIn = (props) => {
             <Field
               type="text"
               variant="outlined"
+              component={TextField}
               size="small"
               fullWidth
-              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              value={dtTrx || "-"}
-              inputProps={{ readOnly: true }}
+              label="Operator WB-OUT"
+              value={user.name}
+              name="originWeighOutOperatorName"
+              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
-              type="text"
+              type="datetime-local"
               variant="outlined"
+              component={TextField}
               size="small"
               fullWidth
-              component={TextField}
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Waktu WB-Out"
-              name="originWeighOutTimestamp"
-              inputProps={{ readOnly: true }}
-              value={
-                values?.originWeighOutTimestamp
-                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                  : "-"
-              }
+              sx={{ mt: 2 }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={values?.originWeighInTimestamp}
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
           </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="datetime-local"
+              variant="outlined"
+              component={TextField}
+              size="small"
+              fullWidth
+              sx={{ mt: 2 }}
+              label="Waktu WB-Out"
+              name="originWeighOutTimestamp"
+              value={values?.originWeighOutTimestamp}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+
           <Grid item xs={6}>
             <Field
               type="number"
               variant="outlined"
+              component={TextField}
               size="small"
               fullWidth
-              component={TextField}
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              sx={{ mt: 2 }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
               label="BERAT MASUK - IN"
               name="originWeighInKg"
-              value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-              inputProps={{ readOnly: true }}
+              value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
               type="number"
               variant="outlined"
+              component={TextField}
               size="small"
               fullWidth
-              component={TextField}
-              sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+              sx={{ mt: 2, mb: 3 }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
-              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
-              inputProps={{ readOnly: true }}
+              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg : "0"}
             />
           </Grid>
           <Grid item xs={12}>
@@ -327,7 +300,7 @@ const PksManualEntryTbsIn = (props) => {
               fullWidth
               component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label={<span style={{ color: "red" }}>POTONGAN</span>}
+              label="POTONGAN"
               name="weightNetto"
               value={0}
               inputProps={{ readOnly: true }}
@@ -369,4 +342,4 @@ const PksManualEntryTbsIn = (props) => {
   );
 };
 
-export default PksManualEntryTbsIn;
+export default PksManualEntryKernelIn;

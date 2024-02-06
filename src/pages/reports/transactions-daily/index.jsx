@@ -39,8 +39,13 @@ const ReportTransactionDaily = () => {
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      progressStatus: { in: [21, 26, 31, 100, 40,41,42] },
+      progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
+
+      NOT: {
+        typeTransaction: 5,
+      },
     },
+
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
 

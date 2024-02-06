@@ -62,7 +62,6 @@ const TransactionPks = () => {
           variant="contained"
           sx={{ mr: 0.5 }}
           onClick={() => {
-            // navigate("/wb/transactions/pks/manual-entry-in");
             if (WBMS.SITE_TYPE === 1) {
               navigate(`/wb/transactions/pks/manual-entry-in`);
             } else if (WBMS.SITE_TYPE === 2) {
@@ -73,15 +72,6 @@ const TransactionPks = () => {
           }}
         >
           Buat Baru
-        </Button>
-
-        <Button
-          variant="contained"
-          onClick={() => {
-            navigate("/wb/transactions/pks-new-backdate");
-          }}
-        >
-          Form
         </Button>
       </Box>
 

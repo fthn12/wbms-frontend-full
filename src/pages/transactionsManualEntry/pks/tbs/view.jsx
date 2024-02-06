@@ -21,12 +21,21 @@ import SortasiTBS from "../../../../components/SortasiTBS";
 
 import { TransactionAPI } from "../../../../apis";
 
-import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
+import {
+  useApp,
+  useConfig,
+  useTransaction,
+  useCompany,
+  useProduct,
+  useDriver,
+  useTransportVehicle,
+} from "../../../../hooks";
 
 const PksManualEntryTbsView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
+  const { urlPrev, setUrlPrev } = useApp();
   const { WBMS, SCC_MODEL } = useConfig();
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
@@ -44,7 +53,10 @@ const PksManualEntryTbsView = () => {
   const handleClose = () => {
     clearOpenedTransaction();
 
-    navigate("/wb/transactions");
+    const url = urlPrev;
+    setUrlPrev("");
+
+    url ? navigate(url) : navigate("/wb/transactions");
   };
 
   useEffect(() => {
@@ -343,7 +355,7 @@ const PksManualEntryTbsView = () => {
                         <Grid item xs={12}>
                           <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                         </Grid>
-                        <SortasiTBS isReadOnly={true} />
+                        <SortasiTBS isReadOnly={true} values={values} />
                       </Grid>
                     </Grid>
                     <Grid item xs={12} sm={6} lg={3}>

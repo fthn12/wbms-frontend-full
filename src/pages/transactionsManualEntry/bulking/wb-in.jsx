@@ -68,6 +68,7 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.typeTransaction = 4;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
@@ -76,7 +77,7 @@ const BulkingManualEntryWBIn = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.ManualEntryBulkingInOthers(tempTrans);
+      const response = await transactionAPI.ManualEntryInOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -385,7 +386,7 @@ const BulkingManualEntryWBIn = () => {
                     {/* {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />} */}
                   </Grid>
                 </Paper>
-                {/* {isLoading && (
+                {isLoading && (
                   <CircularProgress
                     size={50}
                     sx={{
@@ -395,7 +396,7 @@ const BulkingManualEntryWBIn = () => {
                       left: "48.5%",
                     }}
                   />
-                )} */}
+                )}
               </Form>
             );
           }}

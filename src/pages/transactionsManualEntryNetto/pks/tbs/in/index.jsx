@@ -1,32 +1,33 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
   Button,
   CircularProgress,
   Grid,
   InputAdornment,
   Divider,
-  Paper,
+  Checkbox,
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { TextField, Autocomplete } from "formik-mui";
 import { Formik, Form, Field } from "formik";
 import moment from "moment";
+import SortasiTBS from "../../../../../components/SortasiTBS";
 
-import { useAuth, useDriver, useConfig, useTransaction, useApp } from "../../../../hooks";
+import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
-const PksManualEntryOthersIn = (props) => {
-  const { setFieldValue, values, handleChange } = props;
+const PksManualEntryTbsIn = (props) => {
+  const { setFieldValue, values } = props;
   console.clear();
   const { user } = useAuth();
+  const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { wbTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
+
+  const { wbTransaction } = useTransaction();
+  const { data: dtDrivers } = useGetDriversQuery();
   const { setSidebar } = useApp();
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
-
-  const { data: dtDrivers } = useGetDriversQuery();
 
   const [dtTrx, setDtTrx] = useState(null);
 
@@ -39,15 +40,25 @@ const PksManualEntryOthersIn = (props) => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (!wbTransaction) return handleClose();
+
+  //   setSidebar({ selected: "Transaksi WB PKS" });
+  //   setValues(wbTransaction);
+
+  //   return () => {
+  //     // console.clear();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    if (values?.originWeighInKg < WBMS.WB_MIN_WEIGHT || values?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(values?.originWeighInKg - values?.originWeighOutKg);
+      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
       setOriginWeighNetto(total);
     }
-  }, [values]);
-  console.log(moment(values?.originWeighInTimestamp).format("YYYY-MM-DDTHH:mm:ssZ"));
+  }, [wbTransaction]);
 
   return (
     <>
@@ -161,9 +172,32 @@ const PksManualEntryOthersIn = (props) => {
               component={TextField}
               fullWidth
               value={values?.tahun}
-              sx={{ mt: 2 }}
+              sx={{ mt: 2, mb: 2.5 }}
+            />
+            <Grid item xs={12}>
+              <Divider>SPTBS</Divider>
+            </Grid>
+
+            <Field
+              name="sptbs"
+              label="SPTBS"
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              value={values?.sptbs}
+              sx={{ mt: 2.5 }}
             />
           </Grid>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sm={6} lg={3}>
+        <Grid container columnSpacing={1}>
+          <Grid item xs={12}>
+            <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
+          </Grid>
+          <SortasiTBS values={values} isReadOnly={true} />
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
@@ -175,13 +209,27 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Operator WB-IN"
               name="originWeighInOperatorName"
               value={user.name}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Field
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label="Operator WB-OUT"
+              value="-"
+              name="originWeighOutOperatorName"
               inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
             />
           </Grid>
@@ -189,86 +237,65 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Operator WB-OUT"
-              value={user.name}
-              name="originWeighOutOperatorName"
-              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+              label="Waktu WB-IN"
+              name="originWeighInTimestamp"
+              value={dtTrx || "-"}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
-              type="datetime-local"
+              type="text"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2 }}
-              label="Waktu WB-IN"
-              name="originWeighInTimestamp"
-              value={
-                values?.originWeighInTimestamp ? moment(values?.originWeighInTimestamp).format("YYYY-MM-DDTHH:mm") : ""
-              }
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          {/* <Grid item xs={6}>
-            <Field
-              type="datetime-local"
-              variant="outlined"
               component={TextField}
-              size="small"
-              fullWidth
-              sx={{ mt: 2 }}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Waktu WB-Out"
               name="originWeighOutTimestamp"
+              inputProps={{ readOnly: true }}
               value={
                 values?.originWeighOutTimestamp
-                  ? moment(values?.originWeighOutTimestamp).format("YYYY-MM-DDTHH:mm")
-                  : ""
+                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                  : "-"
               }
-              onChange={handleChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
             />
-          </Grid> */}
-
+          </Grid>
           <Grid item xs={6}>
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
+              component={TextField}
               sx={{ mt: 2 }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
               label="BERAT MASUK - IN"
               name="originWeighInKg"
-              value={values?.originWeighInKg ?? 0}
+              value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
             />
           </Grid>
           <Grid item xs={6}>
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 2, mb: 3 }}
+              component={TextField}
+              sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
-              value={values?.originWeighOutKg ?? 0}
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
+              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -278,16 +305,48 @@ const PksManualEntryOthersIn = (props) => {
             <Field
               type="number"
               variant="outlined"
-              component={TextField}
               size="small"
               fullWidth
-              sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+              component={TextField}
+              sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">kg</InputAdornment>,
               }}
-              label="TOTAL"
+              label="TOTAL SEBELUM"
               name="weightNetto"
               value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              label={<span style={{ color: "red" }}>POTONGAN</span>}
+              name="weightNetto"
+              value={0}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Field
+              type="number"
+              variant="outlined"
+              size="small"
+              fullWidth
+              component={TextField}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+              }}
+              label="TOTAL SESUDAH"
+              name="weightNetto"
+              value={0}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
         </Grid>
@@ -309,4 +368,4 @@ const PksManualEntryOthersIn = (props) => {
   );
 };
 
-export default PksManualEntryOthersIn;
+export default PksManualEntryTbsIn;

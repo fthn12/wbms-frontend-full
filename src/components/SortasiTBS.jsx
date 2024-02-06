@@ -2,27 +2,36 @@ import { useState } from "react";
 import { Grid, InputAdornment, Checkbox, TextField as TextFieldMUI } from "@mui/material";
 import { Field } from "formik";
 import { TextField } from "formik-mui";
+// import { useTransaction } from "../../../../../hooks";
 
 export const SortasiTBS = (props) => {
-  const { isReadOnly } = props;
-  const [checked, setChecked] = useState([true, false]);
+  const { isReadOnly, values, setFieldValue } = props;
 
-  const handleChange1 = (event) => {
-    setChecked([event.target.checked, event.target.checked]);
-  };
+  const handleSelectAll = (event) => {
+    const isChecked = event.target.checked;
 
-  const handleChange2 = (event) => {
-    setChecked([event.target.checked, checked[1]]);
-  };
-
-  const handleChange3 = (event) => {
-    setChecked([checked[0], event.target.checked]);
+    setFieldValue("unRipeChecked", isChecked);
+    setFieldValue("underRipeChecked", isChecked);
+    setFieldValue("longStalkChecked", isChecked);
+    setFieldValue("emptyBunchChecked", isChecked);
+    setFieldValue("garbageDirtChecked", isChecked);
+    setFieldValue("waterChecked", isChecked);
+    setFieldValue("parthenocarpyChecked", isChecked);
+    setFieldValue("looseFruitChecked", isChecked);
+    setFieldValue("mandatoryDeductionChecked", isChecked);
+    setFieldValue("othersChecked", isChecked);
   };
 
   return (
     <>
       <Grid item xs={1.1}>
-        <Checkbox size="medium" disabled={isReadOnly} name="unRipeChecked " />
+        <Checkbox
+          name="unRipeChecked"
+          size="medium"
+          checked={values?.unRipeChecked}
+          onChange={(e) => setFieldValue("unRipeChecked", e.target.checked)}
+          disabled={isReadOnly}
+        />
       </Grid>
       <Grid item xs={6.9}>
         <Field
@@ -62,6 +71,8 @@ export const SortasiTBS = (props) => {
         <Checkbox
           name="underRipeChecked"
           size="medium"
+          checked={values?.underRipeChecked}
+          onChange={(e) => setFieldValue("underRipeChecked", e.target.checked)}
           sx={{
             mt: 1,
           }}
@@ -105,6 +116,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="longStalkChecked"
+          checked={values?.longStalkChecked}
+          onChange={(e) => setFieldValue("longStalkChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -150,6 +163,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="emptyBunchChecked"
+          checked={values?.emptyBunchChecked}
+          onChange={(e) => setFieldValue("emptyBunchChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -195,6 +210,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="garbageDirtChecked"
+          checked={values?.garbageDirtChecked}
+          onChange={(e) => setFieldValue("garbageDirtChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -240,6 +257,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="waterChecked"
+          checked={values?.waterChecked}
+          onChange={(e) => setFieldValue("waterChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -285,6 +304,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="parthenocarpyChecked"
+          checked={values?.parthenocarpyChecked}
+          onChange={(e) => setFieldValue("parthenocarpyChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -330,6 +351,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="looseFruitChecked"
+          checked={values?.looseFruitChecked}
+          onChange={(e) => setFieldValue("looseFruitChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -375,6 +398,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="mandatoryDeductionChecked"
+          checked={values?.mandatoryDeductionChecked}
+          onChange={(e) => setFieldValue("mandatoryDeductionChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -393,7 +418,7 @@ export const SortasiTBS = (props) => {
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
-              color: isReadOnly ? "transparent" : "",
+              // color: isReadOnly ? "transparent" : "",
             },
             // readOnly: isReadOnly,
             readOnly: true,
@@ -420,7 +445,9 @@ export const SortasiTBS = (props) => {
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
-          name=""
+          name="othersChecked"
+          checked={values?.othersChecked}
+          onChange={(e) => setFieldValue("othersChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -469,6 +496,7 @@ export const SortasiTBS = (props) => {
           type="number"
           variant="outlined"
           size="small"
+          name="Total Potongan"
           fullWidth
           sx={{ mt: 1 }}
           inputProps={{
@@ -480,13 +508,25 @@ export const SortasiTBS = (props) => {
           }}
           component={TextField}
           label="Total Potongan"
-          name="TangkaiPanjang"
         />
       </Grid>
 
       <Grid item xs={1.1}>
         <Checkbox
-          name=""
+          // name="selectAll"
+          checked={
+            values?.unRipeChecked &&
+            values?.underRipeChecked &&
+            values?.longStalkChecked &&
+            values?.emptyBunchChecked &&
+            values?.garbageDirtChecked &&
+            values?.waterChecked &&
+            values?.parthenocarpyChecked &&
+            values?.looseFruitChecked &&
+            values?.mandatoryDeductionChecked &&
+            values?.othersChecked
+          }
+          onChange={handleSelectAll}
           size="medium"
           sx={{
             mt: 1,
@@ -499,19 +539,6 @@ export const SortasiTBS = (props) => {
           Pilih Semua Sebagai Potongan/Pengurangan Tonase ?
         </span>
       </Grid>
-      {/* <FormControlLabel
-        label="Parent"
-        control={
-          <Checkbox
-            checked={checked[0] && checked[1]}
-            indeterminate={checked[0] !== checked[1]}
-            onChange={handleChange1}
-          />
-        }
-      /> */}
-
-      {/* <FormControlLabel label="Child 1" control={<Checkbox checked={checked[0]} onChange={handleChange2} />} />
-      <FormControlLabel label="Child 2" control={<Checkbox checked={checked[1]} onChange={handleChange3} />} /> */}
     </>
   );
 };

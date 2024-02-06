@@ -31,6 +31,9 @@ const BarChartComponent = () => {
           },
         },
       ],
+      NOT: {
+        typeTransaction: 5,
+      },
     },
     orderBy: { bonTripNo: "desc" },
   };
@@ -96,15 +99,12 @@ const BarChartComponent = () => {
       <div style={{ width: "auto", height: "auto" }}>
         <div className="grafik">
           <Box display="flex" mt={1}>
-            <BarChartIcon sx={{ mr: 1,  fontSize: "23px" }} />
-            <Typography variant="h5" mt={0.1} >
+            <BarChartIcon sx={{ mr: 1, fontSize: "23px" }} />
+            <Typography variant="h5" mt={0.1}>
               Total Transaksi Per Bulan
             </Typography>
           </Box>
-          <FormControl
-  
-            size="small"
-          >
+          <FormControl size="small">
             <Select
               value={selectedProduct}
               onChange={(e) => handleProductChange(e.target.value)}
