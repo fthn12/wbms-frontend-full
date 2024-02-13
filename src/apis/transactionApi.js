@@ -124,14 +124,8 @@ export const TransactionAPI = () => {
     return response;
   };
 
-  const ManualEntryInOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-others`, data).then((res) => res.data);
-
-    return response;
-  };
-
-  const ManualEntryInKernel = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-kernel`, data).then((res) => res.data);
+  const ManualEntryBackDate = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-backdate`, data).then((res) => res.data);
 
     return response;
   };
@@ -142,8 +136,20 @@ export const TransactionAPI = () => {
     return response;
   };
 
-  const ManualEntryBackDate = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-backdate`, data).then((res) => res.data);
+  const ManualEntryInKernel = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-kernel`, data).then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryInOthers = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-others`, data).then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryInDispatch = async (data) => {
+    const response = await axios.post(`${endpoint}/manual-entry-in-dispatch`, data).then((res) => res.data);
 
     return response;
   };
@@ -157,9 +163,10 @@ export const TransactionAPI = () => {
 
     ManualEntryBackDate,
 
-    ManualEntryInOthers,
-    ManualEntryInKernel,
     ManualEntryInTbs,
+    ManualEntryInKernel,
+    ManualEntryInOthers,
+    ManualEntryInDispatch,
 
     eDispatchFindOrCreateByQrcode,
 

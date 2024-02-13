@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, Grid, Divider, Paper, TextField as TextFieldMUI } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  MenuItem,
+  Grid,
+  Divider,
+  Paper,
+  TextField as TextFieldMUI,
+} from "@mui/material";
 import { Formik, Form, Field } from "formik";
-import { TextField, Autocomplete } from "formik-mui";
+import { TextField, Autocomplete, Select } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import TBS from "./tbs/in";
@@ -24,22 +33,30 @@ import {
 
 const PksManualEntryWBIn = () => {
   const navigate = useNavigate();
+  const [selectedOption, setSelectedOption] = useState("");
 
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
   const { user } = useAuth();
-  const { WBMS, SCC_MODEL } = useConfig();
+  const { WBMS, PRODUCT_TYPES } = useConfig();
   const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
-  const { useGetProductsQuery } = useProduct();
+  const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
   const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtProduct } = useGetProductsQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
+  const productFilter = {
+    where: {
+      productGroupId: selectedOption,
+    },
+  };
+  const { data: dtProduct } = useFindManyProductQuery(productFilter);
+
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
 
   const validationSchema = Yup.object().shape({
     transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
@@ -60,6 +77,14 @@ const PksManualEntryWBIn = () => {
     setIsLoading(true);
 
     try {
+      if (!tempTrans.mandatoryDeductionChecked) {
+        delete tempTrans.mandatoryDeductionKg;
+      }
+
+      if (!tempTrans.othersChecked) {
+        delete tempTrans.othersKg;
+      }
+
       if (tempTrans.afdeling) {
         tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
       } else if (tempTrans.kebun) {
@@ -70,6 +95,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 2;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -112,6 +138,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 3;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -153,6 +180,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 4;
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -194,12 +222,12 @@ const PksManualEntryWBIn = () => {
         <Formik
           enableReinitialize
           onSubmit={(values) => {
-            if (selectedOption === "Others") {
-              handleOthersSubmit(values);
-            } else if (selectedOption === "Kernel") {
-              handleKernelSubmit(values);
-            } else if (selectedOption === "Tbs") {
+            if (selectedOption === 2) {
               handleTbsSubmit(values);
+            } else if (selectedOption === 3) {
+              handleKernelSubmit(values);
+            } else if (selectedOption === 4) {
+              handleOthersSubmit(values);
             }
           }}
           initialValues={wbTransaction}
@@ -207,7 +235,7 @@ const PksManualEntryWBIn = () => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, isValid, submitForm, setFieldValue } = props;
+            const { values, isValid, submitForm, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             const handleOtrSubmit = () => {
@@ -224,17 +252,17 @@ const PksManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === "Others" && (
+                  {selectedOption === 2 && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
-                      onClick={() => handleOtrSubmit()}
+                      onClick={() => handleTbsSubmit()}
                     >
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === "Kernel" && (
+                  {selectedOption === 3 && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -244,13 +272,12 @@ const PksManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-
-                  {selectedOption === "Tbs" && (
+                  {selectedOption === 4 && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
-                      onClick={() => handleTbsSubmit()}
+                      onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
                     </Button>
@@ -288,118 +315,126 @@ const PksManualEntryWBIn = () => {
                         inputProps={{ readOnly: true }}
                       />
                       <Field
-                        name="transportVehiclePlateNo"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        freeSolo
-                        disableClearable
-                        options={dtTransport?.records.map((record) => record.plateNo)}
-                        onInputChange={(event, InputValue, reason) => {
-                          if (reason !== "reset") {
-                            setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
-                          }
+                        name="productType"
+                        label="Tipe Produk"
+                        component={Select}
+                        size="small"
+                        formControl={{
+                          fullWidth: true,
+                          required: true,
+                          size: "small",
                         }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
-                            label="Nomor Plat"
+                        sx={{ mb: 2 }}
+                        onChange={(event, newValue) => {
+                          handleChange(event);
+                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          setSelectedOption(selectedProductType.id);
+                        }}
+                      >
+                        {dtTypeProduct &&
+                          dtTypeProduct.map((data, index) => (
+                            <MenuItem key={index} value={data.id}>
+                              {data.value}
+                            </MenuItem>
+                          ))}
+                      </Field>
+
+                      {(selectedOption === 2 || selectedOption === 3 || selectedOption === 4) && (
+                        <>
+                          <Field
                             name="transportVehiclePlateNo"
-                            size="small"
-                            inputProps={{
-                              ...params.inputProps,
-                              style: { textTransform: "uppercase" },
+                            component={Autocomplete}
+                            variant="outlined"
+                            fullWidth
+                            freeSolo
+                            disableClearable
+                            options={dtTransport?.records.map((record) => record.plateNo)}
+                            onInputChange={(event, InputValue, reason) => {
+                              if (reason !== "reset") {
+                                setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
+                              }
                             }}
+                            renderInput={(params) => (
+                              <TextFieldMUI
+                                {...params}
+                                label="Nomor Plat"
+                                name="transportVehiclePlateNo"
+                                size="small"
+                                inputProps={{
+                                  ...params.inputProps,
+                                  style: { textTransform: "uppercase" },
+                                }}
+                              />
+                            )}
                           />
-                        )}
-                      />
-
-                      <Field
-                        name="transporterCompanyName"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        options={dtCompany?.records || []}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={
-                          (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
-                          null
-                        }
-                        onChange={(event, newValue) => {
-                          setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                          setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                          setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                          setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
-                        }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
+                          <Field
                             name="transporterCompanyName"
-                            label="Cust/Vendor transport"
-                            size="small"
-                            sx={{ mt: 2 }}
+                            component={Autocomplete}
+                            variant="outlined"
+                            fullWidth
+                            options={dtCompany?.records || []}
+                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                            value={
+                              (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
+                              null
+                            }
+                            onChange={(event, newValue) => {
+                              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+                              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+                              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                              setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
+                            }}
+                            renderInput={(params) => (
+                              <TextFieldMUI
+                                {...params}
+                                name="transporterCompanyName"
+                                label="Cust/Vendor transport"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            )}
                           />
-                        )}
-                      />
-
-                      <Field
-                        name="productName"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        // freeSolo
-                        // disableClearable
-                        // options={(dtProduct?.records || []).filter(
-                        //   (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-                        // )}
-                        options={dtProduct?.records || []}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
-                        onChange={(event, newValue) => {
-                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
-                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                          setFieldValue("productName", newValue ? newValue.name : "");
-                          setFieldValue("productId", newValue ? newValue.id : "");
-                          setFieldValue("productCode", newValue ? newValue.code : "");
-                          if (!newValue) {
-                            setSelectedOption("");
-                          } else {
-                            const filterOption = (newValue?.name || "").toLowerCase().includes("cpo")
-                              ? "CPO"
-                              : (newValue?.name || "").toLowerCase().includes("pko")
-                              ? "PKO"
-                              : (newValue?.name || "").toLowerCase().includes("kernel")
-                              ? "Kernel"
-                              : (newValue?.name || "").toLowerCase().includes("tbs")
-                              ? "Tbs"
-                              : "Others";
-
-                            setSelectedOption(filterOption);
-                          }
-                        }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
+                          <Field
                             name="productName"
-                            label="Nama Produk"
-                            size="small"
-                            sx={{ mt: 2 }}
+                            component={Autocomplete}
+                            variant="outlined"
+                            fullWidth
+                            options={dtProduct?.records || []}
+                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                            value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
+                            onChange={(event, newValue) => {
+                              setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                              setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+                              setFieldValue("productName", newValue ? newValue.name : "");
+                              setFieldValue("productId", newValue ? newValue.id : "");
+                              setFieldValue("productCode", newValue ? newValue.code : "");
+                            }}
+                            renderInput={(params) => (
+                              <TextFieldMUI
+                                {...params}
+                                name="productName"
+                                label="Nama Produk"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            )}
                           />
-                        )}
-                      />
+                        </>
+                      )}
                     </Grid>
+
                     {/* TBS */}
 
-                    {selectedOption === "Tbs" && <TBS setFieldValue={setFieldValue} values={values} />}
-
-                    {/* Others*/}
-
-                    {selectedOption === "Others" && <OTHERS setFieldValue={setFieldValue} values={values} />}
+                    {selectedOption === 2 && <TBS setFieldValue={setFieldValue} values={values} />}
 
                     {/* KERNEL*/}
 
-                    {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />}
+                    {selectedOption === 3 && <KERNEL setFieldValue={setFieldValue} values={values} />}
+
+                    {/* Others*/}
+
+                    {selectedOption === 4 && <OTHERS setFieldValue={setFieldValue} values={values} />}
                   </Grid>
                 </Paper>
                 {isLoading && (

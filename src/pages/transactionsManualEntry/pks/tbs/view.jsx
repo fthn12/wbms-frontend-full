@@ -44,6 +44,7 @@ const PksManualEntryTbsView = () => {
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
+  const [totalPotongan, setTotalPotongan] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
@@ -90,6 +91,24 @@ const PksManualEntryTbsView = () => {
     }
   }, [openedTransaction]);
 
+  useEffect(() => {
+    if (!openedTransaction) return; // Exit early if openedTransaction is null
+
+    let total = Math.abs(
+      openedTransaction.unripeKg +
+        openedTransaction.underRipeKg +
+        openedTransaction.longStalkKg +
+        openedTransaction.emptyBunchKg +
+        openedTransaction.garbageDirtKg +
+        openedTransaction.waterKg +
+        openedTransaction.parthenocarpyKg +
+        openedTransaction.looseFruitKg +
+        openedTransaction.mandatoryDeductionKg +
+        openedTransaction.othersKg,
+    );
+    setTotalPotongan(total);
+  }, [openedTransaction]);
+
   return (
     <Box>
       <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
@@ -101,7 +120,7 @@ const PksManualEntryTbsView = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, handleChange, setFieldValue } = props;
+            const { values } = props;
             // console.log("Formik props:", props);
 
             return (
@@ -115,7 +134,7 @@ const PksManualEntryTbsView = () => {
                   >
                     SIMPAN
                   </Button> */}
-                  <BonTripPrint dtTrans={{ ...values }} sx={{ mx: 1 }} />
+                  <BonTripPrint dtTrans={{ ...openedTransaction }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -491,7 +510,7 @@ const PksManualEntryTbsView = () => {
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             label={<span style={{ color: "red" }}>POTONGAN</span>}
                             name="weightNetto"
-                            value={0}
+                            value={totalPotongan}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -508,7 +527,7 @@ const PksManualEntryTbsView = () => {
                             }}
                             label="TOTAL SESUDAH"
                             name="weightNetto"
-                            value={0}
+                            value={(originWeighNetto - totalPotongan).toFixed(2) || "0.00"}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>

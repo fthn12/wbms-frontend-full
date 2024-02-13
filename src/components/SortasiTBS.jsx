@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Grid, InputAdornment, Checkbox, TextField as TextFieldMUI } from "@mui/material";
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import { TextField } from "formik-mui";
 // import { useTransaction } from "../../../../../hooks";
 
 export const SortasiTBS = (props) => {
-  const { isReadOnly, values, setFieldValue } = props;
+  const { isReadOnly } = props;
+  const { values, setFieldValue} = useFormikContext();
+
+  const [totalPotongan, setTotalPotongan] = useState(0);
+
 
   const handleSelectAll = (event) => {
     const isChecked = event.target.checked;
@@ -21,6 +25,36 @@ export const SortasiTBS = (props) => {
     setFieldValue("mandatoryDeductionChecked", isChecked);
     setFieldValue("othersChecked", isChecked);
   };
+
+  useEffect(() => {
+    let total = Math.abs(
+      values.unripeKg +
+        values.underRipeKg +
+        values.longStalkKg +
+        values.emptyBunchKg +
+        values.garbageDirtKg +
+        values.waterKg +
+        values.parthenocarpyKg +
+        values.looseFruitKg +
+        values.mandatoryDeductionKg +
+        values.othersKg,
+    );
+    setTotalPotongan(total);
+  }, [values]);
+
+  //grading potongan wajib
+  useEffect(() => {
+    const mandatoryDeductionKg = Math.trunc(Math.abs(values.mandatoryDeductionPercentage / 100) * values.janjang);
+    setFieldValue("mandatoryDeductionKg", mandatoryDeductionKg);
+  }, [values.mandatoryDeductionPercentage, values.janjang, setFieldValue]);
+
+   //grading potongan lainnya
+   useEffect(() => {
+    const othersKg = Math.trunc(Math.abs(values.othersPercentage / 100) * values.janjang);
+    setFieldValue("othersKg", othersKg);
+  }, [values.othersPercentage, values.janjang, setFieldValue]);
+
+  
 
   return (
     <>
@@ -44,8 +78,6 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Buah Mentah"
@@ -92,7 +124,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Buah Lewat Matang"
@@ -109,6 +140,7 @@ export const SortasiTBS = (props) => {
           sx={{ mt: 1, backgroundColor: "whitesmoke" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+            readOnly: true,
           }}
           name="underRipeKg"
         />
@@ -138,7 +170,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Tangkai Panjang"
@@ -185,7 +216,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Tandan Kosong"
@@ -232,7 +262,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Sampah"
@@ -279,7 +308,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Air"
@@ -326,7 +354,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Parteno"
@@ -373,7 +400,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Brondolan"
@@ -398,8 +424,8 @@ export const SortasiTBS = (props) => {
       <Grid item xs={1.1}>
         <Checkbox
           name="mandatoryDeductionChecked"
-          checked={values?.mandatoryDeductionChecked}
           onChange={(e) => setFieldValue("mandatoryDeductionChecked", e.target.checked)}
+          checked={values?.mandatoryDeductionChecked}
           size="medium"
           sx={{
             mt: 1,
@@ -418,9 +444,7 @@ export const SortasiTBS = (props) => {
             endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
-              // color: isReadOnly ? "transparent" : "",
             },
-            // readOnly: isReadOnly,
             readOnly: true,
           }}
           component={TextField}
@@ -441,8 +465,10 @@ export const SortasiTBS = (props) => {
             readOnly: true,
           }}
           name="mandatoryDeductionKg"
+          value={values?.mandatoryDeductionKg}
         />
       </Grid>
+
       <Grid item xs={1.1}>
         <Checkbox
           name="othersChecked"
@@ -468,7 +494,6 @@ export const SortasiTBS = (props) => {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
             // readOnly: isReadOnly,
-            readOnly: true,
           }}
           component={TextField}
           label="Pot. Lainnya"
@@ -503,11 +528,11 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            // readOnly: isReadOnly,
             readOnly: true,
           }}
           component={TextField}
-          label="Total Potongan"
+          value={totalPotongan}
+          label="Total Potongan [KG]"
         />
       </Grid>
 

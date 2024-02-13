@@ -77,6 +77,8 @@ const PksManualEntryOthersView = () => {
     }
   }, [openedTransaction]);
 
+  
+
   return (
     <Box>
       <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />

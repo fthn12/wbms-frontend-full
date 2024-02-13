@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,15 +15,18 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import { Formik } from "formik";
+import { Formik, Field } from "formik";
 import * as yup from "yup";
 import { grey } from "@mui/material/colors";
-import { useProduct } from "../../../hooks";
+import { useProduct, useConfig } from "../../../hooks";
 
 const CreateProduct = (props) => {
   const { isOpen, onClose, refetch } = props;
   const { useCreateProductMutation } = useProduct();
   const [createProduct, { isLoading }] = useCreateProductMutation();
+  const { PRODUCT_TYPES } = useConfig();
+
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     try {
@@ -44,7 +48,7 @@ const CreateProduct = (props) => {
     codeSap: yup.string().required("required"),
     shortName: yup.string().required("required"),
     name: yup.string().required("required"),
-    description: yup.string().required("required"),
+    productGroupId: yup.number().required("required"),
   });
 
   const initialValues = {
@@ -52,7 +56,7 @@ const CreateProduct = (props) => {
     code: "",
     name: "",
     shortName: "",
-    description: "",
+    productGroupId: "",
   };
 
   return (
@@ -75,7 +79,7 @@ const CreateProduct = (props) => {
       </DialogTitle>
 
       <Formik onSubmit={handleSubmit} initialValues={initialValues} validationSchema={checkoutSchema}>
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <DialogContent dividers>
               <Box
@@ -185,9 +189,9 @@ const CreateProduct = (props) => {
                     helperText={touched.shortName && errors.shortName}
                   />
                 </FormControl>
-
                 <FormControl sx={{ gridColumn: "span 4" }}>
                   <FormLabel
+                    id="productGroupId"
                     sx={{
                       marginBottom: "8px",
                       color: "black",
@@ -195,23 +199,41 @@ const CreateProduct = (props) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Product Group Name
+                    Tipe Produk
                   </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Product Group Name...."
+                  <Select
+                    labelId="productGroupId"
+                    name="productGroupId"
+                    value={values.productGroupId}
                     onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.productGroupName}
-                    name="productGroupName"
-                    error={touched.productGroupName && !!errors.productGroupName}
-                    helperText={touched.productGroupName && errors.productGroupName}
-                  />
+                    // onChange={handleChange}
+                    onChange={(event) => {
+                      handleChange(event);
+                      const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                      setFieldValue("productGroupName", selectedProductType ? selectedProductType.value : "");
+                    }}
+                    error={!!touched.productGroupId && !!errors.productGroupId}
+                    helperText={touched.productGroupId && errors.productGroupId}
+                    displayEmpty
+                    sx={{
+                      color: MenuItem ? "grey" : "black",
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      -- Pilih Tipe Produk --
+                    </MenuItem>
+                    {dtTypeProduct &&
+                      dtTypeProduct?.map((data, index) => {
+                        return (
+                          <MenuItem key={index} value={data.id}>
+                            {data.value}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
+
                   <FormLabel
                     sx={{
-                      marginBottom: "8px",
                       marginTop: "20px",
                       color: "black",
                       fontSize: "16px",

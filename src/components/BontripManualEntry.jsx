@@ -13,6 +13,8 @@ const BonTripPrintManualEntry = (props) => {
   const { WBMS } = useConfig();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [originWeighNetto, setOriginWeighNetto] = useState(0);
+  const [totalPotongan, setTotalPotongan] = useState(0);
 
   const formRef = useRef();
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -21,7 +23,32 @@ const BonTripPrintManualEntry = (props) => {
   const jamKeluar = moment(dtTrans.originWeighOutTimestamp).format("HH:mm:ss");
   const tanggal = moment(dtTrans.originWeighOutTimestamp).format("DD- MM-YYYY");
 
-  useEffect(() => {}, [isOpen]);
+  useEffect(() => {
+    if (dtTrans?.originWeighInKg < WBMS.WB_MIN_WEIGHT || dtTrans?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+      setOriginWeighNetto(0);
+    } else {
+      let total = Math.abs(dtTrans?.originWeighInKg - dtTrans?.originWeighOutKg);
+      setOriginWeighNetto(total);
+    }
+  }, [dtTrans]);
+
+  useEffect(() => {
+    if (!dtTrans) return; // Exit early if dtTrans is null
+
+    let total = Math.abs(
+      dtTrans.unripeKg +
+        dtTrans.underRipeKg +
+        dtTrans.longStalkKg +
+        dtTrans.emptyBunchKg +
+        dtTrans.garbageDirtKg +
+        dtTrans.waterKg +
+        dtTrans.parthenocarpyKg +
+        dtTrans.looseFruitKg +
+        dtTrans.mandatoryDeductionKg +
+        dtTrans.othersKg,
+    );
+    setTotalPotongan(total);
+  }, [dtTrans]);
 
   return (
     <>
@@ -178,33 +205,21 @@ const BonTripPrintManualEntry = (props) => {
                         Net Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">
-                        {Math.abs(dtTrans.originWeighOutKg - dtTrans.originWeighInKg).toLocaleString()} KG
-                      </td>
+                      <td className="nota-text">{originWeighNetto} KG</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Potongan
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">
-                        {Math.abs(dtTrans.mandatoryDeductionKg + dtTrans.othersKg).toLocaleString()}
-                      </td>
+                      <td className="nota-text">{totalPotongan}</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Netto A G
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">
-                        {Math.abs(
-                          dtTrans.originWeighOutKg -
-                            dtTrans.originWeighInKg -
-                            dtTrans.mandatoryDeductionKg -
-                            dtTrans.othersKg,
-                        ).toLocaleString()}
-                        KG
-                      </td>
+                      <td className="nota-text">{originWeighNetto - totalPotongan} KG</td>
                     </tr>
                   </Typography>
                 </tbody>

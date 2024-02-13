@@ -18,7 +18,7 @@ import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp }
 
 const PksManualEntryKernelIn = (props) => {
   const { setFieldValue, values } = props;
-  console.clear();
+  // console.clear();
   const { user } = useAuth();
   const { wb } = useWeighbridge();
   const { WBMS, SCC_MODEL } = useConfig();

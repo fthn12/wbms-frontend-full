@@ -12,20 +12,30 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
+import * as yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
 import BonTripPrint from "../../../../components/BontripManualEntry";
-import SortasiKernel from "../../../../components/SortasiKernel";
+import SortasiTBS from "../../../../components/SortasiTBS";
 
 import { TransactionAPI } from "../../../../apis";
 
-import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
+import {
+  useApp,
+  useConfig,
+  useTransaction,
+  useCompany,
+  useProduct,
+  useDriver,
+  useTransportVehicle,
+} from "../../../../hooks";
 
-const PksManualEntryKernelView = () => {
+const PksManualEntryTbsView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
+  const { urlPrev, setUrlPrev } = useApp();
   const { WBMS, SCC_MODEL } = useConfig();
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
@@ -34,6 +44,7 @@ const PksManualEntryKernelView = () => {
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
+  const [totalPotongan, setTotalPotongan] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtProduct } = useGetProductsQuery();
@@ -77,9 +88,27 @@ const PksManualEntryKernelView = () => {
     }
   }, [openedTransaction]);
 
+  useEffect(() => {
+    if (!openedTransaction) return; // Exit early if openedTransaction is null
+
+    let total = Math.abs(
+      openedTransaction.unripeKg +
+        openedTransaction.underRipeKg +
+        openedTransaction.longStalkKg +
+        openedTransaction.emptyBunchKg +
+        openedTransaction.garbageDirtKg +
+        openedTransaction.waterKg +
+        openedTransaction.parthenocarpyKg +
+        openedTransaction.looseFruitKg +
+        openedTransaction.mandatoryDeductionKg +
+        openedTransaction.othersKg,
+    );
+    setTotalPotongan(total);
+  }, [openedTransaction]);
+
   return (
     <Box>
-      <Header title="Transaksi Manual Entry PKS" subtitle="Data Timbang Manual Entry" />
+      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -88,7 +117,7 @@ const PksManualEntryKernelView = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, handleChange, setFieldValue } = props;
+            const { values } = props;
             // console.log("Formik props:", props);
 
             return (
@@ -102,7 +131,7 @@ const PksManualEntryKernelView = () => {
                   >
                     SIMPAN
                   </Button> */}
-                  <BonTripPrint dtTrans={{ ...values }} sx={{ mx: 1 }} />
+                  <BonTripPrint dtTrans={{ ...openedTransaction }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -142,7 +171,7 @@ const PksManualEntryKernelView = () => {
                         freeSolo
                         readOnly={true}
                         disableClearable
-                        options={dtTransport?.records.map((record) => record.palteNo)}
+                        options={dtTransport?.records.map((record) => record.plateNo)}
                         // onInputChange={(event, InputValue, reason) => {
                         //   if (reason !== "reset") {
                         //     setFieldValue("transportVehiclePlateNo", InputValue);
@@ -316,34 +345,33 @@ const PksManualEntryKernelView = () => {
                             size="small"
                             component={TextField}
                             fullWidth
+                            sx={{ mt: 2, mb: 2.5, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                          <Grid item xs={12}>
+                            <Divider>SPTBS</Divider>
+                          </Grid>
+                          <Field
+                            name="sptbs"
+                            label="SPTBS"
+                            type="text"
+                            variant="outlined"
+                            size="small"
+                            component={TextField}
+                            fullWidth
+                            value={values?.sptbs}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
                           />
-                          {/* 
-            <Field
-              name="sptbs"
-              label="SPTBS"
-              type="text"
-              variant="outlined"
-              size="small"
-              component={TextField}
-              fullWidth
-              
-              value={values?.sptbs}
-              sx={{ mt: 2 }}
-               inputProps={{
-                style: { textTransform: "uppercase" },
-              }}
-            /> */}
                         </Grid>
                       </Grid>
-                    </Grid>{" "}
+                    </Grid>
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider sx={{ mb: 2 }}>KUALITAS KERNEL</Divider>
+                          <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                         </Grid>
-                        <SortasiKernel isReadOnly={true} />
+                        <SortasiTBS isReadOnly={true} values={values} />
                       </Grid>
                     </Grid>
                     <Grid item xs={12} sm={6} lg={3}>
@@ -477,9 +505,9 @@ const PksManualEntryKernelView = () => {
                             fullWidth
                             component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="POTONGAN"
+                            label={<span style={{ color: "red" }}>POTONGAN</span>}
                             name="weightNetto"
-                            value={0}
+                            value={totalPotongan}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -496,7 +524,7 @@ const PksManualEntryKernelView = () => {
                             }}
                             label="TOTAL SESUDAH"
                             name="weightNetto"
-                            value={0}
+                            value={Math.abs(originWeighNetto - totalPotongan).toFixed(2) || "0.00"}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -504,8 +532,6 @@ const PksManualEntryKernelView = () => {
                     </Grid>
                   </Grid>
                 </Paper>
-
-          
               </Form>
             );
           }}
@@ -527,4 +553,4 @@ const PksManualEntryKernelView = () => {
   );
 };
 
-export default PksManualEntryKernelView;
+export default PksManualEntryTbsView;

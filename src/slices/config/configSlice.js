@@ -16,6 +16,7 @@ const initialState = {
   MD_SOURCE: dataLocalStorage?.MD_SOURCE ? dataLocalStorage.MD_SOURCE : null,
   ROLES: dataLocalStorage?.ROLES ? dataLocalStorage.ROLES : null,
   SITE_TYPES: dataLocalStorage?.SITE_TYPES ? dataLocalStorage.SITE_TYPES : null,
+  PRODUCT_TYPES: dataLocalStorage?.PRODUCT_TYPES ? dataLocalStorage.PRODUCT_TYPES : null,
 
   VA_SCC_MODEL: dataLocalStorage?.VA_SCC_MODEL ? dataLocalStorage.VA_SCC_MODEL : null,
   SCC_MODEL: dataLocalStorage?.SCC_MODEL ? dataLocalStorage.SCC_MODEL : null,

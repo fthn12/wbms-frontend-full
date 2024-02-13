@@ -10,14 +10,15 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { TextField, Autocomplete } from "formik-mui";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, useFormikContext } from "formik";
 import moment from "moment";
 import SortasiTBS from "../../../../../components/SortasiTBS";
 
 import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
 
 const PksManualEntryTbsIn = (props) => {
-  const { setFieldValue, values } = props;
+  // const { setFieldValue, values } = props;
+  const { values, setFieldValue } = useFormikContext();
 
   const { user } = useAuth();
   const { wb } = useWeighbridge();
@@ -197,7 +198,7 @@ const PksManualEntryTbsIn = (props) => {
           <Grid item xs={12}>
             <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
           </Grid>
-          <SortasiTBS values={values} isReadOnly={true} />
+          <SortasiTBS isReadOnly={true} />
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6} lg={3}>
@@ -346,7 +347,7 @@ const PksManualEntryTbsIn = (props) => {
               }}
               label="TOTAL SESUDAH"
               name="weightNetto"
-              value={0}
+              value="0.00"
               inputProps={{ readOnly: true }}
             />
           </Grid>

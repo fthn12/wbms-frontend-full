@@ -4,6 +4,7 @@ import {
   useUpdateProductMutation,
   useCreateProductMutation,
   useDeleteProductMutation,
+  useFindManyProductQuery,
 } from "../slices/master-data/productSliceApi";
 
 export const useProduct = () => {
@@ -13,5 +14,6 @@ export const useProduct = () => {
     useUpdateProductMutation,
     useCreateProductMutation,
     useDeleteProductMutation,
+    useFindManyProductQuery,
   };
 };

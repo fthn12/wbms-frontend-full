@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,25 +7,31 @@ import {
   Button,
   Box,
   FormControl,
+  Select,
+  MenuItem,
   IconButton,
   FormLabel,
   DialogActions,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
-import { Formik } from "formik";
+import { Formik, Field } from "formik";
 import * as yup from "yup";
 import { grey } from "@mui/material/colors";
-import { useProduct } from "../../../hooks";
+import { useProduct, useConfig } from "../../../hooks";
 
 const EditProduct = (props) => {
   const { isEditOpen, onClose, dtProducts, refetch } = props;
   const { useUpdateProductMutation } = useProduct();
   const [updateProduct] = useUpdateProductMutation();
+  const { PRODUCT_TYPES } = useConfig();
+
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
+
   const handleFormSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       updateProduct(values).then((results) => {
-        toast.success("Data Berhasil Disimpan");
+        toast.success("Data Berhasil Diedit");
         setSubmitting(false);
         resetForm();
         refetch();
@@ -65,7 +71,7 @@ const EditProduct = (props) => {
       </DialogTitle>
 
       <Formik onSubmit={handleFormSubmit} initialValues={dtProducts} validationSchema={userSchema}>
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
           <form onSubmit={handleSubmit}>
             <DialogContent dividers>
               <Box
@@ -184,28 +190,45 @@ const EditProduct = (props) => {
                       fontWeight: "bold",
                     }}
                   >
-                    Product Group Name
+                    Tipe Produk
                   </FormLabel>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    type="text"
-                    placeholder="Masukkan Product Group Name...."
+                  <Select
+                    labelId="productGroupId"
+                    name="productGroupId"
+                    value={values.productGroupId}
                     onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values?.productGroupName}
-                    name="productGroupName"
-                    error={touched.productGroupName && !!errors.productGroupName}
-                    helperText={touched.productGroupName && errors.productGroupName}
-                  />
+                    // onChange={handleChange}
+                    onChange={(event) => {
+                      handleChange(event);
+                      const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                      setFieldValue("productGroupName", selectedProductType ? selectedProductType.value : "");
+                    }}
+                    error={!!touched.productGroupId && !!errors.productGroupId}
+                    helperText={touched.productGroupId && errors.productGroupId}
+                    displayEmpty
+                    sx={{
+                      color: MenuItem ? "grey" : "black",
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      -- Pilih Tipe Produk --
+                    </MenuItem>
+                    {dtTypeProduct &&
+                      dtTypeProduct?.map((data, index) => {
+                        return (
+                          <MenuItem key={index} value={data.id}>
+                            {data.value}
+                          </MenuItem>
+                        );
+                      })}
+                  </Select>
 
                   <FormLabel
                     sx={{
-                      marginBottom: "8px",
+                      marginTop: "20px",
                       color: "black",
                       fontSize: "16px",
                       fontWeight: "bold",
-                      marginTop: "20px",
                     }}
                   >
                     Sertifikasi
@@ -248,7 +271,6 @@ const EditProduct = (props) => {
                     name="description"
                     error={touched.description && !!errors.description}
                     helperText={touched.description && errors.description}
-                    // Atur ukuran tulisan label di sini
                   />
                 </FormControl>
               </Box>

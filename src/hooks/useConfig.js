@@ -101,6 +101,14 @@ const roles = [
   { id: 6, value: "Admin IT" },
 ];
 
+const productTypes = [
+  // { id: 0, value: "Not Assigned" },
+  { id: 1, value: "Dispatch" },
+  { id: 2, value: "TBS" },
+  { id: 3, value: "Kernel" },
+  { id: 4, value: "Others" },
+];
+
 const eDispatchServer = [
   { id: 1, value: "API SERVER 1 (primary)" },
   { id: 2, value: "API SERVER 2 (secondary)" },
@@ -155,6 +163,7 @@ export const useConfig = () => {
     ROLES,
     EDISPATCH_SERVER,
     SITE_TYPES,
+    PRODUCT_TYPES,
     SCC_MODEL,
     VA_SCC_MODEL,
     RSPO_SCC_MODEL,
@@ -172,6 +181,7 @@ export const useConfig = () => {
     ROLES: roles,
     EDISPATCH_SERVER: eDispatchServer,
     SITE_TYPES: siteTypes,
+    PRODUCT_TYPES: productTypes,
     SCC_MODEL: sccModel,
     VA_SCC_MODEL: vaSccModel,
     RSPO_SCC_MODEL: rspoSccModel,
@@ -194,6 +204,7 @@ export const useConfig = () => {
     ROLES,
     EDISPATCH_SERVER,
     SITE_TYPES,
+    PRODUCT_TYPES,
     SCC_MODEL,
     VA_SCC_MODEL,
     RSPO_SCC_MODEL,

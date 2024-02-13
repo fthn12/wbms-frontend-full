@@ -20,6 +20,15 @@ const productApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response, meta, arg) => response?.data?.product,
       providesTags: ["product"],
     }),
+    findManyProduct: builder.query({
+      query: (data) => ({
+        url: `${API_URL}/find-many`,
+        method: "POST",
+        body: { ...data },
+      }),
+      transformResponse: (response, meta, arg) => response?.data?.product,
+      providesTags: ["product"],
+    }),
     createProduct: builder.mutation({
       query: (data) => ({
         url: `${API_URL}`,
@@ -40,13 +49,13 @@ const productApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
-    
   }),
 });
 
 export const {
   useEDispatchProductSyncMutation,
   useGetProductsQuery,
+  useFindManyProductQuery,
   useUpdateProductMutation,
   useCreateProductMutation,
   useDeleteProductMutation,
