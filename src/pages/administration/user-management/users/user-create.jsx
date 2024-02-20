@@ -90,7 +90,7 @@ const UserCreate = () => {
                 <Button variant="contained" disabled sx={{ ml: 0.5 }} onClick={() => {}}>
                   HAPUS
                 </Button> */}
-                <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => navigate("/")}>
+                <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => navigate("/wb/administration/users")}>
                   BATAL
                 </Button>
               </Box>

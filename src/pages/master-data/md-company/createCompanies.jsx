@@ -61,7 +61,7 @@ const CreateCompanies = (props) => {
     contactName: "",
     contactEmail: "",
     contactPhone: "",
-    isMillOperator: "",
+    isMillOperator: false,
     isTransporter: false,
     isSiteOperator: false,
     isEstate: false,

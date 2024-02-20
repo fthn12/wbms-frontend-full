@@ -23,6 +23,7 @@ import TopicOutlinedIcon from "@mui/icons-material/TopicOutlined";
 import ArrowRightOutlinedIcon from "@mui/icons-material/ArrowRightOutlined";
 import DragHandleOutlinedIcon from "@mui/icons-material/DragHandleOutlined";
 import DisplaySettingsOutlinedIcon from "@mui/icons-material/DisplaySettingsOutlined";
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 // hex to rgba converter
 // pakai rgba agar bisa set transparansi
@@ -348,6 +349,15 @@ const Sidebar = () => {
 
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Administrasi" icon={<DisplaySettingsOutlinedIcon />}>
+                  <SubMenu label="Config" icon={<SettingsOutlinedIcon />}>
+                  <Item
+                    title="Config List"
+                    to="/wb/administration/configs"
+                    icon={<ArrowRightOutlinedIcon />}
+                    selected={sidebar.selected}
+                    setSelected={setSelected}
+                  />
+                </SubMenu>
                 <SubMenu label="Manual Entry" icon={<LocalShippingIcon />}>
                   <Item
                     title="Transaksi Manual"

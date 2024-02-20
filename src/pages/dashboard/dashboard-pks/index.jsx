@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, Typography, Paper } from "@mui/material";
+import { Box, Grid, Typography, Paper } from "@mui/material";
 import BarChartIcon from "@mui/icons-material/EqualizerOutlined";
 import { useConfig, useTransaction } from "../../../hooks";
 import moment from "moment";
@@ -70,9 +70,10 @@ const DashboardPKS = () => {
   }, [results, isLoading, isError]);
 
   return (
-    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gridAutoRows="140px" gap="10px">
+    <>
+     <Grid container spacing={2}>
+    <Grid item xs={3}>
       <Box
-        gridColumn="span 3"
         display="flex"
         height="150px"
         justifyContent="space-between"
@@ -93,8 +94,10 @@ const DashboardPKS = () => {
         </Box>
         <BarChartIcon sx={{ fontSize: 90, color: "#283593", mr: 2 }} />
       </Box>
+    </Grid>
+
+    <Grid item xs={3}>
       <Box
-        gridColumn="span 3"
         display="flex"
         height="150px"
         justifyContent="space-between"
@@ -115,8 +118,10 @@ const DashboardPKS = () => {
         </Box>
         <BarChartIcon sx={{ fontSize: 90, color: "#2e7d32", mr: 2 }} />
       </Box>
+    </Grid>
+
+    <Grid item xs={3}>
       <Box
-        gridColumn="span 3"
         display="flex"
         height="150px"
         justifyContent="space-between"
@@ -137,8 +142,10 @@ const DashboardPKS = () => {
         </Box>
         <BarChartIcon sx={{ fontSize: 90, color: "#ff8f00", mr: 2 }} />
       </Box>
+    </Grid>
+
+    <Grid item xs={3}>
       <Box
-        gridColumn="span 3"
         display="flex"
         height="150px"
         justifyContent="space-between"
@@ -159,15 +166,16 @@ const DashboardPKS = () => {
         </Box>
         <BarChartIcon sx={{ fontSize: 90, color: "#b71c1c", mr: 2 }} />
       </Box>
+    </Grid>
 
-      <Box gridColumn="span 8" pt={3}>
-        <BarCharts />
-      </Box>
+    <Grid item xs={8} pt={3}>
+      <BarCharts />
+    </Grid>
 
-      <Box gridColumn="span 4" pt={3}>
-        <TrukPending />
-      </Box>
-    </Box>
+    <Grid item xs={4} pt={3}>
+      <TrukPending />
+    </Grid></Grid>
+  </>
   );
 };
 

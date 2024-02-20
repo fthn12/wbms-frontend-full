@@ -73,14 +73,14 @@ const TransactionManualEntry = () => {
         >
           new
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           onClick={() => {
             navigate("/wb/transactions/pks-new-backdate");
           }}
         >
           Form
-        </Button>
+        </Button> */}
       </Box>
 
       <Paper sx={{ mt: 1, p: 2, minHeight: "75vh" }}>

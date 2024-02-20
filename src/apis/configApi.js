@@ -10,5 +10,10 @@ export const ConfigAPI = () => {
     return response;
   };
 
-  return { Setup };
+  const getById = async (id) => {
+    const response = await axios.get(`${endpoint}/${id}`).then((res) => res.data);
+    return response;
+  };
+
+  return { Setup, getById };
 };

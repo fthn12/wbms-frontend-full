@@ -97,7 +97,7 @@ const MDSite = () => {
     { field: "codeSap", headerName: "Kode SAP", maxWidth: 150, cellStyle: { textAlign: "center" } },
     {
       field: "productGroupName",
-      headerName: "Grup Produk",
+      headerName: "Tipe Produk",
       cellStyle: { textAlign: "center" },
     },
     { field: "shortName", headerName: "Nama Pendek", cellStyle: { textAlign: "center" } },

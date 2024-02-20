@@ -242,7 +242,7 @@ const PksManualEntryNettoOthersOut = () => {
                     variant="contained"
                     sx={{ mr: 1 }}
                     disabled={
-                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 35)
+                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
                     }
                   >
                     SIMPAN

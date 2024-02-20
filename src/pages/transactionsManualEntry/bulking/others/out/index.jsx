@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   Box,
   Button,
+  MenuItem,
   CircularProgress,
   Grid,
   InputAdornment,
@@ -11,7 +12,7 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
-import { TextField, Autocomplete } from "formik-mui";
+import { TextField, Autocomplete, Select } from "formik-mui";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
@@ -37,19 +38,29 @@ const BulkingManualEntryOthersOut = () => {
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
   const { id } = useParams();
-  const { WBMS, SCC_MODEL } = useConfig();
+  const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
-  const { useGetProductsQuery } = useProduct();
+  const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
+  const [selectedOption, setSelectedOption] = useState("");
 
   const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtProduct } = useGetProductsQuery();
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
+
+  const productFilter = {
+    where: {
+      productGroupId: selectedOption,
+    },
+  };
+
+  const { data: dtProduct } = useFindManyProductQuery(productFilter);
+
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,6 +96,7 @@ const BulkingManualEntryOthersOut = () => {
       }
 
       tempTrans.progressStatus = 42;
+      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
@@ -116,7 +128,6 @@ const BulkingManualEntryOthersOut = () => {
 
   useEffect(() => {
     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
-    setSidebar({ selected: "Transaksi WB PKS" });
 
     return () => {
       // console.clear();
@@ -140,6 +151,7 @@ const BulkingManualEntryOthersOut = () => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
+        setSelectedOption(res.data.transaction.productType);
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -176,22 +188,24 @@ const BulkingManualEntryOthersOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue } = props;
+            const { values, isValid, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ mr: 1 }}
-                    disabled={
-                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
-                    }
-                  >
-                    SIMPAN
-                  </Button>
+                  {selectedOption === 4 && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={
+                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
@@ -223,114 +237,57 @@ const BulkingManualEntryOthersOut = () => {
                         inputProps={{ readOnly: true }}
                       />
                       <Field
-                        name="transportVehiclePlateNo"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        freeSolo
-                        disableClearable
-                        options={dtTransport?.records.map((record) => record.plateNo)}
-                        onInputChange={(event, InputValue, reason) => {
-                          if (reason !== "reset") {
-                            setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
-                          }
+                        name="productType"
+                        label="Tipe Produk"
+                        component={Select}
+                        size="small"
+                        formControl={{
+                          fullWidth: true,
+                          required: true,
+                          size: "small",
                         }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
-                            label="Nomor Plat"
-                            name="transportVehiclePlateNo"
-                            size="small"
-                            inputProps={{
-                              ...params.inputProps,
-                              style: { textTransform: "uppercase" },
-                            }}
-                          />
-                        )}
-                      />
-
-                      <Field
-                        name="transporterCompanyName"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        options={dtCompany?.records || []}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
+                        sx={{ mb: 2 }}
                         onChange={(event, newValue) => {
-                          setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                          setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                          setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                          setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
+                          handleChange(event);
+                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          setSelectedOption(selectedProductType.id);
+                          // setFieldValue("productName", "");
+                          // setFieldValue("productId", "");
+                          // setFieldValue("productCode", "");
+                          // setFieldValue("transportVehicleProductName", "");
+                          // setFieldValue("transportVehicleId", "");
+                          // setFieldValue("transportVehicleProductCode", "");
                         }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
-                            name="transporterCompanyName"
-                            label="Cust/Vendor transport"
-                            size="small"
-                            sx={{ mt: 2 }}
-                          />
-                        )}
-                      />
+                      >
+                        {dtTypeProduct &&
+                          dtTypeProduct.map((data, index) => (
+                            <MenuItem key={index} value={data.id}>
+                              {data.value}
+                            </MenuItem>
+                          ))}
+                      </Field>
 
-                      <Field
-                        name="productName"
-                        component={Autocomplete}
-                        variant="outlined"
-                        fullWidth
-                        // freeSolo
-                        // disableClearable
-                        options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
-                        )}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
-                        onChange={(event, newValue) => {
-                          setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                          setFieldValue("transportVehicleId", newValue ? newValue.id : "");
-                          setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                          setFieldValue("productName", newValue ? newValue.name : "");
-                          setFieldValue("productId", newValue ? newValue.id : "");
-                          setFieldValue("productCode", newValue ? newValue.code : "");
-                        }}
-                        renderInput={(params) => (
-                          <TextFieldMUI
-                            {...params}
-                            name="productName"
-                            label="Nama Produk"
-                            size="small"
-                            sx={{ mt: 2 }}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
-                          <Divider>DATA SUPIR & MUATAN</Divider>
-                        </Grid>
-                        <Grid item xs={12}>
+                      {selectedOption === 4 && (
+                        <>
                           <Field
-                            name="driverName"
+                            name="transportVehiclePlateNo"
                             component={Autocomplete}
                             variant="outlined"
                             fullWidth
                             freeSolo
                             disableClearable
-                            options={dtDrivers?.records.map((record) => record.name)}
+                            options={dtTransport?.records.map((record) => record.plateNo)}
                             onInputChange={(event, InputValue, reason) => {
                               if (reason !== "reset") {
-                                setFieldValue("driverName", InputValue.toUpperCase());
+                                setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
                               }
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI
                                 {...params}
-                                name="driverName"
+                                label="Nomor Plat"
+                                name="transportVehiclePlateNo"
                                 size="small"
-                                label="Nama Supir"
-                                sx={{ mt: 2 }}
                                 inputProps={{
                                   ...params.inputProps,
                                   style: { textTransform: "uppercase" },
@@ -338,210 +295,300 @@ const BulkingManualEntryOthersOut = () => {
                               />
                             )}
                           />
-
                           <Field
-                            name="afdeling"
-                            label="Afdeling"
-                            type="text"
+                            name="transporterCompanyName"
+                            component={Autocomplete}
                             variant="outlined"
-                            size="small"
-                            component={TextField}
                             fullWidth
-                            value={values?.afdeling}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
+                            options={dtCompany?.records || []}
+                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                            value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
+                            onChange={(event, newValue) => {
+                              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+                              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+                              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                              setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
                             }}
+                            renderInput={(params) => (
+                              <TextFieldMUI
+                                {...params}
+                                name="transporterCompanyName"
+                                label="Cust/Vendor transport"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            )}
                           />
                           <Field
-                            name="kebun"
-                            label="Kebun"
-                            type="text"
+                            name="productName"
+                            component={Autocomplete}
                             variant="outlined"
-                            size="small"
                             fullWidth
-                            component={TextField}
-                            value={values?.kebun}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
+                            options={dtProduct?.records || []}
+                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                            value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
+                            onChange={(event, newValue) => {
+                              setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                              setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+                              setFieldValue("productName", newValue ? newValue.name : "");
+                              setFieldValue("productId", newValue ? newValue.id : "");
+                              setFieldValue("productCode", newValue ? newValue.code : "");
                             }}
+                            renderInput={(params) => (
+                              <TextFieldMUI
+                                {...params}
+                                name="productName"
+                                label="Nama Produk"
+                                size="small"
+                                sx={{ mt: 2 }}
+                              />
+                            )}
                           />
-                          <Field
-                            name="blok"
-                            label="Blok"
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            component={TextField}
-                            fullWidth
-                            value={values?.blok}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
-                          />
-                          <Field
-                            name="janjang"
-                            label="Janjang/Sak"
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            component={TextField}
-                            fullWidth
-                            value={values?.janjang}
-                            sx={{ mt: 2 }}
-                          />
-                          <Field
-                            name="npb"
-                            label="NPB/BE"
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            component={TextField}
-                            fullWidth
-                            value={values?.npb}
-                            sx={{ mt: 2 }}
-                            inputProps={{
-                              style: { textTransform: "uppercase" },
-                            }}
-                          />
-                          <Field
-                            name="tahun"
-                            label="Tahun"
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            component={TextField}
-                            fullWidth
-                            value={values?.tahun}
-                            sx={{ mt: 2 }}
-                          />
-                        </Grid>
-                      </Grid>
+                        </>
+                      )}
                     </Grid>
+                    {selectedOption === 4 && (
+                      <>
+                        <Grid item xs={12} sm={6} lg={3}>
+                          <Grid container columnSpacing={1}>
+                            <Grid item xs={12}>
+                              <Divider>DATA SUPIR & MUATAN</Divider>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                name="driverName"
+                                component={Autocomplete}
+                                variant="outlined"
+                                fullWidth
+                                freeSolo
+                                disableClearable
+                                options={dtDrivers?.records.map((record) => record.name)}
+                                onInputChange={(event, InputValue, reason) => {
+                                  if (reason !== "reset") {
+                                    setFieldValue("driverName", InputValue.toUpperCase());
+                                  }
+                                }}
+                                renderInput={(params) => (
+                                  <TextFieldMUI
+                                    {...params}
+                                    name="driverName"
+                                    size="small"
+                                    label="Nama Supir"
+                                    sx={{ mt: 2 }}
+                                    inputProps={{
+                                      ...params.inputProps,
+                                      style: { textTransform: "uppercase" },
+                                    }}
+                                  />
+                                )}
+                              />
 
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
-                          <Divider>DATA TIMBANG KENDARAAN</Divider>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Operator WB-IN"
-                            name="originWeighInOperatorName"
-                            value={values?.originWeighInOperatorName}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Operator WB-OUT"
-                            value={user.name}
-                            name="originWeighOutOperatorName"
-                            inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-IN"
-                            name="originWeighInTimestamp"
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                                : "-"
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-Out"
-                            name="originWeighOutTimestamp"
-                            inputProps={{ readOnly: true }}
-                            value={dtTrx || "-"}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT MASUK - IN"
-                            name="originWeighInKg"
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            component={TextField}
-                            sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="BERAT KELUAR - OUT"
-                            name="originWeighOutKg"
-                            value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Divider>TOTAL</Divider>
+                              <Field
+                                name="afdeling"
+                                label="Afdeling"
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.afdeling}
+                                sx={{ mt: 2 }}
+                                inputProps={{
+                                  style: { textTransform: "uppercase" },
+                                }}
+                              />
+                              <Field
+                                name="kebun"
+                                label="Kebun"
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                value={values?.kebun}
+                                sx={{ mt: 2 }}
+                                inputProps={{
+                                  style: { textTransform: "uppercase" },
+                                }}
+                              />
+                              <Field
+                                name="blok"
+                                label="Blok"
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.blok}
+                                sx={{ mt: 2 }}
+                                inputProps={{
+                                  style: { textTransform: "uppercase" },
+                                }}
+                              />
+                              <Field
+                                name="janjang"
+                                label="Janjang/Sak"
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.janjang}
+                                sx={{ mt: 2 }}
+                              />
+                              <Field
+                                name="npb"
+                                label="NPB/BE"
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.npb}
+                                sx={{ mt: 2 }}
+                                inputProps={{
+                                  style: { textTransform: "uppercase" },
+                                }}
+                              />
+                              <Field
+                                name="tahun"
+                                label="Tahun"
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                component={TextField}
+                                fullWidth
+                                value={values?.tahun}
+                                sx={{ mt: 2 }}
+                              />
+                            </Grid>
+                          </Grid>
                         </Grid>
 
-                        <Grid item xs={12}>
-                          <Field
-                            type="number"
-                            variant="outlined"
-                            component={TextField}
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 3, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            label="TOTAL"
-                            name="weightNetto"
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
-                          />
+                        <Grid item xs={12} sm={6} lg={3}>
+                          <Grid container columnSpacing={1}>
+                            <Grid item xs={12}>
+                              <Divider>DATA TIMBANG KENDARAAN</Divider>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label="Operator WB-IN"
+                                name="originWeighInOperatorName"
+                                value={values?.originWeighInOperatorName}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label="Operator WB-OUT"
+                                value={user.name}
+                                name="originWeighOutOperatorName"
+                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label="Waktu WB-IN"
+                                name="originWeighInTimestamp"
+                                inputProps={{ readOnly: true }}
+                                value={
+                                  values?.originWeighInTimestamp
+                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    : "-"
+                                }
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="text"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                label="Waktu WB-Out"
+                                name="originWeighOutTimestamp"
+                                inputProps={{ readOnly: true }}
+                                value={dtTrx || "-"}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="BERAT MASUK - IN"
+                                name="originWeighInKg"
+                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                component={TextField}
+                                sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="BERAT KELUAR - OUT"
+                                name="originWeighOutKg"
+                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider>TOTAL</Divider>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                component={TextField}
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 3, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                label="TOTAL"
+                                name="weightNetto"
+                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                              />
+                            </Grid>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </Grid>
+                      </>
+                    )}
                   </Grid>
                 </Paper>
                 {isLoading && (

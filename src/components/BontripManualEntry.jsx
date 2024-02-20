@@ -205,21 +205,21 @@ const BonTripPrintManualEntry = (props) => {
                         Net Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{originWeighNetto} KG</td>
+                      <td className="nota-text">{originWeighNetto.toLocaleString()} KG</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Potongan
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{totalPotongan}</td>
+                      <td className="nota-text">{totalPotongan.toLocaleString()}</td>
                     </tr>
                     <tr>
                       <td height="20" width="100">
                         Netto A G
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{originWeighNetto - totalPotongan} KG</td>
+                      <td className="nota-text">{(originWeighNetto - totalPotongan).toLocaleString()} KG</td>
                     </tr>
                   </Typography>
                 </tbody>

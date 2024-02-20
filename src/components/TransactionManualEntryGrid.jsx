@@ -258,7 +258,7 @@ const TransactionGrid = (props) => {
     },
     {
       headerName: "WAKTU TRANSAKSI",
-      field: "originWeighOutTimestamp",
+      field: "dtModified",
       maxWidth: 150,
       cellStyle: { textAlign: "center" },
       valueFormatter: datetimeFormatter,
