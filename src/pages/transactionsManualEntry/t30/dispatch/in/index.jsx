@@ -144,7 +144,7 @@ const T30ManualEntryDispatchIn = (props) => {
               isReadOnly={false}
               sx={{ mt: 2 }}
               backgroundColor="transparant"
-              siteId={T30Site.id}
+              siteId={WBMS.SITE_REFID}
             />
           </Grid>
 

@@ -10,7 +10,7 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
@@ -23,7 +23,7 @@ import TopicOutlinedIcon from "@mui/icons-material/TopicOutlined";
 import ArrowRightOutlinedIcon from "@mui/icons-material/ArrowRightOutlined";
 import DragHandleOutlinedIcon from "@mui/icons-material/DragHandleOutlined";
 import DisplaySettingsOutlinedIcon from "@mui/icons-material/DisplaySettingsOutlined";
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 
 // hex to rgba converter
 // pakai rgba agar bisa set transparansi
@@ -233,7 +233,6 @@ const Sidebar = () => {
               selected={sidebar.selected}
               setSelected={setSelected}
             />
-
             {WBMS.SITE_TYPE === 1 && (
               <Item
                 title="Transaksi WB PKS"
@@ -261,7 +260,15 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             )}
-
+            {(user.role === 5 || user.role === 6) && (
+              <Item
+                title="Transaksi Manual Berat"
+                to="/wb/transactions/manual-entry"
+                icon={<LocalShippingIcon />}
+                selected={sidebar.selected}
+                setSelected={setSelected}
+              />
+            )}
             {/* <Item
               title="Approval Request"
               to="#"
@@ -278,7 +285,6 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             </SubMenu>
-
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Master Data" icon={<TopicOutlinedIcon />}>
                 {/* <Item
@@ -346,27 +352,17 @@ const Sidebar = () => {
                 />
               </SubMenu>
             )}
-
+            {(user.role === 5 || user.role === 6) && (
+              <Item
+                title="Config"
+                to="/wb/administration/configs/1"
+                icon={<SettingsOutlinedIcon />}
+                selected={sidebar.selected}
+                setSelected={setSelected}
+              />
+            )}
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Administrasi" icon={<DisplaySettingsOutlinedIcon />}>
-                  <SubMenu label="Config" icon={<SettingsOutlinedIcon />}>
-                  <Item
-                    title="Config List"
-                    to="/wb/administration/configs"
-                    icon={<ArrowRightOutlinedIcon />}
-                    selected={sidebar.selected}
-                    setSelected={setSelected}
-                  />
-                </SubMenu>
-                <SubMenu label="Manual Entry" icon={<LocalShippingIcon />}>
-                  <Item
-                    title="Transaksi Manual"
-                    to="/wb/transactions/manual-entry"
-                    icon={<ArrowRightOutlinedIcon />}
-                    selected={sidebar.selected}
-                    setSelected={setSelected}
-                  />
-                </SubMenu>
                 <SubMenu label="User Management" icon={<PeopleOutlinedIcon />}>
                   <Item
                     title="User List"

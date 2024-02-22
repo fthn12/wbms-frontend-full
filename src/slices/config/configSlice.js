@@ -22,8 +22,6 @@ const initialState = {
   SCC_MODEL: dataLocalStorage?.SCC_MODEL ? dataLocalStorage.SCC_MODEL : null,
   RSPO_SCC_MODEL: dataLocalStorage?.RSPO_SCC_MODEL ? dataLocalStorage.RSPO_SCC_MODEL : null,
   ISCC_SCC_MODEL: dataLocalStorage?.ISCC_SCC_MODEL ? dataLocalStorage.ISCC_SCC_MODEL : null,
-
-  openedFormConfig: dataLocalStorage?.openedFormConfig ? dataLocalStorage.openedFormConfig : null,
 };
 
 export const configSlice = createSlice({
@@ -41,13 +39,7 @@ export const configSlice = createSlice({
       return state;
     },
   },
-  setOpenedFormConfig: (state, action) => {
-    const configs = action.payload;
 
-    state.openedFormConfig = { ...state.openedFormConfig, ...configs };
-
-    localStorage.setItem("configs", JSON.stringify(state));
-  },
   extraReducers: (builder) => {
     builder.addCase(getConfigs.pending, (state) => {
       // console.log("getConfigs loading");
@@ -67,4 +59,4 @@ export const configSlice = createSlice({
   },
 });
 
-export const { setConfigs, setOpenedFormConfig } = configSlice.actions;
+export const { setConfigs } = configSlice.actions;

@@ -31,15 +31,7 @@ const configApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    getConfigs: builder.query({
-      query: (data) => ({
-        url: `${API_URL}/get-all`,
-        method: "GET",
-      }),
-      transformResponse: (response, meta, arg) => response?.data?.config,
-      providesTags: ["config"],
-    }),
   }),
 });
 
-export const { useGetENVQuery, useGetConfigsQuery } = configApiSlice;
+export const { useGetENVQuery } = configApiSlice;

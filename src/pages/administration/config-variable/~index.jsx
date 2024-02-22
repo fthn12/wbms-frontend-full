@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Box, Button, IconButton, Paper } from "@mui/material";
+import { Box, Button, CircularProgress, IconButton, Paper } from "@mui/material";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import "ag-grid-enterprise";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
@@ -9,35 +9,21 @@ import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
 import { RichSelectModule } from "@ag-grid-enterprise/rich-select";
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
-import "ag-grid-community/styles/ag-theme-balham.min.css"; // Optional theme CSS
 import { ModuleRegistry } from "@ag-grid-community/core";
 
 import PlagiarismOutlinedIcon from "@mui/icons-material/PlagiarismOutlined";
 
 import Header from "../../../components/layout/signed/Header";
 
-import { useConfig, useUser } from "../../../hooks";
+import { useConfig, useSite } from "../../../hooks";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
 
-const ConfigsTable = () => {
+const MDSite = () => {
   const navigate = useNavigate();
-
-  const { ROLES, useGetConfigsQuery } = useConfig();
-  const { useGetUsersQuery } = useUser();
+  const { MD_SOURCE, useGetConfigsQuery } = useConfig();
 
   const { data: response, error, refetch } = useGetConfigsQuery();
-
-  const sourceFormatter = (params) => {
-    let value = "-";
-
-    // const filteredRoles = ROLES.filter((role) => role.id === +params.value);
-    const findRole = ROLES.find((role) => role.id === +params.value);
-
-    if (findRole) value = findRole.value;
-
-    return value;
-  };
 
   const actionsRenderer = (params) => {
     return (
@@ -50,7 +36,9 @@ const ConfigsTable = () => {
       </Box>
     );
   };
-
+  const sourceFormatter = (params) => {
+    return MD_SOURCE[params.value];
+  };
   const [columnDefs] = useState([
     // {
     //   field: "role",
@@ -61,20 +49,18 @@ const ConfigsTable = () => {
     //   hide: true,
     // },
     {
-      headerName: "No",
-      field: "no",
-      filter: true,
-      sortable: true,
-      resizable: true,
-      hide: false,
-      maxWidth: 80,
-      cellStyle: { textAlign: "center" },
-      valueGetter: (params) => params.node.rowIndex + 1,
+      field: "id",
+      headerName: "Actions",
+      maxWidth: 150,
+      cellRenderer: actionsRenderer,
+      pinned: "left",
+      lockPinned: true,
     },
+
     {
       field: "siteType",
       headerName: "Tipe Site",
-      maxWidth: 120,
+
       cellStyle: { textAlign: "center" },
       valueGetter: (params) => {
         const siteTypes = {
@@ -85,38 +71,18 @@ const ConfigsTable = () => {
         return siteTypes[params.data.siteType] || "-";
       },
     },
-    { field: "siteCutOffHour", headerName: "Jam Cut Off", maxWidth: 120, cellStyle: { textAlign: "center" } },
-    { field: "siteCutOffMinute", headerName: "Menit Cut Off", maxWidth: 120, cellStyle: { textAlign: "center" } },
-    { field: "btSiteCode", headerName: "Kode BONTRIP", maxWidth: 125, cellStyle: { textAlign: "center" } },
+    { field: "btSiteCode", headerName: "Kode BONTRIP", cellStyle: { textAlign: "center" } },
     {
       field: "btSuffixTrx",
       headerName: "Suffix BONTRIP Transaksi WB",
-
+      flex: true,
       cellStyle: { textAlign: "center" },
     },
-    {
-      field: "btSuffixForm",
-      headerName: "Suffix BONTRIP Backdate Form",
+    { field: "siteCutOffHour", headerName: "Jam Cut Off", cellStyle: { textAlign: "center" } },
+    { field: "siteCutOffMinute", headerName: "Menit Cut Off", cellStyle: { textAlign: "center" } },
 
-      cellStyle: { textAlign: "center" },
-    },
-    {
-      field: "btSuffixTemplate",
-      headerName: "Suffix BONTRIP Backdate Template",
-
-      cellStyle: { textAlign: "center" },
-    },
-    { field: "wbMinWeight", headerName: "Berat Minimum WB", maxWidth: 140, cellStyle: { textAlign: "center" } },
-    { field: "wbStablePeriod", headerName: "Lama Waktu Stabil WB", maxWidth: 149, cellStyle: { textAlign: "center" } },
-
-    {
-      field: "id",
-      headerName: "Actions",
-      maxWidth: 150,
-      cellRenderer: actionsRenderer,
-      pinned: "right",
-      lockPinned: true,
-    },
+    { field: "wbMinWeight", headerName: "Berat Minimum WB", cellStyle: { textAlign: "center" } },
+    { field: "wbStablePeriod", headerName: "Lama Waktu Stabil WB", cellStyle: { textAlign: "center" } },
   ]);
 
   const defaultColDef = {
@@ -151,25 +117,10 @@ const ConfigsTable = () => {
     <Box>
       <Header title="CONFIGS" subtitle="List Configs" />
 
-      {/* <Box display="flex" sx={{ mt: 3 }}>
-        <Box flex={1}></Box>
-        <Button
-          variant="contained"
-          onClick={() => {
-            navigate("/wb/administration/users/add");
-          }}
-        >
-          Add
-        </Button>
-        <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => refetch()}>
-          Reload
-        </Button>
-      </Box> */}
-
-      <Paper sx={{ mt: 5, p: 2, minHeight: "72vh" }}>
+      <Paper sx={{ mt: 8, p: 2, minHeight: "71.5vh" }}>
         <Box
-          className="ag-theme-balham"
-          sx={{ "& .ag-header-cell-label": { justifyContent: "center" }, width: "auto", height: "69vh" }}
+          className="ag-theme-alpine"
+          sx={{ "& .ag-header-cell-label": { justifyContent: "center" }, width: "auto", height: "67.5vh" }}
         >
           <AgGridReact
             rowData={response?.records} // Row Data for Rows
@@ -188,8 +139,9 @@ const ConfigsTable = () => {
           />
         </Box>
       </Paper>
+     
     </Box>
   );
 };
 
-export default ConfigsTable;
+export default MDSite;

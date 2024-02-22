@@ -195,17 +195,18 @@ const TransactionT30NormalIn = (props) => {
                     variant="contained"
                     disabled={isReadOnly ? false : !(isValid && dirty)}
                     onClick={handleSubmit}
+                    sx={{  mr: 1 }}
                   >
                     {isReadOnly ? "EDIT" : "SIMPAN"}
                   </Button>
-                  <CancelConfirmation
+                  {/* <CancelConfirmation
                     title="Alasan HAPUS TRANSAKSI"
                     caption="HAPUS TRANSAKSI"
                     content="Anda yakin melakukan HAPUS transaksi WB ini? Berikan keterangan yang cukup."
                     onClose={handleDelete}
                     disabled={!isReadOnly}
                     sx={{ ml: 1, mr: 1, backgroundColor: "darkred" }}
-                  />
+                  /> */}
                   <QRCodeViewer
                     progressStatus={values.progressStatus}
                     deliveryOrderId={values.deliveryOrderId}

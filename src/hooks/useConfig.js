@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import * as configRedux from "../slices/config/configSlice";
-import { getConfigs, useGetConfigsQuery } from "../slices/config/configSliceApi";
+import { getConfigs } from "../slices/config/configSliceApi";
 
 // const sccModel = {
 //   0: "None",
@@ -168,7 +168,6 @@ export const useConfig = () => {
     VA_SCC_MODEL,
     RSPO_SCC_MODEL,
     ISCC_SCC_MODEL,
-    openedFormConfig,
   } = useSelector((state) => state.configs);
 
   const initialData = {
@@ -184,14 +183,12 @@ export const useConfig = () => {
     SITE_TYPES: siteTypes,
     PRODUCT_TYPES: productTypes,
     SCC_MODEL: sccModel,
-    VA_SCC_MODEL: vaSccModel,
-    RSPO_SCC_MODEL: rspoSccModel,
+    VA_SCC_MODELL: vaSccModel,
+    RSPO_SCC_MODE: rspoSccModel,
     ISCC_SCC_MODEL: isccSccModel,
   };
 
-  const setOpenedFormConfig = (values) => {
-    dispatch(configRedux.setOpenedFormConfig(values));
-  };
+
 
   const syncConfig = () => {
     dispatch(getConfigs());
@@ -215,8 +212,5 @@ export const useConfig = () => {
     RSPO_SCC_MODEL,
     ISCC_SCC_MODEL,
     syncConfig,
-    useGetConfigsQuery,
-    openedFormConfig,
-    setOpenedFormConfig,
   };
 };

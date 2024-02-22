@@ -111,7 +111,6 @@ const AdmUserCreate = lazy(() => import("../pages/administration/user-management
 const AdmUserView = lazy(() => import("../pages/administration/user-management/users/user-view"));
 
 const Config = lazy(() => import("../pages/administration/config-variable"));
-const ConfigEdit = lazy(() => import("../pages/administration/config-variable/edit-config"));
 
 const routes = () => {
   return (
@@ -328,8 +327,7 @@ const routes = () => {
           <Route path="md/companies" element={<MDCompany />} />
           <Route path="md/drivers" element={<MDDriver />} />
 
-          <Route path="administration/configs" element={<Config />} />
-          <Route path="administration/configs/update/:id" element={<ConfigEdit />} />
+          <Route path="administration/configs/:id" element={<Config />} />
 
           <Route path="administration/users" element={<AdmUser />} />
           <Route path="administration/users/add" element={<AdmUserCreate />} />

@@ -53,7 +53,7 @@ const T30ManualEntryWBIn = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
       refType: 1,
     },
   };

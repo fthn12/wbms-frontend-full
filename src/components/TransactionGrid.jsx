@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import * as moment from "moment";
 
 import PlagiarismOutlinedIcon from "@mui/icons-material/PlagiarismOutlined";
+import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
 import { TransactionAPI } from "../apis";
 
@@ -107,12 +108,13 @@ const TransactionGrid = (props) => {
           throw new Error("Progress Status tidak valid.");
         }
       } else if (WBMS.SITE_TYPE === 2) {
-        // if (progressStatus === 1) {
-        //   urlPath = "/wb/transactions/t30-edispatch-normal-in";
-        // }
         if (progressStatus === 1) {
-          urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
-        } else if (progressStatus === 21) {
+          urlPath = "/wb/transactions/t30-edispatch-normal-in";
+        }
+        // if (progressStatus === 1) {
+        //   urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
+        // }
+        else if (progressStatus === 21) {
           urlPath = "/wb/transactions/t30-edispatch-normal-out";
         } else if (progressStatus === 6) {
           urlPath = "/wb/transactions/t30-edispatch-cancel-in";
@@ -152,6 +154,71 @@ const TransactionGrid = (props) => {
     }
   };
 
+  const handleWbOutClick = async (id, progressStatus, bonTripRef) => {
+    try {
+      setIsLoading(true);
+
+      // const response = await transactionAPI.getById(id);
+
+      // setOpenedTransaction(response.data.transaction);
+
+      let urlPath = "";
+
+      if (WBMS.SITE_TYPE === 1) {
+        if (progressStatus === 1) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-out";
+        } else if (progressStatus === 21) {
+          urlPath = "/wb/transactions/pks-edispatch-normal-out";
+        } else if (progressStatus === 35) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
+        } else if (progressStatus === 36) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/pks/manual-entry-others-out";
+        } else if (progressStatus === 40) {
+          urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
+        } else if (progressStatus === 41) {
+          urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
+        } else {
+          throw new Error("Progress Status tidak valid.");
+        }
+      } else if (WBMS.SITE_TYPE === 2) {
+        if (progressStatus === 1) {
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
+        } else if (progressStatus === 21) {
+          urlPath = "/wb/transactions/t30-edispatch-normal-out";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/t30/manual-entry-others-out";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/t30/manual-entry-others-view";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
+        } else {
+          throw new Error("Progress Status tidak valid.");
+        }
+      } else if (WBMS.SITE_TYPE === 3) {
+        if (progressStatus === 2) {
+          urlPath = "/wb/transactions/bulking-edispatch-in";
+        } else if (progressStatus === 21) {
+          urlPath = "/wb/transactions/bulking-edispatch-out";
+        } else {
+          throw new Error("Progress Status tidak valid.");
+        }
+      }
+
+      setIsLoading(false);
+
+      return navigate(`${urlPath}/${id}`);
+    } catch (error) {
+      setIsLoading(false);
+      return toast.error(`${error?.message}..!!`);
+    }
+  };
+
   const actionsRenderer = (params) => {
     return (
       <>
@@ -163,8 +230,31 @@ const TransactionGrid = (props) => {
               type="grid"
             />
             <IconButton
+              disabled={
+                !(
+                  params.data.progressStatus === 1 ||
+                  params.data.progressStatus === 2 ||
+                  params.data.progressStatus === 21 ||
+                  params.data.progressStatus === 26 ||
+                  params.data.progressStatus === 31
+                )
+              }
               size="small"
               onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
+            >
+              <PlagiarismIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+            <IconButton
+              disabled={
+                !(
+                  params.data.typeTransaction === 5 ||
+                  params.data.progressStatus === 35 ||
+                  params.data.progressStatus === 36 ||
+                  params.data.progressStatus === 37
+                )
+              }
+              size="small"
+              onClick={() => handleWbOutClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
             >
               <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
             </IconButton>

@@ -15,5 +15,10 @@ export const ConfigAPI = () => {
     return response;
   };
 
-  return { Setup, getById };
+  const updateById = async (id, data) => {
+    const response = await axios.patch(`${endpoint}/${id}`, data).then((res) => res.data);
+    return response;
+  };
+
+  return { Setup, getById, updateById };
 };

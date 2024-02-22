@@ -9,7 +9,7 @@ import SyncIcon from "@mui/icons-material/Sync";
 import { useSite } from "../../hooks";
 
 export const SiteSelect = (props) => {
-  const { isRequired, isReadOnly, backgroundColor, sx, ...others } = props;
+  const { isRequired, isReadOnly, backgroundColor, name, sx, ...others } = props;
 
   const { useGetSitesQuery, useEDispatchSiteSyncMutation } = useSite();
 
@@ -26,6 +26,7 @@ export const SiteSelect = (props) => {
             id="storageTankId"
             labelId="storageTankLbl"
             size="small"
+            name={name}
             formControl={{
               fullWidth: true,
               required: isRequired,

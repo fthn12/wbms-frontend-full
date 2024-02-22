@@ -24,18 +24,7 @@ import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import {
-  useAuth,
-  useConfig,
-  useTransaction,
-  useCompany,
-  useProduct,
-  useDriver,
-  useWeighbridge,
-  useTransportVehicle,
-  useApp,
-  useStorageTank,
-} from "../../../../../hooks";
+import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../../hooks";
 
 const T30ManualEntryDispatchOut = () => {
   const navigate = useNavigate();
@@ -46,22 +35,14 @@ const T30ManualEntryDispatchOut = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const { useGetDriversQuery } = useDriver();
-  const { useGetCompaniesQuery } = useCompany();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
   const [selectedOption, setSelectedOption] = useState("");
-
-  const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
-  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
       refType: 1,
     },
   };
@@ -422,7 +403,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={T30Site.id}
+                                siteId={WBMS.SITE_REFID}
                               />
                             </Grid>
 
