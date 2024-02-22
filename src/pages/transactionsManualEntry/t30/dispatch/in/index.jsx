@@ -3,44 +3,21 @@ import { Divider, Grid } from "@mui/material";
 import { TextField as TextFieldMUI, InputAdornment, CircularProgress } from "@mui/material";
 import { Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
-import SyncIcon from "@mui/icons-material/Sync";
+import { CertificateSelect, StorageTankSelect } from "../../../../../components/FormikMUI";
 
-import ProgressStatus from "components/ProgressStatus";
-import {
-  TransportVehicleAC,
-  CertificateSelect,
-  CompanyAC,
-  StorageTankSelect,
-  ProduckSelect,
-} from "../../../../../components/FormikMUI";
-// import { DriverAC } from "../../../../../components/FormManual";
 import * as eDispatchApi from "../../../../../apis/eDispatchApi";
-import { TransactionAPI } from "apis";
 import { useAuth, useConfig, useTransaction, useWeighbridge, useApp, useDriver } from "hooks";
-import { useStorageTank } from "hooks";
-import { useNavigate } from "react-router-dom";
+
 import moment from "moment";
 
-const T30ManualEntryCPOIn = (props) => {
+const T30ManualEntryDispatchIn = (props) => {
   const { setFieldValue, values } = props;
-  const navigate = useNavigate();
-  const transactionAPI = TransactionAPI();
   const { user } = useAuth();
   const { WBMS } = useConfig();
-  const { urlPrev, setUrlPrev } = useApp();
   const { wbTransaction } = useTransaction();
-  const { useGetDriversQuery } = useDriver();
   const { wb } = useWeighbridge();
 
-  const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
-  const storageTankFilter = {
-    where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
-      refType: 1,
-    },
-  };
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
 
   const [dtTrx, setDtTrx] = useState(null);
 
@@ -65,17 +42,30 @@ const T30ManualEntryCPOIn = (props) => {
       <Grid item xs={12} sm={6} lg={3}>
         <Grid container columnSpacing={1}>
           <Grid item xs={12}>
-            <Divider>DATA SUPIR & PRODUK</Divider>
+            <Divider>DATA PRODUK</Divider>
           </Grid>
-
+          <Grid item xs={12}>
+            <Field
+              name="product"
+              label="Produk"
+              type="text"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
+              value={`${values?.productCode} - ${values?.productName}`}
+            />
+          </Grid>
           <Grid item xs={6}>
             <CertificateSelect
               name="rspoSccModel"
               label="Sertifikasi RSPO"
               isRequired={false}
-              // isReadOnly={true}
+              isReadOnly={true}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="whitesmoke"
             />
           </Grid>
           <Grid item xs={6}>
@@ -98,9 +88,9 @@ const T30ManualEntryCPOIn = (props) => {
               name="isccSccModel"
               label="Sertifikasi ISCC"
               isRequired={false}
-              // isReadOnly={true}
+              isReadOnly={true}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="whitesmoke"
             />
           </Grid>
           <Grid item xs={6}>
@@ -123,9 +113,9 @@ const T30ManualEntryCPOIn = (props) => {
               name="ispoSccModel"
               label="Sertifikasi ISPO"
               isRequired={false}
-              // isReadOnly={true}
+              isReadOnly={true}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="whitesmoke"
             />
           </Grid>
           <Grid item xs={6}>
@@ -142,9 +132,8 @@ const T30ManualEntryCPOIn = (props) => {
               value={values?.ispoCertificateNumber ? values.ispoCertificateNumber : "-"}
             />
           </Grid>
-
           <Grid item xs={12}>
-            <Divider sx={{ mt: 2 }}>Tangki</Divider>
+            <Divider sx={{ mt: 4 }}>Tangki</Divider>
           </Grid>
 
           <Grid item xs={12}>
@@ -152,7 +141,7 @@ const T30ManualEntryCPOIn = (props) => {
               name="originSourceStorageTankId"
               label="Tangki Asal"
               isRequired={true}
-              // isReadOnly={false}
+              isReadOnly={false}
               sx={{ mt: 2 }}
               backgroundColor="transparant"
               siteId={T30Site.id}
@@ -160,7 +149,7 @@ const T30ManualEntryCPOIn = (props) => {
           </Grid>
 
           <Grid item xs={12}>
-            <Divider sx={{ mt: 3 }}>Kualitas</Divider>
+            <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
           </Grid>
 
           <Grid item xs={4}>
@@ -172,12 +161,12 @@ const T30ManualEntryCPOIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
-              // inputProps={{ readOnly: true }}
-              // value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
             />
           </Grid>
           <Grid item xs={4}>
@@ -189,12 +178,12 @@ const T30ManualEntryCPOIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
-              // inputProps={{ readOnly: true }}
-              // value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+              inputProps={{ readOnly: true }}
+              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
             />
           </Grid>
           <Grid item xs={4}>
@@ -206,12 +195,12 @@ const T30ManualEntryCPOIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
               InputProps={{
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
-              // inputProps={{ readOnly: true }}
-              // value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
+              inputProps={{ readOnly: true }}
+              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
             />
           </Grid>
         </Grid>
@@ -459,19 +448,24 @@ const T30ManualEntryCPOIn = (props) => {
               value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
             />
           </Grid>
-          <Grid item xs={12} sx={{ mt: 3 }}>
+          <Grid item xs={12} sx={{ mt: 2 }}>
             <Divider>Catatan</Divider>
           </Grid>
 
           <Grid item xs={12}>
             <Field
-              name="loadedSeal1"
-              label="Catatan alasan untuk Entri Manual"
+              name="originWeighInRemark"
+              label="Alasan untuk Entri Manual"
               type="text"
               multiline
-              rows={6}
+              rows={5}
               required={true}
               component={TextField}
+              onChange={(e) => {
+                const { value } = e.target;
+                setFieldValue("originWeighInRemark", value);
+                setFieldValue("originWeighOutRemark", value);
+              }}
               variant="outlined"
               size="small"
               fullWidth
@@ -487,4 +481,4 @@ const T30ManualEntryCPOIn = (props) => {
   );
 };
 
-export default T30ManualEntryCPOIn;
+export default T30ManualEntryDispatchIn;

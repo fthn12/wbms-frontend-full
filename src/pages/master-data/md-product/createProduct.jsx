@@ -206,7 +206,6 @@ const CreateProduct = (props) => {
                     name="productGroupId"
                     value={values.productGroupId}
                     onBlur={handleBlur}
-                    // onChange={handleChange}
                     onChange={(event) => {
                       handleChange(event);
                       const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);

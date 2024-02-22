@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, MenuItem, TextField, IconButton, CircularProgress } from "@mui/material";
 
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import { Autocomplete, Select } from "formik-mui";
 
 import SyncIcon from "@mui/icons-material/Sync";
@@ -11,6 +11,7 @@ import { useProduct } from "../../hooks";
 export const ProductACP = (props) => {
   const { data, name, sx, isReadOnly, ...others } = props;
 
+  const { values, handleChange, setFieldValue } = useFormikContext();
   const { useGetProductsQuery, useEDispatchProductSyncMutation } = useProduct();
 
   const { refetch } = useGetProductsQuery();
@@ -21,24 +22,6 @@ export const ProductACP = (props) => {
       {/* justifyContent="center" alignItems="center" */}
       {data && (
         <>
-          {/* <Field
-            name={name}
-            component={Autocomplete}
-            variant="outlined"
-            fullWidth
-            readOnly={isReadOnly}
-            // getOptionLabel={(option) => option.plateNo}
-            options={data?.records.map((record) => record.name)}
-            renderInput={(params) => (
-              <TextField
-                {...others}
-                {...params}
-                name={name}
-                size="small"
-                sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "white" }}
-              />
-            )}
-          /> */}
           <Field
             {...others}
             name={name}
@@ -51,6 +34,15 @@ export const ProductACP = (props) => {
             sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "white" }}
             inputProps={{ readOnly: isReadOnly }}
             component={Select}
+            onChange={(event) => {
+              handleChange(event);
+              const newValue = data?.records?.find((item) => item.id === event.target.value);
+              setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+              setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
+              setFieldValue("productName", newValue ? newValue.name : "");
+              setFieldValue("productId", newValue ? newValue.id : "");
+              setFieldValue("productCode", newValue ? newValue.code : "");
+            }}
           >
             {data &&
               data?.records?.map((item, index) => (

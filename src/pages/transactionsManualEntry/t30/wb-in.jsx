@@ -18,7 +18,7 @@ import OTHERS from "./others/in";
 import Dispatch from "./dispatch/in";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import moment from "moment";
-import { DriverACP, CompanyACP, ProductACP } from "../../../components/FormManualEntry";
+import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../components/FormManualEntry";
 import { TransactionAPI } from "../../../apis";
 import * as eDispatchApi from "../../../apis/eDispatchApi";
 
@@ -75,10 +75,14 @@ const T30ManualEntryWBIn = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
-    // transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
-    // transporterCompanyName: Yup.string().required("Wajib diisi"),
-    // productName: Yup.string().required("Wajib diisi"),
-    // driverName: Yup.string().required("Wajib diisi"),
+    transportVehicleId: Yup.string().required("Wajib diisi"),
+    transporterCompanyId: Yup.string().required("Wajib diisi"),
+    productId: Yup.string().required("Wajib diisi"),
+    driverId: Yup.string().required("Wajib diisi"),
+    originSourceStorageTankId: Yup.string().required("Wajib diisi"),
+    loadedSeal1: Yup.string().required("Wajib diisi"),
+    loadedSeal2: Yup.string().required("Wajib diisi"),
+    originWeighInRemark: Yup.string().required("Wajib diisi"),
   });
 
   const handleClose = () => {
@@ -99,16 +103,7 @@ const T30ManualEntryWBIn = () => {
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedProduct = dtProduct.records.find((item) => item.id === values.transportVehicleId);
-
-      if (selectedProduct) {
-        tempTrans.transportVehicleProductName = selectedProduct.name || "";
-        tempTrans.transportVehicleProductCode = selectedProduct.code || "";
-        tempTrans.productId = selectedProduct.id || "";
-        tempTrans.productName = selectedProduct.name || "";
-        tempTrans.productCode = selectedProduct.code || "";
-      }
-
+      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
@@ -199,7 +194,7 @@ const T30ManualEntryWBIn = () => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, isValid, submitForm, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, submitForm, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             const handleOtrSubmit = () => {
@@ -217,7 +212,7 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
                       onClick={() => handleDspSubmit()}
                     >
                       SIMPAN
@@ -227,7 +222,7 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -290,12 +285,13 @@ const T30ManualEntryWBIn = () => {
 
                       {selectedOption === 1 && (
                         <>
-                          <DriverACP
-                            name="transportVehiclePlateNo"
+                          <TransportVehicleACP
+                            name="transportVehicleId"
                             label="Nomor Plat"
                             isReadOnly={false}
                             sx={{ mb: 2 }}
                           />
+                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mb: 2 }} />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
@@ -304,7 +300,7 @@ const T30ManualEntryWBIn = () => {
                           />
                           <ProductACP
                             data={dtProduct}
-                            name="transportVehicleId"
+                            name="productId"
                             label="Nama Product"
                             isReadOnly={false}
                             sx={{ mb: 2 }}
@@ -377,7 +373,6 @@ const T30ManualEntryWBIn = () => {
                             value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
                             onChange={(event, newValue) => {
                               setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
                               setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
                               setFieldValue("productName", newValue ? newValue.name : "");
                               setFieldValue("productId", newValue ? newValue.id : "");

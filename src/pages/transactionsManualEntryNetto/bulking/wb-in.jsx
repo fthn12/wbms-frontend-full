@@ -212,7 +212,7 @@ const BulkingManualEntryWBIn = () => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, isValid, submitForm, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, submitForm, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             const handleOtrSubmit = () => {
@@ -233,7 +233,7 @@ const BulkingManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -382,7 +382,7 @@ const BulkingManualEntryWBIn = () => {
                             value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
                             onChange={(event, newValue) => {
                               setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+
                               setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
                               setFieldValue("productName", newValue ? newValue.name : "");
                               setFieldValue("productId", newValue ? newValue.id : "");

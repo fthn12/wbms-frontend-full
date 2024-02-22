@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, TextField, IconButton, CircularProgress } from "@mui/material";
 
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import { Autocomplete } from "formik-mui";
 
 import SyncIcon from "@mui/icons-material/Sync";
@@ -10,6 +10,7 @@ import { useCompany, useDriver } from "../../hooks";
 
 export const CompanyACP = (props) => {
   const { name, sx, isReadOnly, ...others } = props;
+  const { values, handleChange, setFieldValue } = useFormikContext();
 
   const { useGetCompaniesQuery, useEDispatchCompanySyncMutation } = useCompany();
 
@@ -27,13 +28,20 @@ export const CompanyACP = (props) => {
             variant="outlined"
             fullWidth
             readOnly={isReadOnly}
-            // getOptionLabel={(option) => option.name}
-            options={data?.records.map((record) => record.name)}
+            value={(values && data?.records?.find((item) => item.id === values.transporterCompanyId)) || null}
+            options={data?.records || []}
+            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+            onChange={(event, newValue) => {
+              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
+              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
+              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+            }}
             renderInput={(params) => (
               <TextField
                 {...others}
                 {...params}
                 name={name}
+                required={true}
                 size="small"
                 sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "white" }}
               />

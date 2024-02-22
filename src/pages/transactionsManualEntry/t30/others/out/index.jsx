@@ -32,7 +32,7 @@ import {
   useApp,
 } from "../../../../../hooks";
 
-const PksManualEntryOthersOut = () => {
+const T30ManualEntryOthersOut = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -328,7 +328,7 @@ const PksManualEntryOthersOut = () => {
                             value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
                             onChange={(event, newValue) => {
                               setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                        
                               setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
                               setFieldValue("productName", newValue ? newValue.name : "");
                               setFieldValue("productId", newValue ? newValue.id : "");
@@ -623,4 +623,4 @@ const PksManualEntryOthersOut = () => {
   );
 };
 
-export default PksManualEntryOthersOut;
+export default T30ManualEntryOthersOut;

@@ -64,6 +64,10 @@ const T30ManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsMan
 const T30ManualEntryNettoOthersView = lazy(() => import("../pages/transactionsManualEntryNetto/t30/others/view"));
 
 const T30ManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/t30/wb-in"));
+
+const T30ManualEntryOutDispatch = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/out"));
+const T30ManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/view"));
+
 const T30ManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/t30/others/out"));
 const T30ManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/t30/others/view"));
 
@@ -245,6 +249,18 @@ const routes = () => {
           />
 
           <Route path="transactions/t30/manual-entry-in" name="T30ManualEntryWbIn" element={<T30ManualEntryIn />} />
+
+          <Route
+            path="transactions/t30/manual-entry-dispatch-out/:id"
+            name="T30ManualEntryOutDispatch"
+            element={<T30ManualEntryOutDispatch />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-dispatch-view/:id"
+            name="T30ManualEntryDispatchView"
+            element={<T30ManualEntryDispatchView />}
+          />
+
           <Route
             path="transactions/t30/manual-entry-others-out/:id"
             name="T30ManualEntryOutOthers"

@@ -284,7 +284,7 @@ const PksManualEntryBackDate = () => {
                             value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
                             onChange={(event, newValue) => {
                               setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+                       
                               setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
                               setFieldValue("productName", newValue ? newValue.name : "");
                               setFieldValue("productId", newValue ? newValue.id : "");

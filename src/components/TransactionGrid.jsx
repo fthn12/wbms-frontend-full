@@ -56,9 +56,9 @@ const TransactionGrid = (props) => {
         { dtModified: { gte: moment().subtract(3, "hours").format() } },
         { progressStatus: { in: [1, 2, 6, 11, 35, 36, 37] } },
       ],
-      NOT: {
-        typeTransaction: 5,
-      },
+      // NOT: {
+      //   typeTransaction: 5,
+      // },
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
@@ -107,8 +107,11 @@ const TransactionGrid = (props) => {
           throw new Error("Progress Status tidak valid.");
         }
       } else if (WBMS.SITE_TYPE === 2) {
+        // if (progressStatus === 1) {
+        //   urlPath = "/wb/transactions/t30-edispatch-normal-in";
+        // }
         if (progressStatus === 1) {
-          urlPath = "/wb/transactions/t30-edispatch-normal-in";
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/t30-edispatch-normal-out";
         } else if (progressStatus === 6) {

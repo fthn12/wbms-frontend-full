@@ -6,16 +6,16 @@ import { Autocomplete } from "formik-mui";
 
 import SyncIcon from "@mui/icons-material/Sync";
 
-import { useDriver } from "../../hooks";
+import { useTransportVehicle } from "../../hooks";
 
-export const DriverACP = (props) => {
+export const TransportVehicleACP = (props) => {
   const { name, sx, isReadOnly, ...others } = props;
   const { values, handleChange, setFieldValue } = useFormikContext();
 
-  const { useGetDriversQuery, useEDispatchDriverSyncMutation } = useDriver();
+  const { useGetTransportVehiclesQuery, useEDispatchTransportVehicleSyncMutation } = useTransportVehicle();
 
-  const { data, refetch } = useGetDriversQuery();
-  const [eDispatchSync, { isLoading }] = useEDispatchDriverSyncMutation();
+  const { data, refetch } = useGetTransportVehiclesQuery();
+  const [eDispatchSync, { isLoading }] = useEDispatchTransportVehicleSyncMutation();
 
   return (
     <Box display="flex" sx={{ ...sx }} alignItems="start">
@@ -28,12 +28,12 @@ export const DriverACP = (props) => {
             variant="outlined"
             fullWidth
             readOnly={isReadOnly}
-            value={(values && data?.records?.find((item) => item.id === values.driverId)) || null}
+            value={(values && data?.records?.find((item) => item.id === values.transportVehicleId)) || null}
             options={data?.records || []}
-            getOptionLabel={(option) => option.name}
+            getOptionLabel={(option) => option.plateNo}
             onChange={(event, newValue) => {
-              setFieldValue("driverId", newValue ? newValue.id : "");
-              setFieldValue("driverName", newValue ? newValue.name : "");
+              setFieldValue("transportVehicleId", newValue ? newValue.id : "");
+              setFieldValue("transportVehiclePlateNo", newValue ? newValue.plateNo : "");
             }}
             renderInput={(params) => (
               <TextField
