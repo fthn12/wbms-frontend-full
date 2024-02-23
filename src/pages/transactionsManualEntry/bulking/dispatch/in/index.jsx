@@ -10,14 +10,14 @@ import { useAuth, useConfig, useTransaction, useWeighbridge, useApp, useDriver }
 
 import moment from "moment";
 
-const T30ManualEntryDispatchIn = (props) => {
+const LBNManualEntryDispatchIn = (props) => {
   const { setFieldValue, values } = props;
   const { user } = useAuth();
   const { WBMS } = useConfig();
   const { wbTransaction } = useTransaction();
   const { wb } = useWeighbridge();
 
-  const T30Site = eDispatchApi.getT30Site();
+  const LBNSite = eDispatchApi.getBulkingSite();
 
   const [dtTrx, setDtTrx] = useState(null);
 
@@ -144,7 +144,7 @@ const T30ManualEntryDispatchIn = (props) => {
               isReadOnly={false}
               sx={{ mt: 2 }}
               backgroundColor="transparant"
-              siteId={WBMS.SITE_REFID}
+              siteId={WBMS.SITE_REFID }
             />
           </Grid>
 
@@ -408,7 +408,7 @@ const T30ManualEntryDispatchIn = (props) => {
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                 }}
                 label="BERAT MASUK - IN"
-                name="originWeighInKg"
+                name="destinationWeighInKg"
                 value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
                 inputProps={{ readOnly: true }}
               />
@@ -427,8 +427,8 @@ const T30ManualEntryDispatchIn = (props) => {
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                 }}
                 label="BERAT MASUK - IN"
-                name="originWeighInKg"
-                value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
+                name="destinationWeighInKg"
+                value={values?.destinationWeighInKg > 0 ? values.destinationWeighInKg : "0"}
               />
             </Grid>
           )}
@@ -501,4 +501,4 @@ const T30ManualEntryDispatchIn = (props) => {
   );
 };
 
-export default T30ManualEntryDispatchIn;
+export default LBNManualEntryDispatchIn;

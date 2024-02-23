@@ -110,11 +110,7 @@ const TransactionGrid = (props) => {
       } else if (WBMS.SITE_TYPE === 2) {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/t30-edispatch-normal-in";
-        }
-        // if (progressStatus === 1) {
-        //   urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
-        // }
-        else if (progressStatus === 21) {
+        } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/t30-edispatch-normal-out";
         } else if (progressStatus === 6) {
           urlPath = "/wb/transactions/t30-edispatch-cancel-in";
@@ -154,7 +150,7 @@ const TransactionGrid = (props) => {
     }
   };
 
-  const handleWbOutClick = async (id, progressStatus, bonTripRef) => {
+  const handleManualEntryClick = async (id, progressStatus, bonTripRef) => {
     try {
       setIsLoading(true);
 
@@ -168,7 +164,7 @@ const TransactionGrid = (props) => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-out";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/pks-edispatch-normal-out";
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
         } else if (progressStatus === 35) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
         } else if (progressStatus === 36) {
@@ -190,7 +186,7 @@ const TransactionGrid = (props) => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/t30-edispatch-normal-out";
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-view";
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/t30/manual-entry-others-out";
         } else if (progressStatus === 42) {
@@ -202,9 +198,13 @@ const TransactionGrid = (props) => {
         }
       } else if (WBMS.SITE_TYPE === 3) {
         if (progressStatus === 2) {
-          urlPath = "/wb/transactions/bulking-edispatch-in";
+          urlPath = "/wb/transactions/bulking/manual-entry-dispatch-out";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/bulking-edispatch-out";
+          urlPath = "/wb/transactions/bulking/manual-entry-dispatch-view";
+        } else if (progressStatus === 37) {
+          urlPath = "/wb/transactions/bulking/manual-entry-others-out";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/bulking/manual-entry-others-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -229,35 +229,24 @@ const TransactionGrid = (props) => {
               deliveryOrderId={params.data.deliveryOrderId}
               type="grid"
             />
-            <IconButton
-              disabled={
-                !(
-                  params.data.progressStatus === 1 ||
-                  params.data.progressStatus === 2 ||
-                  params.data.progressStatus === 21 ||
-                  params.data.progressStatus === 26 ||
-                  params.data.progressStatus === 31
-                )
-              }
-              size="small"
-              onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
-            >
-              <PlagiarismIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-            <IconButton
-              disabled={
-                !(
-                  params.data.typeTransaction === 5 ||
-                  params.data.progressStatus === 35 ||
-                  params.data.progressStatus === 36 ||
-                  params.data.progressStatus === 37
-                )
-              }
-              size="small"
-              onClick={() => handleWbOutClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
-            >
-              <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
-            </IconButton>
+            {params.data.isApproved === true && (
+              <IconButton
+                size="small"
+                onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
+              >
+                <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            )}
+            {params.data.isApproved === false && (
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleManualEntryClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)
+                }
+              >
+                <PlagiarismIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            )}
           </Box>
         )}
       </>

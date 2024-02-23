@@ -16,17 +16,29 @@ import { TextField, Autocomplete, Select } from "formik-mui";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
-import { CertificateSelect, StorageTankSelect } from "../../../../../components/FormikMUI";
-import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../../components/FormManualEntry";
+import Header from "../../../../components/layout/signed/HeaderTransaction";
+import { CertificateSelect, StorageTankSelect } from "../../../../components/FormikMUI";
+import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../components/FormManualEntry";
+import BonTripPrintT30 from "../../../../components/BonTripPrint";
 
-import * as eDispatchApi from "../../../../../apis/eDispatchApi";
+import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
-import { TransactionAPI } from "../../../../../apis";
+import { TransactionAPI } from "../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useCompany,
+  useProduct,
+  useDriver,
+  useWeighbridge,
+  useTransportVehicle,
+  useApp,
+  useStorageTank,
+} from "../../../../hooks";
 
-const T30ManualEntryDispatchOut = () => {
+const PKSManualEntryDispatchView = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -35,14 +47,22 @@ const T30ManualEntryDispatchOut = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const [selectedOption, setSelectedOption] = useState(0);
+  const { useGetDriversQuery } = useDriver();
+  const { useGetCompaniesQuery } = useCompany();
+  const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { setSidebar } = useApp();
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const { data: dtCompany } = useGetCompaniesQuery();
+  const { data: dtDrivers } = useGetDriversQuery();
+  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
       refType: 1,
     },
   };
@@ -100,6 +120,7 @@ const T30ManualEntryDispatchOut = () => {
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 21;
+      tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -142,9 +163,9 @@ const T30ManualEntryDispatchOut = () => {
   // };
 
   //weight wb
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighOutKg: wb.weight });
-  // }, [wb.weight]);
+  useEffect(() => {
+    setWbTransaction({ originWeighOutKg: wb.weight });
+  }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -180,7 +201,7 @@ const T30ManualEntryDispatchOut = () => {
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -196,19 +217,8 @@ const T30ManualEntryDispatchOut = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      sx={{ mr: 1 }}
-                      disabled={
-                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 1)
-                      }
-                    >
-                      SIMPAN
-                    </Button>
-                  )}
-                  {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
+              
+                  <BonTripPrintT30 dtTrans={{ ...values }}  sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -248,7 +258,8 @@ const T30ManualEntryDispatchOut = () => {
                           required: true,
                           size: "small",
                         }}
-                        sx={{ mb: 2 }}
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
@@ -271,35 +282,24 @@ const T30ManualEntryDispatchOut = () => {
 
                       {selectedOption === 1 && (
                         <>
-                          <Field
-                            name="deliveryOrderNo"
-                            label="NO DO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            required
-                            size="small"
-                            fullWidth
-                            sx={{ mb: 2, backgroundColor: "transparant" }}
-                          />
                           <TransportVehicleACP
                             name="transportVehicleId"
                             label="Nomor Plat"
-                            isReadOnly={false}
+                            isReadOnly={true}
                             sx={{ mb: 2 }}
                           />
-                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mb: 2 }} />
+                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mb: 2 }} />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
-                            isReadOnly={false}
+                            isReadOnly={true}
                             sx={{ mb: 2 }}
                           />
                           <ProductACP
                             data={dtProduct}
                             name="productId"
                             label="Nama Product"
-                            isReadOnly={false}
+                            isReadOnly={true}
                             sx={{ mb: 2 }}
                           />
                         </>
@@ -331,9 +331,9 @@ const T30ManualEntryDispatchOut = () => {
                                 name="rspoSccModel"
                                 label="Sertifikasi RSPO"
                                 isRequired={true}
-                                isReadOnly={false}
+                                isReadOnly={true}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="whitesmoke"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -356,9 +356,9 @@ const T30ManualEntryDispatchOut = () => {
                                 name="isccSccModel"
                                 label="Sertifikasi ISCC"
                                 isRequired={true}
-                                isReadOnly={false}
+                                isReadOnly={true}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="whitesmoke"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -381,9 +381,9 @@ const T30ManualEntryDispatchOut = () => {
                                 name="ispoSccModel"
                                 label="Sertifikasi ISPO"
                                 isRequired={true}
-                                isReadOnly={false}
+                                isReadOnly={true}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="whitesmoke"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -410,10 +410,10 @@ const T30ManualEntryDispatchOut = () => {
                                 name="originSourceStorageTankId"
                                 label="Tangki Asal"
                                 isRequired={true}
-                                isReadOnly={false}
+                                isReadOnly={true}
                                 sx={{ mt: 2 }}
-                                backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
+                                backgroundColor="whitesmoke"
+                                siteId={T30Site.id}
                               />
                             </Grid>
 
@@ -430,11 +430,12 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
                                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 }}
                                 value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                             <Grid item xs={4}>
@@ -446,11 +447,12 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
                                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 }}
                                 value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                             <Grid item xs={4}>
@@ -462,11 +464,12 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
                                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                                 }}
                                 value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                           </Grid>
@@ -549,8 +552,8 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
-                                // inputProps={{ readOnly: true }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -563,8 +566,8 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
-                                // inputProps={{ readOnly: true }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -576,8 +579,8 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
-                                // inputProps={{ readOnly: true }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -589,8 +592,8 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "tranparant" }}
-                                // inputProps={{ readOnly: true }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                           </Grid>
@@ -612,7 +615,7 @@ const T30ManualEntryDispatchOut = () => {
                                 label="Operator WB-IN"
                                 name="originWeighInOperatorName"
                                 value={user.name}
-                                inputProps={{ readOnly: true }}
+                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -678,43 +681,23 @@ const T30ManualEntryDispatchOut = () => {
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
-                            {WBMS.USE_WB === true && (
-                              <Grid item xs={6}>
-                                <Field
-                                  type="number"
-                                  variant="outlined"
-                                  size="small"
-                                  fullWidth
-                                  component={TextField}
-                                  sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
-                                  InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                  }}
-                                  label="BERAT KELUAR - OUT"
-                                  name="originWeighOutKg"
-                                  value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-                                  inputProps={{ readOnly: true }}
-                                />
-                              </Grid>
-                            )}
-                            {WBMS.USE_WB === false && (
-                              <Grid item xs={6}>
-                                <Field
-                                  type="number"
-                                  variant="outlined"
-                                  component={TextField}
-                                  size="small"
-                                  fullWidth
-                                  sx={{ mt: 2, mb: 1.5 }}
-                                  InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                  }}
-                                  label="BERAT KELUAR - OUT"
-                                  name="originWeighOutKg"
-                                  value={values?.originWeighOutKg > 0 ? values.originWeighOutKg : "0"}
-                                />
-                              </Grid>
-                            )}
+                            <Grid item xs={6}>
+                              <Field
+                                type="number"
+                                variant="outlined"
+                                component={TextField}
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                }}
+                                value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                                label="BERAT KELUAR - OUT"
+                                name="originWeighOutKg"
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
                             <Grid item xs={12}>
                               <Divider>TOTAL</Divider>
                             </Grid>
@@ -755,8 +738,8 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
-                                // inputProps={{ readOnly: true }}
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                           </Grid>
@@ -798,4 +781,4 @@ const T30ManualEntryDispatchOut = () => {
   );
 };
 
-export default T30ManualEntryDispatchOut;
+export default PKSManualEntryDispatchView;

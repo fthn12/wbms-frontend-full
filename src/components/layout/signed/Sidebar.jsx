@@ -260,15 +260,7 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             )}
-            {(user.role === 5 || user.role === 6) && (
-              <Item
-                title="Transaksi Manual Berat"
-                to="/wb/transactions/manual-entry"
-                icon={<LocalShippingIcon />}
-                selected={sidebar.selected}
-                setSelected={setSelected}
-              />
-            )}
+          
             {/* <Item
               title="Approval Request"
               to="#"
@@ -352,17 +344,16 @@ const Sidebar = () => {
                 />
               </SubMenu>
             )}
-            {(user.role === 5 || user.role === 6) && (
-              <Item
-                title="Config"
-                to="/wb/administration/configs/1"
-                icon={<SettingsOutlinedIcon />}
-                selected={sidebar.selected}
-                setSelected={setSelected}
-              />
-            )}
+
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Administrasi" icon={<DisplaySettingsOutlinedIcon />}>
+                <Item
+                  title="Config"
+                  to="/wb/administration/configs/1"
+                  icon={<SettingsOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
                 <SubMenu label="User Management" icon={<PeopleOutlinedIcon />}>
                   <Item
                     title="User List"

@@ -26,9 +26,7 @@ const TransactionPending = () => {
           progressStatus: { in: [1, 6, 11, 35, 36, 37] },
         },
       ],
-      NOT: {
-        typeTransaction: 5,
-      },
+
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };

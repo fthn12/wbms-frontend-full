@@ -7,6 +7,7 @@ import { Formik, Form, Field } from "formik";
 import { TextField, Select } from "formik-mui";
 import * as yup from "yup";
 import { SiteSelect } from "../../../components/FormikMUI";
+import { SiteSelected } from "../../../components/FormManualEntry";
 
 import Header from "../../../components/layout/signed/Header";
 
@@ -66,21 +67,6 @@ const UserCreate = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [openedConfig, setOpenedConfig] = useState("");
-  useEffect(() => {
-    const status = localStorage.getItem("res");
-    const message = localStorage.getItem("message");
-
-    if (status && message) {
-      if (status === "success") {
-        toast.success(message);
-      } else if (status === "error") {
-        toast.error(message);
-      }
-
-      localStorage.removeItem("res");
-      localStorage.removeItem("message");
-    }
-  }, [toast]);
 
   const handleFormikSubmit = async (values) => {
     let editConfig = { ...values };
@@ -107,6 +93,22 @@ const UserCreate = () => {
     }
     window.location.reload();
   };
+
+  useEffect(() => {
+    const status = localStorage.getItem("res");
+    const message = localStorage.getItem("message");
+
+    if (status && message) {
+      if (status === "success") {
+        toast.success(message);
+      } else if (status === "error") {
+        toast.error(message);
+      }
+
+      localStorage.removeItem("res");
+      localStorage.removeItem("message");
+    }
+  }, [toast]);
 
   useEffect(() => {
     if (!id);
@@ -215,7 +217,6 @@ const UserCreate = () => {
                             fullWidth
                           />
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="btSiteCode"
@@ -240,7 +241,6 @@ const UserCreate = () => {
                             fullWidth
                           />
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="btSuffixForm"
@@ -265,7 +265,6 @@ const UserCreate = () => {
                             fullWidth
                           />
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="btApproval1"
@@ -289,6 +288,36 @@ const UserCreate = () => {
                             size="small"
                             fullWidth
                           />
+                        </Grid>{" "}
+                        <Grid item xs={12} sm={6}>
+                          <Field
+                            name="wbMinWeight"
+                            label="Berat Minimal WB"
+                            type="number"
+                            component={TextField}
+                            required
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Field
+                            name="wbStablePeriod"
+                            label="Lama Waktu Stabil WB"
+                            type="number"
+                            component={TextField}
+                            required
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <SiteSelect name="siteId" label="Site StorageTank" isReadOnly={false} />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <SiteSelected name="destinationSiteId" label="Site Tujuan" isReadOnly={false} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Field
@@ -302,34 +331,6 @@ const UserCreate = () => {
                             fullWidth
                           />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <SiteSelect name="siteId" label="Site StorageTank" isReadOnly={false} />
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                          <Field
-                            name="wbMinWeight"
-                            label="Berat Minimal WB"
-                            type="number"
-                            component={TextField}
-                            required
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid item xs={6} sm={3}>
-                          <Field
-                            name="wbStablePeriod"
-                            label="Lama Waktu Stabil WB"
-                            type="number"
-                            component={TextField}
-                            required
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                          />
-                        </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             id="useWbId"
@@ -351,7 +352,6 @@ const UserCreate = () => {
                             </MenuItem>
                           </Field>
                         </Grid>
-
                         <Grid item xs={6} sm={3}>
                           <Field
                             name="logErrorToFile"
@@ -438,7 +438,6 @@ const UserCreate = () => {
                             </MenuItem>
                           </Field>
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="eDispatchApiUrl1"
@@ -473,7 +472,6 @@ const UserCreate = () => {
                             // helperText={touched.eDispatchApiUrl2 && errors.eDispatchApiUrl2}
                           />
                         </Grid>
-
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="eDispatchApi"

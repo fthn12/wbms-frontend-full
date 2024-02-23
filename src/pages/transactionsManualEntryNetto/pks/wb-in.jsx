@@ -43,7 +43,7 @@ const PksManualEntryNettoWBIn = () => {
   const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
@@ -98,7 +98,7 @@ const PksManualEntryNettoWBIn = () => {
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 5;
+      tempTrans.typeTransaction = 2;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -140,7 +140,7 @@ const PksManualEntryNettoWBIn = () => {
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 5;
+      tempTrans.typeTransaction = 3;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -181,7 +181,7 @@ const PksManualEntryNettoWBIn = () => {
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 5;
+      tempTrans.typeTransaction = 4;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()

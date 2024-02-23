@@ -4,7 +4,7 @@ import { Box, Paper, Button } from "@mui/material";
 import moment from "moment";
 
 import Header from "../../components/layout/signed/HeaderTransaction";
-import TransactionManualEntryGrid from "../../components/TransactionManualEntryGrid";
+import TransactionGrid from "../../components/TransactionGrid";
 
 import { TransactionAPI } from "../../apis";
 import { useConfig, useTransaction, useApp } from "../../hooks";
@@ -84,7 +84,7 @@ const TransactionManualEntry = () => {
       </Box>
 
       <Paper sx={{ mt: 1, p: 2, minHeight: "75vh" }}>
-        <TransactionManualEntryGrid />
+        <TransactionGrid />
       </Paper>
     </Box>
   );

@@ -10,7 +10,7 @@ import { useAuth, useConfig, useTransaction, useWeighbridge, useApp, useDriver }
 
 import moment from "moment";
 
-const T30ManualEntryDispatchIn = (props) => {
+const PKSManualEntryDispatchIn = (props) => {
   const { setFieldValue, values } = props;
   const { user } = useAuth();
   const { WBMS } = useConfig();
@@ -501,4 +501,4 @@ const T30ManualEntryDispatchIn = (props) => {
   );
 };
 
-export default T30ManualEntryDispatchIn;
+export default PKSManualEntryDispatchIn;

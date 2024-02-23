@@ -11,16 +11,18 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
+import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../components/FormManualEntry";
 import { TextField, Autocomplete, Select } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import Dispatch from "./dispatch/in";
 import TBS from "./tbs/in";
 import OTHERS from "./others/in";
 import KERNEL from "./kernel/in";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import moment from "moment";
 import { TransactionAPI } from "../../../apis";
-
+import * as eDispatchApi from "../../../apis/eDispatchApi";
 import {
   useAuth,
   useConfig,
@@ -29,11 +31,12 @@ import {
   useWeighbridge,
   useProduct,
   useTransportVehicle,
+  useStorageTank,
+  useSite,
 } from "../../../hooks";
 
 const PksManualEntryWBIn = () => {
   const navigate = useNavigate();
-  const [selectedOption, setSelectedOption] = useState("");
 
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
@@ -42,9 +45,13 @@ const PksManualEntryWBIn = () => {
   const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
   const { useFindManyProductQuery } = useProduct();
+  const { useGetSitesQuery } = useSite();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
+  const [selectedOption, setSelectedOption] = useState(0);
+
   const { data: dtCompany } = useGetCompaniesQuery();
+  const { data: dtSite } = useGetSitesQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const productFilter = {
@@ -65,10 +72,77 @@ const PksManualEntryWBIn = () => {
     driverName: Yup.string().required("Wajib diisi"),
   });
 
+  const { useFindManyStorageTanksQuery } = useStorageTank();
+  const T30Site = eDispatchApi.getT30Site();
+
+  const storageTankFilter = {
+    where: {
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      refType: 1,
+    },
+  };
+
+  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+
   const handleClose = () => {
     clearOpenedTransaction();
 
     navigate("/wb/transactions");
+  };
+
+  const handleDispatchSubmit = async (values) => {
+    let tempTrans = { ...values };
+
+    setIsLoading(true);
+    try {
+      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+
+      if (selectedStorageTank) {
+        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
+        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+        tempTrans.originSiteCode = selectedStorageTank.code || "";
+        tempTrans.originSiteName = selectedStorageTank.name || "";
+      }
+
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+
+      if (selectedSite) {
+        tempTrans.originSiteId = selectedSite.id || "";
+        tempTrans.originSiteCode = selectedSite.code || "";
+        tempTrans.originSiteName = selectedSite.name || "";
+      }
+
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+
+      if (selectedDestinationSite) {
+        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+      }
+
+      tempTrans.productType = parseInt(tempTrans.productType);
+      tempTrans.progressStatus = 1;
+      tempTrans.originWeighInTimestamp = moment().toDate();
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+      setIsLoading(true);
+      const response = await transactionAPI.ManualEntryInDispatch(tempTrans);
+
+      if (!response.status) throw new Error(response?.message);
+
+      clearOpenedTransaction();
+      handleClose();
+      setWbTransaction({ ...response.data.transaction });
+
+      setIsLoading(false);
+
+      toast.success(`Transaksi WB-IN telah tersimpan.`);
+    } catch (error) {
+      return toast.error(`${error.message}.`);
+    }
   };
 
   const handleTbsSubmit = async (values) => {
@@ -97,7 +171,6 @@ const PksManualEntryWBIn = () => {
 
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 2;
-      tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -140,7 +213,6 @@ const PksManualEntryWBIn = () => {
 
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 3;
-      tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -182,7 +254,6 @@ const PksManualEntryWBIn = () => {
 
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 4;
-      tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -207,9 +278,9 @@ const PksManualEntryWBIn = () => {
     }
   };
 
-  useEffect(() => {
-    setWbTransaction({ originWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
@@ -222,7 +293,9 @@ const PksManualEntryWBIn = () => {
         <Formik
           enableReinitialize
           onSubmit={(values) => {
-            if (selectedOption === 2) {
+            if (selectedOption === 1) {
+              handleDispatchSubmit(values);
+            } else if (selectedOption === 2) {
               handleTbsSubmit(values);
             } else if (selectedOption === 3) {
               handleKernelSubmit(values);
@@ -233,6 +306,7 @@ const PksManualEntryWBIn = () => {
           initialValues={wbTransaction}
           isInitialValid={false}
           validationSchema={validationSchema}
+          isInitialError={true}
         >
           {(props) => {
             const { values, isValid, dirty, submitForm, setFieldValue, handleChange } = props;
@@ -249,9 +323,23 @@ const PksManualEntryWBIn = () => {
               submitForm();
             };
 
+            const handleDspSubmit = () => {
+              submitForm();
+            };
+
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  {selectedOption === 1 && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      onClick={() => handleDspSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   {selectedOption === 2 && (
                     <Button
                       variant="contained"
@@ -329,6 +417,9 @@ const PksManualEntryWBIn = () => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
                           setSelectedOption(selectedProductType.id);
+                          setFieldValue("mandatoryDeductionPercentage", 0);
+                          setFieldValue("mandatoryDeductionKg", 0);
+                          setFieldValue("othersKg", 0);
                         }}
                       >
                         {dtTypeProduct &&
@@ -338,6 +429,42 @@ const PksManualEntryWBIn = () => {
                             </MenuItem>
                           ))}
                       </Field>
+
+                      {selectedOption === 1 && (
+                        <>
+                          <Field
+                            name="deliveryOrderNo"
+                            label="NO DO"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            required
+                            size="small"
+                            fullWidth
+                            sx={{ mb: 2, backgroundColor: "transparant" }}
+                          />
+                          <TransportVehicleACP
+                            name="transportVehicleId"
+                            label="Nomor Plat"
+                            isReadOnly={false}
+                            sx={{ mb: 2 }}
+                          />
+                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mb: 2 }} />
+                          <CompanyACP
+                            name="transporterCompanyName"
+                            label="Nama Vendor"
+                            isReadOnly={false}
+                            sx={{ mb: 2 }}
+                          />
+                          <ProductACP
+                            data={dtProduct}
+                            name="productId"
+                            label="Nama Product"
+                            isReadOnly={false}
+                            sx={{ mb: 2 }}
+                          />
+                        </>
+                      )}
 
                       {(selectedOption === 2 || selectedOption === 3 || selectedOption === 4) && (
                         <>
@@ -423,6 +550,9 @@ const PksManualEntryWBIn = () => {
                         </>
                       )}
                     </Grid>
+                    {/*Dispatch*/}
+
+                    {selectedOption === 1 && <Dispatch setFieldValue={setFieldValue} values={values} />}
 
                     {/* TBS */}
 

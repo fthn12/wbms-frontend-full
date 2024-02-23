@@ -37,9 +37,7 @@ const DashboardPKS = () => {
           },
         },
       ],
-      NOT: {
-        typeTransaction: 5,
-      },
+  
     },
   };
 

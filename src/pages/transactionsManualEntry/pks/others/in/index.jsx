@@ -11,21 +11,14 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { TextField, Autocomplete } from "formik-mui";
-import * as yup from "yup";
 import { Formik, Form, Field } from "formik";
-import { toast } from "react-toastify";
-import { useForm } from "../../../../../utils/useForm";
 import moment from "moment";
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
-
-import { TransactionAPI } from "../../../../../apis";
 
 import {
   useAuth,
   useDriver,
   useConfig,
   useTransaction,
-  useTransportVehicle,
   useWeighbridge,
   useApp,
 } from "../../../../../hooks";
@@ -245,23 +238,43 @@ const PksManualEntryOthersIn = (props) => {
               }
             />
           </Grid>
-          <Grid item xs={6}>
-            <Field
-              type="number"
-              variant="outlined"
-              component={TextField}
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-              }}
-              label="BERAT MASUK - IN"
-              name="originWeighInKg"
-              value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
+          {WBMS.USE_WB === true && (
+            <Grid item xs={6}>
+              <Field
+                type="number"
+                variant="outlined"
+                component={TextField}
+                size="small"
+                fullWidth
+                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                }}
+                label="BERAT MASUK - IN"
+                name="originWeighInKg"
+                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                inputProps={{ readOnly: true }}
+              />
+            </Grid>
+          )}
+          {WBMS.USE_WB === false && (
+            <Grid item xs={6}>
+              <Field
+                type="number"
+                variant="outlined"
+                component={TextField}
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                }}
+                label="BERAT MASUK - IN"
+                name="originWeighInKg"
+                value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
+              />
+            </Grid>
+          )}
           <Grid item xs={6}>
             <Field
               type="number"

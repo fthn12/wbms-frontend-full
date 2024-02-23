@@ -46,7 +46,7 @@ const BulkingManualEntryOthersOut = () => {
   const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtDrivers } = useGetDriversQuery();
@@ -97,7 +97,6 @@ const BulkingManualEntryOthersOut = () => {
 
       tempTrans.progressStatus = 42;
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -140,9 +139,9 @@ const BulkingManualEntryOthersOut = () => {
   // };
 
   //weight wb
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -548,23 +547,43 @@ const BulkingManualEntryOthersOut = () => {
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
-                            <Grid item xs={6}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                component={TextField}
-                                sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                }}
-                                label="BERAT KELUAR - OUT"
-                                name="originWeighOutKg"
-                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
+                            {WBMS.USE_WB === true && (
+                              <Grid item xs={6}>
+                                <Field
+                                  type="number"
+                                  variant="outlined"
+                                  size="small"
+                                  fullWidth
+                                  component={TextField}
+                                  sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                                  InputProps={{
+                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  }}
+                                  label="BERAT KELUAR - OUT"
+                                  name="originWeighOutKg"
+                                  value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                  inputProps={{ readOnly: true }}
+                                />
+                              </Grid>
+                            )}
+                            {WBMS.USE_WB === false && (
+                              <Grid item xs={6}>
+                                <Field
+                                  type="number"
+                                  variant="outlined"
+                                  component={TextField}
+                                  size="small"
+                                  fullWidth
+                                  sx={{ mt: 2, mb: 1.5 }}
+                                  InputProps={{
+                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  }}
+                                  label="BERAT KELUAR - OUT"
+                                  name="originWeighOutKg"
+                                  value={values?.originWeighOutKg > 0 ? values.originWeighOutKg : "0"}
+                                />
+                              </Grid>
+                            )}
                             <Grid item xs={12}>
                               <Divider>TOTAL</Divider>
                             </Grid>

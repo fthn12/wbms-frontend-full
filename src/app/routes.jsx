@@ -22,25 +22,17 @@ const TransactionsManualEntry = lazy(() => import("../pages/transactionsManualEn
 
 const ManualEntryBackDate = lazy(() => import("../pages/transactionsManualEntryNetto/backDate/form"));
 
-const PksManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/pks/wb-in"));
-
-const PksManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/pks/others/out"));
-const PksManualEntryNettoOutKernel = lazy(() => import("../pages/transactionsManualEntryNetto/pks/kernel/out"));
-const PksManualEntryNettoOutTbs = lazy(() => import("../pages/transactionsManualEntryNetto/pks/tbs/out"));
-
-const PksManualEntryNettoOthersView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/others/view"));
-const PksManualEntryNettoTbsView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/tbs/view"));
-const PksManualEntryNettoKernelView = lazy(() => import("../pages/transactionsManualEntryNetto/pks/kernel/view"));
-
 const PksManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/pks/wb-in"));
 
 const PksManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/pks/others/out"));
 const PksManualEntryOutKernel = lazy(() => import("../pages/transactionsManualEntry/pks/kernel/out"));
 const PksManualEntryOutTbs = lazy(() => import("../pages/transactionsManualEntry/pks/tbs/out"));
+const PksManualEntryOutDispatch = lazy(() => import("../pages/transactionsManualEntry/pks/dispatch/out"));
 
 const PksManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/pks/others/view"));
 const PksManualEntryTbsView = lazy(() => import("../pages/transactionsManualEntry/pks/tbs/view"));
 const PksManualEntryKernelView = lazy(() => import("../pages/transactionsManualEntry/pks/kernel/view"));
+const PksManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/pks/dispatch/view"));
 
 const PksNormalIn = lazy(() => import("../pages/transactions/pks/NormalIn"));
 const PksNormalOut = lazy(() => import("../pages/transactions/pks/NormalOut"));
@@ -59,16 +51,12 @@ const PksRejectBulkingInView = lazy(() => import("../pages/transactions/pks/Reje
 const PksRejectOutView = lazy(() => import("../pages/transactions/pks/RejectOut/view"));
 const PksEDispatchNew = lazy(() => import("../pages/transactions/pks/new"));
 
-const T30ManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/t30/wb-in"));
-const T30ManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/t30/others/out"));
-const T30ManualEntryNettoOthersView = lazy(() => import("../pages/transactionsManualEntryNetto/t30/others/view"));
-
 const T30ManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/t30/wb-in"));
 
 const T30ManualEntryOutDispatch = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/out"));
-const T30ManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/view"));
-
 const T30ManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/t30/others/out"));
+
+const T30ManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/view"));
 const T30ManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/t30/others/view"));
 
 const T30NormalIn = lazy(() => import("../pages/transactions/t30/NormalIn"));
@@ -82,14 +70,12 @@ const T30CancelInView = lazy(() => import("../pages/transactions/t30/CancelIn/vi
 const T30CancelOutView = lazy(() => import("../pages/transactions/t30/CancelOut/view"));
 const T30DeletedView = lazy(() => import("../pages/transactions/t30/Deleted/view"));
 
-const BulkingManualEntryNettoIn = lazy(() => import("../pages/transactionsManualEntryNetto/bulking/wb-in"));
-const BulkingManualEntryNettoOutOthers = lazy(() => import("../pages/transactionsManualEntryNetto/bulking/others/out"));
-const BulkingManualEntryNettoOthersView = lazy(() =>
-  import("../pages/transactionsManualEntryNetto/bulking/others/view"),
-);
-
 const BulkingManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/bulking/wb-in"));
+
+const BulkingManualEntryDispatchOut = lazy(() => import("../pages/transactionsManualEntry/bulking/dispatch/out"));
 const BulkingManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEntry/bulking/others/out"));
+
+const BulkingManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/bulking/dispatch/view"));
 const BulkingManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/bulking/others/view"));
 
 const BulkingIn = lazy(() => import("../pages/transactions/bulking/In"));
@@ -159,44 +145,6 @@ const routes = () => {
 
           <Route path="transactions/pks-new-backdate" element={<ManualEntryBackDate />} />
 
-          <Route
-            path="transactions/pks/manual-entry-netto-in"
-            name="PksManualEntryNettoWbIn"
-            element={<PksManualEntryNettoIn />}
-          />
-
-          <Route
-            path="transactions/pks/manual-entry-others-netto-out/:id"
-            name="PksManualEntryNettoOutOthers"
-            element={<PksManualEntryNettoOutOthers />}
-          />
-          <Route
-            path="transactions/pks/manual-entry-kernel-netto-out/:id"
-            name="PksManualEntryNettoOutKernel"
-            element={<PksManualEntryNettoOutKernel />}
-          />
-          <Route
-            path="transactions/pks/manual-entry-tbs-netto-out/:id"
-            name="PksManualEntryNettoOutTbs"
-            element={<PksManualEntryNettoOutTbs />}
-          />
-
-          <Route
-            path="transactions/pks/manual-entry-other-netto-view/:id"
-            name="PksManualEntryNettoOthersView"
-            element={<PksManualEntryNettoOthersView />}
-          />
-          <Route
-            path="transactions/pks/manual-entry-tbs-netto-view/:id"
-            name="PksManualEntryNettoTbsView"
-            element={<PksManualEntryNettoTbsView />}
-          />
-          <Route
-            path="transactions/pks/manual-entry-kernel-netto-view/:id"
-            name="PksManualEntryNettoKernelView"
-            element={<PksManualEntryNettoKernelView />}
-          />
-
           <Route path="transactions/pks/manual-entry-in" name="PksManualEntryWbIn" element={<PksManualEntryIn />} />
 
           <Route
@@ -214,6 +162,11 @@ const routes = () => {
             name="PksManualEntryOutTbs"
             element={<PksManualEntryOutTbs />}
           />
+          <Route
+            path="transactions/pks/manual-entry-dispatch-out/:id"
+            name="PksManualEntryOutDispatch"
+            element={<PksManualEntryOutDispatch />}
+          />
 
           <Route
             path="transactions/pks/manual-entry-other-view/:id"
@@ -230,21 +183,10 @@ const routes = () => {
             name="PksManualEntryKernelView"
             element={<PksManualEntryKernelView />}
           />
-
           <Route
-            path="transactions/t30/manual-entry-netto-in"
-            name="T30ManualEntryNettoWbIn"
-            element={<T30ManualEntryNettoIn />}
-          />
-          <Route
-            path="transactions/t30/manual-entry-others-netto-out/:id"
-            name="T30ManualEntryNettoOutOthers"
-            element={<T30ManualEntryNettoOutOthers />}
-          />
-          <Route
-            path="transactions/t30/manual-entry-others-netto-view/:id"
-            name="T30ManualEntryNettoOthersView"
-            element={<T30ManualEntryNettoOthersView />}
+            path="transactions/pks/manual-entry-dispatch-view/:id"
+            name="PksManualEntryDispatchView"
+            element={<PksManualEntryDispatchView />}
           />
 
           <Route path="transactions/t30/manual-entry-in" name="T30ManualEntryWbIn" element={<T30ManualEntryIn />} />
@@ -283,30 +225,26 @@ const routes = () => {
           <Route path="transactions/t30-edispatch-deleted/:id" element={<T30DeletedView />} />
 
           <Route
-            path="transactions/bulking/manual-entry-netto-in"
-            name="BulkingManualEntryWbIn"
-            element={<BulkingManualEntryNettoIn />}
-          />
-          <Route
-            path="transactions/bulking/manual-entry-others-netto-out/:id"
-            name="BulkingManualEntryNettoOutOthers"
-            element={<BulkingManualEntryNettoOutOthers />}
-          />
-          <Route
-            path="transactions/bulking/manual-entry-others-netto-view/:id"
-            name="BulkingManualEntryNettoOthersView"
-            element={<BulkingManualEntryNettoOthersView />}
-          />
-
-          <Route
             path="transactions/bulking/manual-entry-in"
             name="BulkingManualEntryWbIn"
             element={<BulkingManualEntryIn />}
+          />
+
+          <Route
+            path="transactions/bulking/manual-entry-dispatch-out/:id"
+            name="BulkingManualEntryDispatchOut"
+            element={<BulkingManualEntryDispatchOut />}
           />
           <Route
             path="transactions/bulking/manual-entry-others-out/:id"
             name="BulkingManualEntryOutOthers"
             element={<BulkingManualEntryOutOthers />}
+          />
+
+          <Route
+            path="transactions/bulking/manual-entry-dispatch-view/:id"
+            name="BulkingManualEntryDispatchView"
+            element={<BulkingManualEntryDispatchView />}
           />
           <Route
             path="transactions/bulking/manual-entry-others-view/:id"

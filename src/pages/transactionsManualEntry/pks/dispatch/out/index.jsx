@@ -24,9 +24,17 @@ import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useSite,
+  useProduct,
+  useWeighbridge,
+  useStorageTank,
+} from "../../../../../hooks";
 
-const T30ManualEntryDispatchOut = () => {
+const PKSManualEntryDispatchOut = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -35,14 +43,17 @@ const T30ManualEntryDispatchOut = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const [selectedOption, setSelectedOption] = useState(0);
+  const { useGetSitesQuery } = useSite();
+  const [selectedOption, setSelectedOption] = useState("");
+
+  const { data: dtSite } = useGetSitesQuery();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
       refType: 1,
     },
   };
@@ -74,6 +85,7 @@ const T30ManualEntryDispatchOut = () => {
     loadedSeal1: Yup.string().required("Wajib diisi"),
     loadedSeal2: Yup.string().required("Wajib diisi"),
     originWeighOutRemark: Yup.string().required("Wajib diisi"),
+    deliveryOrderNo: Yup.string().required("Wajib diisi"),
   });
 
   const handleClose = () => {
@@ -93,6 +105,22 @@ const T30ManualEntryDispatchOut = () => {
       if (selectedStorageTank) {
         tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+      }
+
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+
+      if (selectedSite) {
+        tempTrans.originSiteId = selectedSite.id || "";
+        tempTrans.originSiteCode = selectedSite.code || "";
+        tempTrans.originSiteName = selectedSite.name || "";
+      }
+
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+
+      if (selectedDestinationSite) {
+        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
@@ -117,7 +145,7 @@ const T30ManualEntryDispatchOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/t30/manual-entry-dispatch-view/${id}`);
+      navigate(`/wb/transactions/pks/manual-entry-dispatch-view/${id}`);
 
       return;
     } catch (error) {
@@ -180,7 +208,7 @@ const T30ManualEntryDispatchOut = () => {
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-OUT" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -413,7 +441,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
+                                siteId={T30Site.id}
                               />
                             </Grid>
 
@@ -798,4 +826,4 @@ const T30ManualEntryDispatchOut = () => {
   );
 };
 
-export default T30ManualEntryDispatchOut;
+export default PKSManualEntryDispatchOut;

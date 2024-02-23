@@ -41,7 +41,7 @@ const BulkingManualEntryWBIn = () => {
   const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
@@ -85,7 +85,7 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      tempTrans.typeTransaction = 5;
+      tempTrans.typeTransaction = 4;
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();

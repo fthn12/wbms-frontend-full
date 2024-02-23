@@ -31,9 +31,7 @@ const BarChartComponent = () => {
           },
         },
       ],
-      NOT: {
-        typeTransaction: 5,
-      },
+ 
     },
     orderBy: { bonTripNo: "desc" },
   };

@@ -24,9 +24,20 @@ import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useCompany,
+  useProduct,
+  useDriver,
+  useWeighbridge,
+  useTransportVehicle,
+  useApp,
+  useStorageTank,
+} from "../../../../../hooks";
 
-const T30ManualEntryDispatchOut = () => {
+const LBNManualEntryDispatchOut = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const transactionAPI = TransactionAPI();
@@ -35,10 +46,11 @@ const T30ManualEntryDispatchOut = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const [selectedOption, setSelectedOption] = useState(0);
+  const [selectedOption, setSelectedOption] = useState("");
+
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
-  const T30Site = eDispatchApi.getT30Site();
+  const LBNSite = eDispatchApi.getBulkingSite();
 
   const storageTankFilter = {
     where: {
@@ -117,7 +129,7 @@ const T30ManualEntryDispatchOut = () => {
       toast.success(`Transaksi WB-OUT telah tersimpan.`);
       // redirect ke form view
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/t30/manual-entry-dispatch-view/${id}`);
+      navigate(`/wb/transactions/pks/manual-entry-dispatch-view/${id}`);
 
       return;
     } catch (error) {
@@ -180,7 +192,7 @@ const T30ManualEntryDispatchOut = () => {
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header title="Transaksi BULKING" subtitle="Transaksi Manual Entry WB-OUT" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -271,17 +283,6 @@ const T30ManualEntryDispatchOut = () => {
 
                       {selectedOption === 1 && (
                         <>
-                          <Field
-                            name="deliveryOrderNo"
-                            label="NO DO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            required
-                            size="small"
-                            fullWidth
-                            sx={{ mb: 2, backgroundColor: "transparant" }}
-                          />
                           <TransportVehicleACP
                             name="transportVehicleId"
                             label="Nomor Plat"
@@ -413,7 +414,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
+                                siteId={WBMS.SITE_REFID }
                               />
                             </Grid>
 
@@ -798,4 +799,4 @@ const T30ManualEntryDispatchOut = () => {
   );
 };
 
-export default T30ManualEntryDispatchOut;
+export default LBNManualEntryDispatchOut;

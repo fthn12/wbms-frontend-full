@@ -51,7 +51,7 @@ const T30ManualEntryDispatchView = () => {
   const { useGetCompaniesQuery } = useCompany();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtDrivers } = useGetDriversQuery();

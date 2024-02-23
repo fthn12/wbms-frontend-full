@@ -31,6 +31,7 @@ import {
   useProduct,
   useTransportVehicle,
   useStorageTank,
+  useSite,
 } from "../../../hooks";
 
 const T30ManualEntryWBIn = () => {
@@ -42,11 +43,14 @@ const T30ManualEntryWBIn = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetCompaniesQuery } = useCompany();
-
+  const { useGetSitesQuery } = useSite();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const [selectedOption, setSelectedOption] = useState("");
+
+  const [selectedOption, setSelectedOption] = useState(0);
+
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
+  const { data: dtSite } = useGetSitesQuery();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
@@ -103,8 +107,24 @@ const T30ManualEntryWBIn = () => {
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
       }
 
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+
+      if (selectedSite) {
+        tempTrans.originSiteId = selectedSite.id || "";
+        tempTrans.originSiteCode = selectedSite.code || "";
+        tempTrans.originSiteName = selectedSite.name || "";
+      }
+
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+
+      if (selectedDestinationSite) {
+        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.originWeighInKg = wb.weight;
+      tempTrans.progressStatus = 1;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -145,7 +165,6 @@ const T30ManualEntryWBIn = () => {
 
       tempTrans.typeTransaction = 4;
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -168,9 +187,9 @@ const T30ManualEntryWBIn = () => {
     }
   };
 
-  useEffect(() => {
-    setWbTransaction({ originWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
@@ -285,6 +304,17 @@ const T30ManualEntryWBIn = () => {
 
                       {selectedOption === 1 && (
                         <>
+                          <Field
+                            name="deliveryOrderNo"
+                            label="NO DO"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            required
+                            size="small"
+                            fullWidth
+                            sx={{ mb: 2, backgroundColor: "transparant" }}
+                          />
                           <TransportVehicleACP
                             name="transportVehicleId"
                             label="Nomor Plat"
@@ -351,7 +381,6 @@ const T30ManualEntryWBIn = () => {
                               setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
                               setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
                               setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                              setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI

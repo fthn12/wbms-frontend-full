@@ -50,7 +50,7 @@ const BulkingManualEntryOthersOut = () => {
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const productFilter = {
     where: {

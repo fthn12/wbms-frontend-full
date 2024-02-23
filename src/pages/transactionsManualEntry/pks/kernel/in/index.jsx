@@ -239,23 +239,43 @@ const PksManualEntryKernelIn = (props) => {
               }
             />
           </Grid>
-          <Grid item xs={6}>
-            <Field
-              type="number"
-              variant="outlined"
-              size="small"
-              fullWidth
-              component={TextField}
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-              }}
-              label="BERAT MASUK - IN"
-              name="originWeighInKg"
-              value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
-              inputProps={{ readOnly: true }}
-            />
-          </Grid>
+          {WBMS.USE_WB === true && (
+            <Grid item xs={6}>
+              <Field
+                type="number"
+                variant="outlined"
+                component={TextField}
+                size="small"
+                fullWidth
+                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                }}
+                label="BERAT MASUK - IN"
+                name="originWeighInKg"
+                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                inputProps={{ readOnly: true }}
+              />
+            </Grid>
+          )}
+          {WBMS.USE_WB === false && (
+            <Grid item xs={6}>
+              <Field
+                type="number"
+                variant="outlined"
+                component={TextField}
+                size="small"
+                fullWidth
+                sx={{ mt: 2 }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                }}
+                label="BERAT MASUK - IN"
+                name="originWeighInKg"
+                value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
+              />
+            </Grid>
+          )}
           <Grid item xs={6}>
             <Field
               type="number"
