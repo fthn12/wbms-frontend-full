@@ -81,7 +81,9 @@ const UserCreate = () => {
         editConfig.siteRefId = selected.refId || "";
       }
 
-      editConfig.useWb = editConfig.useWb === "true" ? true : false;
+      if (editConfig.useWb) {
+        editConfig.useWb = editConfig.useWb === "true" ? true : editConfig.useWb === "false" ? false : undefined;
+      }
 
       const response = await configApi.updateById(editConfig.id, { ...editConfig });
       localStorage.setItem("res", "success");
@@ -333,8 +335,8 @@ const UserCreate = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Field
-                            id="useWbId"
-                            labelId="useWbLbl"
+                            // id="useWbId"
+                            // labelId="useWbLbl"
                             name="useWb"
                             label="TONASE :"
                             component={Select}
@@ -344,10 +346,10 @@ const UserCreate = () => {
                               required: true,
                             }}
                           >
-                            <MenuItem key={true} value={true}>
+                            <MenuItem key={1} value={true}>
                               Menggunakan Timbangan
                             </MenuItem>
-                            <MenuItem key={false} value={false}>
+                            <MenuItem key={0} value={false}>
                               Manual Berat Timbangan
                             </MenuItem>
                           </Field>

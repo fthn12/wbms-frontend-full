@@ -21,12 +21,24 @@ const CompanyApiSlice = apiSlice.injectEndpoints({
       providesTags: ["company"],
     }),
 
+    getEdispatchCompany: builder.query({
+      query: (data) => ({
+        url: `${API_URL}/get-edispatch`,
+        method: "POST",
+        body: { ...data },
+      }),
+      transformResponse: (response, meta, arg) => response?.data?.company,
+      providesTags: ["company"],
+    }),
+
     findManyCompanies: builder.query({
       query: (data) => ({
         url: `${API_URL}/find-many`,
         method: "POST",
         body: { ...data },
       }),
+      transformResponse: (response, meta, arg) => response?.data?.company,
+      providesTags: ["company"],
     }),
 
     findFirstCompany: builder.query({
@@ -67,6 +79,7 @@ export const {
   useGetCompaniesQuery,
   useFindManyCompaniesQuery,
   useFindFirstCompanyQuery,
+  useGetEdispatchCompanyQuery,
   useUpdateCompanyMutation,
   useCreateCompanyMutation,
   useDeleteCompanyMutation,

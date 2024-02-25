@@ -12,9 +12,9 @@ export const TransportVehicleACP = (props) => {
   const { name, sx, isReadOnly, ...others } = props;
   const { values, handleChange, setFieldValue } = useFormikContext();
 
-  const { useGetTransportVehiclesQuery, useEDispatchTransportVehicleSyncMutation } = useTransportVehicle();
+  const { useGetEdispatchTransportVehiclesQuery, useEDispatchTransportVehicleSyncMutation } = useTransportVehicle();
 
-  const { data, refetch } = useGetTransportVehiclesQuery();
+  const { data, refetch } = useGetEdispatchTransportVehiclesQuery();
   const [eDispatchSync, { isLoading }] = useEDispatchTransportVehicleSyncMutation();
 
   return (

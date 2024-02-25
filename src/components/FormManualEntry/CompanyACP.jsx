@@ -10,11 +10,11 @@ import { useCompany, useDriver } from "../../hooks";
 
 export const CompanyACP = (props) => {
   const { name, sx, isReadOnly, ...others } = props;
-  const { values, handleChange, setFieldValue } = useFormikContext();
+  const { values, setFieldValue } = useFormikContext();
 
-  const { useGetCompaniesQuery, useEDispatchCompanySyncMutation } = useCompany();
+  const { useGetEdispatchCompanyQuery, useEDispatchCompanySyncMutation } = useCompany();
 
-  const { data, refetch } = useGetCompaniesQuery();
+  const { data, refetch } = useGetEdispatchCompanyQuery();
   const [eDispatchSync, { isLoading }] = useEDispatchCompanySyncMutation();
 
   return (

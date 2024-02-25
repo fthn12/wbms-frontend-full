@@ -39,6 +39,7 @@ const ReportTransactionDaily = () => {
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
+      isApproved: true,
       progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
     },
 

@@ -6,6 +6,7 @@ import {
   useUpdateCompanyMutation,
   useCreateCompanyMutation,
   useDeleteCompanyMutation,
+  useGetEdispatchCompanyQuery,
 } from "../slices/master-data/companySliceApi";
 
 export const useCompany = () => {
@@ -17,5 +18,6 @@ export const useCompany = () => {
     useUpdateCompanyMutation,
     useCreateCompanyMutation,
     useDeleteCompanyMutation,
+    useGetEdispatchCompanyQuery,
   };
 };

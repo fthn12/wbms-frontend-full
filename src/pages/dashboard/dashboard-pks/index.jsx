@@ -27,6 +27,7 @@ const DashboardPKS = () => {
       OR: [
         {
           progressStatus: { in: [21, 40, 41, 42] },
+          isApproved: true,
         },
       ],
       AND: [

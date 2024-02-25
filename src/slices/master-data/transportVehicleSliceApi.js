@@ -20,7 +20,21 @@ const transportVehicleApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response, meta, arg) => response?.data?.transportVehicle,
       providesTags: ["transport-vehicle"],
     }),
+
+    getEdispatchTransportVehicles: builder.query({
+      query: (data) => ({
+        url: `${API_URL}/get-edispatch`,
+        method: "POST",
+        body: { ...data },
+      }),
+      transformResponse: (response, meta, arg) => response?.data?.transportVehicle,
+      providesTags: ["transport-vehicle"],
+    }),
   }),
 });
 
-export const { useEDispatchTransportVehicleSyncMutation, useGetTransportVehiclesQuery } = transportVehicleApiSlice;
+export const {
+  useEDispatchTransportVehicleSyncMutation,
+  useGetTransportVehiclesQuery,
+  useGetEdispatchTransportVehiclesQuery,
+} = transportVehicleApiSlice;

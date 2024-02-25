@@ -12,9 +12,9 @@ export const DriverACP = (props) => {
   const { name, sx, isReadOnly, ...others } = props;
   const { values, handleChange, setFieldValue } = useFormikContext();
 
-  const { useGetDriversQuery, useEDispatchDriverSyncMutation } = useDriver();
+  const { useGetEdispatchDriversQuery, useEDispatchDriverSyncMutation } = useDriver();
 
-  const { data, refetch } = useGetDriversQuery();
+  const { data, refetch } = useGetEdispatchDriversQuery();
   const [eDispatchSync, { isLoading }] = useEDispatchDriverSyncMutation();
 
   return (

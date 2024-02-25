@@ -57,9 +57,6 @@ const TransactionGrid = (props) => {
         { dtModified: { gte: moment().subtract(3, "hours").format() } },
         { progressStatus: { in: [1, 2, 6, 11, 35, 36, 37] } },
       ],
-      // NOT: {
-      //   typeTransaction: 5,
-      // },
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
@@ -227,6 +224,7 @@ const TransactionGrid = (props) => {
             <QRCodeViewer
               progressStatus={params.data.progressStatus}
               deliveryOrderId={params.data.deliveryOrderId}
+              isApproved={params.data.isApproved}
               type="grid"
             />
             {params.data.isApproved === true && (

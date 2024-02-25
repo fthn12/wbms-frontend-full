@@ -119,6 +119,10 @@ const PksManualEntryOthersOut = () => {
         tempTrans.progressStatus = 42;
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighOutKg = wb.weight;
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
       // tempTrans.originWeighOutKg = wb.weight;
       tempTrans.originWeighOutTimestamp = moment().toDate();

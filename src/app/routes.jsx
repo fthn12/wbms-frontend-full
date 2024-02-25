@@ -18,9 +18,6 @@ const Page500 = lazy(() => import("../pages/Page500"));
 const DashboardAll = lazy(() => import("../pages/dashboard/dashboard-all"));
 
 const Transactions = lazy(() => import("../pages/transactions"));
-const TransactionsManualEntry = lazy(() => import("../pages/transactionsManualEntryNetto"));
-
-const ManualEntryBackDate = lazy(() => import("../pages/transactionsManualEntryNetto/backDate/form"));
 
 const PksManualEntryIn = lazy(() => import("../pages/transactionsManualEntry/pks/wb-in"));
 
@@ -123,7 +120,6 @@ const routes = () => {
           <Route path="dashboard/labanan" element={<div>Dashboard Labanan</div>} />
 
           <Route path="transactions" element={<Transactions />} />
-          <Route path="transactions/manual-entry" element={<TransactionsManualEntry />} />
 
           <Route path="transactions/pks-edispatch-normal-in" element={<PksNormalIn />} />
           <Route path="transactions/pks-edispatch-normal-out" element={<PksNormalOut />} />
@@ -142,8 +138,6 @@ const routes = () => {
           <Route path="transactions/pks-edispatch-reject-out/:id" element={<PksRejectOutView />} />
 
           <Route path="transactions/pks-new" element={<PksEDispatchNew />} />
-
-          <Route path="transactions/pks-new-backdate" element={<ManualEntryBackDate />} />
 
           <Route path="transactions/pks/manual-entry-in" name="PksManualEntryWbIn" element={<PksManualEntryIn />} />
 

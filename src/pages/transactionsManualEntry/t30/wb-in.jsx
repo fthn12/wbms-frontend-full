@@ -83,10 +83,10 @@ const T30ManualEntryWBIn = () => {
     transporterCompanyId: Yup.string().required("Wajib diisi"),
     productId: Yup.string().required("Wajib diisi"),
     driverId: Yup.string().required("Wajib diisi"),
-    originSourceStorageTankId: Yup.string().required("Wajib diisi"),
-    loadedSeal1: Yup.string().required("Wajib diisi"),
-    loadedSeal2: Yup.string().required("Wajib diisi"),
-    originWeighInRemark: Yup.string().required("Wajib diisi"),
+    // originSourceStorageTankId: Yup.string().required("Wajib diisi"),
+    // loadedSeal1: Yup.string().required("Wajib diisi"),
+    // loadedSeal2: Yup.string().required("Wajib diisi"),
+    // originWeighInRemark: Yup.string().required("Wajib diisi"),
   });
 
   const handleClose = () => {
@@ -121,6 +121,10 @@ const T30ManualEntryWBIn = () => {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
         tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+      }
+
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);
@@ -161,6 +165,10 @@ const T30ManualEntryWBIn = () => {
         tempTrans.blok = tempTrans.blok.toUpperCase();
       } else if (tempTrans.npb) {
         tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
+
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
       }
 
       tempTrans.typeTransaction = 4;
@@ -231,7 +239,14 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty 
+                        )
+                      }
                       onClick={() => handleDspSubmit()}
                     >
                       SIMPAN

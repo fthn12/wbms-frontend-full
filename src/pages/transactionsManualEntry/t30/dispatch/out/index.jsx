@@ -24,7 +24,15 @@ import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../../hooks";
+import {
+  useAuth,
+  useSite,
+  useConfig,
+  useTransaction,
+  useProduct,
+  useWeighbridge,
+  useStorageTank,
+} from "../../../../../hooks";
 
 const T30ManualEntryDispatchOut = () => {
   const navigate = useNavigate();
@@ -33,6 +41,7 @@ const T30ManualEntryDispatchOut = () => {
   const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
+  const { useGetSitesQuery } = useSite();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
   const [selectedOption, setSelectedOption] = useState(0);
@@ -58,6 +67,7 @@ const T30ManualEntryDispatchOut = () => {
   };
 
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
+  const { data: dtSite } = useGetSitesQuery();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
@@ -93,6 +103,26 @@ const T30ManualEntryDispatchOut = () => {
       if (selectedStorageTank) {
         tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+      }
+
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+
+      if (selectedSite) {
+        tempTrans.originSiteId = selectedSite.id || "";
+        tempTrans.originSiteCode = selectedSite.code || "";
+        tempTrans.originSiteName = selectedSite.name || "";
+      }
+
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+
+      if (selectedDestinationSite) {
+        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+      }
+
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighOutKg = wb.weight;
       }
 
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
@@ -674,7 +704,7 @@ const T30ManualEntryDispatchOut = () => {
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>

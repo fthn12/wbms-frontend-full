@@ -120,6 +120,10 @@ const PksManualEntryWBIn = () => {
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 1;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -169,6 +173,10 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 2;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -211,6 +219,10 @@ const PksManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.typeTransaction = 3;
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -250,6 +262,10 @@ const PksManualEntryWBIn = () => {
         tempTrans.blok = tempTrans.blok.toUpperCase();
       } else if (tempTrans.npb) {
         tempTrans.npb = tempTrans.npb.toUpperCase();
+      }
+
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);

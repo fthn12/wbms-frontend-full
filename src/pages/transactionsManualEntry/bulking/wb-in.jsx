@@ -67,6 +67,7 @@ const BulkingManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
+    // destinationWeighInKg: Yup.string().required("Wajib diisi"),
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -93,22 +94,14 @@ const BulkingManualEntryWBIn = () => {
 
     setIsLoading(true);
     try {
-      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.destinationSinkStorageTankId);
 
       if (selectedStorageTank) {
-        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
-        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+        tempTrans.destinationSinkStorageTankCode = selectedStorageTank.code || "";
+        tempTrans.destinationSinkStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
-
-      if (selectedSite) {
-        tempTrans.originSiteId = selectedSite.id || "";
-        tempTrans.originSiteCode = selectedSite.code || "";
-        tempTrans.originSiteName = selectedSite.name || "";
-      }
-
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -116,10 +109,14 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.destinationWeighInKg = wb.weight;
+      }
+
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 2;
-      tempTrans.originWeighInTimestamp = moment().toDate();
-      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.destinationWeighInTimestamp = moment().toDate();
+      tempTrans.destinationWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
@@ -158,8 +155,8 @@ const BulkingManualEntryWBIn = () => {
 
       tempTrans.typeTransaction = 4;
       tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.destinationWeighInTimestamp = moment().toDate();
-      tempTrans.destinationWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.originWeighInTimestamp = moment().toDate();
+      tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
@@ -179,10 +176,6 @@ const BulkingManualEntryWBIn = () => {
       return toast.error(`${error.message}.`);
     }
   };
-
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighInKg: wb.weight });
-  // }, [wb.weight]);
 
   useEffect(() => {
     setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });

@@ -30,8 +30,8 @@ const DashboardT30 = () => {
       typeSite: +WBMS.SITE_TYPE,
       OR: [
         {
-          // progressStatus: { in: [21, 40, 41, 42] },
-          progressStatus: { in: [21, 100, 41, 42] },
+          progressStatus: { in: [21, 42] },
+          isApproved: true,
         },
       ],
       AND: [

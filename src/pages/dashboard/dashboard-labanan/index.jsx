@@ -22,14 +22,13 @@ const DashboardLabanan = () => {
   const [TBSProduct, setTBSProduct] = useState(0);
   const [OtherProduct, setOtherProduct] = useState(0);
 
-
-
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
       OR: [
         {
-          progressStatus: 21,
+          progressStatus: { in: [21, 42] },
+          isApproved: true,
         },
       ],
     },

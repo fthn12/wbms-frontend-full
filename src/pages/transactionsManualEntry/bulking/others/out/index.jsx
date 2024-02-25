@@ -95,6 +95,10 @@ const BulkingManualEntryOthersOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighOutKg = wb.weight;
+      }
+
       tempTrans.progressStatus = 42;
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighOutTimestamp = moment().toDate();
@@ -174,6 +178,7 @@ const BulkingManualEntryOthersOut = () => {
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
+
 
   return (
     <Box>

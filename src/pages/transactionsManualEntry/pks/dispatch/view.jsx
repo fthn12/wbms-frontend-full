@@ -51,7 +51,7 @@ const PKSManualEntryDispatchView = () => {
   const { useGetCompaniesQuery } = useCompany();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
   const { setSidebar } = useApp();
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
   const { data: dtDrivers } = useGetDriversQuery();
@@ -62,7 +62,7 @@ const PKSManualEntryDispatchView = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
       refType: 1,
     },
   };
@@ -217,8 +217,7 @@ const PKSManualEntryDispatchView = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-              
-                  <BonTripPrintT30 dtTrans={{ ...values }}  sx={{ mx: 1 }} />
+                  <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -282,6 +281,18 @@ const PKSManualEntryDispatchView = () => {
 
                       {selectedOption === 1 && (
                         <>
+                          <Field
+                            name="deliveryOrderNo"
+                            label="NO DO"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            required
+                            size="small"
+                            fullWidth
+                            inputProps={{ readOnly: true }}
+                            sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                          />
                           <TransportVehicleACP
                             name="transportVehicleId"
                             label="Nomor Plat"
@@ -413,7 +424,7 @@ const PKSManualEntryDispatchView = () => {
                                 isReadOnly={true}
                                 sx={{ mt: 2 }}
                                 backgroundColor="whitesmoke"
-                                siteId={T30Site.id}
+                                siteId={WBMS.SITE_REFID}
                               />
                             </Grid>
 
@@ -677,7 +688,7 @@ const PKSManualEntryDispatchView = () => {
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>

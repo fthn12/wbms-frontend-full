@@ -217,8 +217,7 @@ const T30ManualEntryDispatchView = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-              
-                  <BonTripPrintT30 dtTrans={{ ...values }}  sx={{ mx: 1 }} />
+                  <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -282,6 +281,18 @@ const T30ManualEntryDispatchView = () => {
 
                       {selectedOption === 1 && (
                         <>
+                          <Field
+                            name="deliveryOrderNo"
+                            label="NO DO"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            required
+                            size="small"
+                            fullWidth
+                            inputProps={{ readOnly: true }}
+                            sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                          />
                           <TransportVehicleACP
                             name="transportVehicleId"
                             label="Nomor Plat"
@@ -677,7 +688,7 @@ const T30ManualEntryDispatchView = () => {
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>

@@ -20,7 +20,17 @@ const driverApiSlice = apiSlice.injectEndpoints({
       transformResponse: (response, meta, arg) => response?.data?.driver,
       providesTags: ["driver"],
     }),
+
+    getEdispatchDrivers: builder.query({
+      query: (data) => ({
+        url: `${API_URL}/get-edispatch`,
+        method: "POST",
+        body: { ...data },
+      }),
+      transformResponse: (response, meta, arg) => response?.data?.driver,
+      providesTags: ["driver"],
+    }),
   }),
 });
 
-export const { useEDispatchDriverSyncMutation, useGetDriversQuery } = driverApiSlice;
+export const { useEDispatchDriverSyncMutation, useGetDriversQuery, useGetEdispatchDriversQuery } = driverApiSlice;

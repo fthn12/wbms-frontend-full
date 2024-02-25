@@ -44,7 +44,7 @@ const PKSManualEntryDispatchOut = () => {
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
   const { useGetSitesQuery } = useSite();
-  const [selectedOption, setSelectedOption] = useState("");
+  const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtSite } = useGetSitesQuery();
 
@@ -53,7 +53,7 @@ const PKSManualEntryDispatchOut = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
       refType: 1,
     },
   };
@@ -121,6 +121,10 @@ const PKSManualEntryDispatchOut = () => {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
         tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+      }
+
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighOutKg = wb.weight;
       }
 
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
@@ -441,7 +445,7 @@ const PKSManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={T30Site.id}
+                                siteId={WBMS.SITE_REFID}
                               />
                             </Grid>
 
