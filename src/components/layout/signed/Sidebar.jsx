@@ -260,7 +260,7 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             )}
-          
+
             {/* <Item
               title="Approval Request"
               to="#"
@@ -338,6 +338,17 @@ const Sidebar = () => {
                 <Item
                   title="Drivers"
                   to="md/drivers"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+              </SubMenu>
+            )}
+            {(user.role === 5 || user.role === 6) && (
+              <SubMenu label="Kualitas" icon={<TopicOutlinedIcon />}>
+                <Item
+                  title="CPO"
+                  to="kualitas/cpo"
                   icon={<ArrowRightOutlinedIcon />}
                   selected={sidebar.selected}
                   setSelected={setSelected}

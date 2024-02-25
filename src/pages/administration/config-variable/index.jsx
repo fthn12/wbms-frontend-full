@@ -316,7 +316,7 @@ const UserCreate = () => {
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <SiteSelect name="siteId" label="Site StorageTank" isReadOnly={false} />
+                          <SiteSelect name="siteId" label="Site" isReadOnly={false} />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <SiteSelected name="destinationSiteId" label="Site Tujuan" isReadOnly={false} />

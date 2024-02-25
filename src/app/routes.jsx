@@ -93,6 +93,8 @@ const AdmUser = lazy(() => import("../pages/administration/user-management/users
 const AdmUserCreate = lazy(() => import("../pages/administration/user-management/users/user-create"));
 const AdmUserView = lazy(() => import("../pages/administration/user-management/users/user-view"));
 
+const KualitasCpo = lazy(() => import("../pages/kualitas/kualitas-cpo"));
+
 const Config = lazy(() => import("../pages/administration/config-variable"));
 
 const routes = () => {
@@ -258,6 +260,8 @@ const routes = () => {
           <Route path="md/transport-vehicles" element={<MDTransportVehicle />} />
           <Route path="md/companies" element={<MDCompany />} />
           <Route path="md/drivers" element={<MDDriver />} />
+
+          <Route path="kualitas/cpo" element={<KualitasCpo />} />
 
           <Route path="administration/configs/:id" element={<Config />} />
 

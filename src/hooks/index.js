@@ -14,3 +14,4 @@ export * from "./useTransaction";
 export * from "./useTransportVehicle";
 export * from "./useUser";
 export * from "./useWeighbridge";
+export * from "./useKualitasCpo";

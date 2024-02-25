@@ -23,7 +23,7 @@ export const SortasiKernel = (props) => {
           }}
           component={TextField}
           label="Moisture"
-          name="Moisture"
+          name="moisturePercentage"
         />
       </Grid>
       <Grid item xs={5}>
@@ -38,7 +38,7 @@ export const SortasiKernel = (props) => {
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: true,
           }}
-          name="Moisture"
+          name="moistureKg"
         />
       </Grid>
       <Grid item xs={7}>
@@ -57,7 +57,7 @@ export const SortasiKernel = (props) => {
           }}
           component={TextField}
           label="Dirt"
-          name="BuahLewatMatang"
+          name="dirtPercentage"
         />
       </Grid>
       <Grid item xs={5}>
@@ -72,7 +72,7 @@ export const SortasiKernel = (props) => {
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: true,
           }}
-          name="Moisture"
+          name="dirtKg"
         />
       </Grid>
       <Grid item xs={7}>
@@ -91,7 +91,7 @@ export const SortasiKernel = (props) => {
           }}
           component={TextField}
           label="Stone"
-          name="TangkaiPanjang"
+          name="stonePercentage"
         />
       </Grid>
       <Grid item xs={5}>
@@ -106,7 +106,7 @@ export const SortasiKernel = (props) => {
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: true,
           }}
-          name="Moisture"
+          name="stoneKg"
         />
       </Grid>
 
