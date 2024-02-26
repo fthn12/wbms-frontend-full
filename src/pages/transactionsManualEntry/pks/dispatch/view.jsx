@@ -163,9 +163,9 @@ const PKSManualEntryDispatchView = () => {
   // };
 
   //weight wb
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
