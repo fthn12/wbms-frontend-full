@@ -239,14 +239,7 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={
-                        !(
-                          isValid &&
-                          wb?.isStable &&
-                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                          dirty 
-                        )
-                      }
+                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
                       onClick={() => handleDspSubmit()}
                     >
                       SIMPAN

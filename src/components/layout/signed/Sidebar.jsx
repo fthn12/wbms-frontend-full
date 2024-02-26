@@ -24,6 +24,7 @@ import ArrowRightOutlinedIcon from "@mui/icons-material/ArrowRightOutlined";
 import DragHandleOutlinedIcon from "@mui/icons-material/DragHandleOutlined";
 import DisplaySettingsOutlinedIcon from "@mui/icons-material/DisplaySettingsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import DvrOutlinedIcon from '@mui/icons-material/DvrOutlined';
 
 // hex to rgba converter
 // pakai rgba agar bisa set transparansi
@@ -345,7 +346,7 @@ const Sidebar = () => {
               </SubMenu>
             )}
             {(user.role === 5 || user.role === 6) && (
-              <SubMenu label="Kualitas" icon={<TopicOutlinedIcon />}>
+              <SubMenu label="Kualitas" icon={<DvrOutlinedIcon />}>
                 <Item
                   title="CPO"
                   to="kualitas/cpo"

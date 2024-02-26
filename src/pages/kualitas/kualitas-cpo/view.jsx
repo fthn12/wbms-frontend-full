@@ -70,7 +70,7 @@ const CreateKualitasCpo = (props) => {
               <Box
                 display="grid"
                 padding={5}
-                paddingBottom={3}
+                paddingBottom={5}
                 paddingLeft={3}
                 paddingRight={3}
                 gap="20px"

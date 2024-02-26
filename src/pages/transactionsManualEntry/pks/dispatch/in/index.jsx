@@ -200,7 +200,7 @@ const PKSManualEntryDispatchIn = (props) => {
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               inputProps={{ readOnly: true }}
-              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
+              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.00"}
             />
           </Grid>
         </Grid>

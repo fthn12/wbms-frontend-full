@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Box, Button, CircularProgress, IconButton, Paper } from "@mui/material";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import "ag-grid-enterprise";
-import { toast } from "react-toastify";
+import moment from "moment";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
 import { RangeSelectionModule } from "@ag-grid-enterprise/range-selection";
 import { RowGroupingModule } from "@ag-grid-enterprise/row-grouping";
@@ -58,6 +58,10 @@ const KualitasCpo = () => {
     return MD_SOURCE[params.value];
   };
 
+  const datetimeFormatter = (params) => {
+    if (params.data) return moment(params.value).format("DD/MM/YYYY, HH:mm:ss");
+  };
+
   const [columnDefs] = useState([
     // {
     //   field: "refType",
@@ -70,6 +74,13 @@ const KualitasCpo = () => {
     { field: "FfaPercentage", headerName: "Ffa Percentage", flex: 1, cellStyle: { textAlign: "center" } },
     { field: "MoistPercentage", headerName: "Moist Percentage", flex: 1, cellStyle: { textAlign: "center" } },
     { field: "DirtPercentage", headerName: "Dirt Percentage", flex: 1, cellStyle: { textAlign: "center" } },
+    {
+      field: "dtModified",
+      headerName: "Tanggal",
+      flex: 1,
+      cellStyle: { textAlign: "center" },
+      valueFormatter: datetimeFormatter,
+    },
     {
       field: "id",
       headerName: "Actions",
@@ -119,7 +130,7 @@ const KualitasCpo = () => {
             setIsOpen(true);
           }}
         >
-         UPDATE KUALITAS
+          UPDATE KUALITAS
         </Button>
 
         <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => refetch()}>

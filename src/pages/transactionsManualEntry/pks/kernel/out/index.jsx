@@ -174,9 +174,9 @@ const PksManualEntryKernelOut = () => {
   }, [selectedOption, refetchProducts]);
 
   //weight wb
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -251,7 +251,7 @@ const PksManualEntryKernelOut = () => {
                     variant="contained"
                     sx={{ mr: 1 }}
                     disabled={
-                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 35)
+                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 36)
                     }
                   >
                     SIMPAN
