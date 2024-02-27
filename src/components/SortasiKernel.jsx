@@ -33,10 +33,10 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ backgroundColor: "whitesmoke" }}
+          sx={{   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
+            readOnly: isReadOnly,
           }}
           name="moistureKg"
         />
@@ -67,10 +67,10 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 2,   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
+            readOnly: isReadOnly,
           }}
           name="dirtKg"
         />
@@ -101,10 +101,10 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 2, mb: 1.5,   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
+            readOnly: isReadOnly,
           }}
           name="stoneKg"
         />

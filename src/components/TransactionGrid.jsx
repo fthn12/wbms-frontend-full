@@ -160,8 +160,12 @@ const TransactionGrid = (props) => {
       if (WBMS.SITE_TYPE === 1) {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-out";
+        } else if (progressStatus === 6) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
+        } else if (progressStatus === 26) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
         } else if (progressStatus === 35) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
         } else if (progressStatus === 36) {
@@ -182,8 +186,12 @@ const TransactionGrid = (props) => {
       } else if (WBMS.SITE_TYPE === 2) {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/t30/manual-entry-dispatch-out";
+        } else if (progressStatus === 6) {
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-cancel-out";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/t30/manual-entry-dispatch-view";
+        } else if (progressStatus === 26) {
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-cancel-out-view";
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/t30/manual-entry-others-out";
         } else if (progressStatus === 42) {
@@ -196,6 +204,8 @@ const TransactionGrid = (props) => {
       } else if (WBMS.SITE_TYPE === 3) {
         if (progressStatus === 2) {
           urlPath = "/wb/transactions/bulking/manual-entry-dispatch-out";
+        } else if (progressStatus === 11) {
+          urlPath = "/wb/transactions/pks-edispatch-reject-out-manual";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/bulking/manual-entry-dispatch-view";
         } else if (progressStatus === 37) {

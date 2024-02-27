@@ -6,10 +6,9 @@ import { TextField } from "formik-mui";
 
 export const SortasiTBS = (props) => {
   const { isReadOnly } = props;
-  const { values, setFieldValue} = useFormikContext();
+  const { values, setFieldValue } = useFormikContext();
 
   const [totalPotongan, setTotalPotongan] = useState(0);
-
 
   const handleSelectAll = (event) => {
     const isChecked = event.target.checked;
@@ -48,13 +47,11 @@ export const SortasiTBS = (props) => {
     setFieldValue("mandatoryDeductionKg", mandatoryDeductionKg);
   }, [values.mandatoryDeductionPercentage, values.janjang, setFieldValue]);
 
-   //grading potongan lainnya
-   useEffect(() => {
+  //grading potongan lainnya
+  useEffect(() => {
     const othersKg = Math.trunc(Math.abs(values.othersPercentage / 100) * values.janjang);
     setFieldValue("othersKg", othersKg);
   }, [values.othersPercentage, values.janjang, setFieldValue]);
-
-  
 
   return (
     <>
@@ -80,6 +77,8 @@ export const SortasiTBS = (props) => {
             },
           }}
           component={TextField}
+          disabled={isReadOnly}
+        
           label="Buah Mentah"
           name="unRipePercentage"
         />
@@ -92,11 +91,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ backgroundColor: "whitesmoke" }}
+          sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
         />
       </Grid>
       <Grid item xs={1.1}>
@@ -125,6 +124,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Buah Lewat Matang"
           name="underRipePercentage"
@@ -137,11 +137,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="underRipeKg"
         />
       </Grid>
@@ -171,6 +171,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Tangkai Panjang"
           name="longStalkPercentage"
@@ -183,11 +184,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="longStalkKg"
         />
       </Grid>
@@ -217,6 +218,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Tandan Kosong"
           name="emptyBunchPercentage"
@@ -229,11 +231,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="emptyBunchKg"
         />
       </Grid>
@@ -263,6 +265,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Sampah"
           name="garbageDirtPercentage"
@@ -275,11 +278,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="garbageDirtKg"
         />
       </Grid>
@@ -309,6 +312,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Air"
           name="waterPercentage"
@@ -321,11 +325,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="waterKg"
         />
       </Grid>
@@ -355,6 +359,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Parteno"
           name="parthenocarpyPercentage"
@@ -367,11 +372,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="parthenocarpyKg"
         />
       </Grid>
@@ -401,6 +406,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Brondolan"
           name="looseFruitPercentage"
@@ -413,11 +419,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="looseFruitKg"
         />
       </Grid>
@@ -445,8 +451,10 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: true,
           }}
+          disa
+          disabled={isReadOnly}
+          bled={isReadOnly}
           component={TextField}
           label="Pot. Wajib Vendor"
           name="mandatoryDeductionPercentage"
@@ -459,11 +467,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="mandatoryDeductionKg"
           value={values?.mandatoryDeductionKg}
         />
@@ -495,6 +503,7 @@ export const SortasiTBS = (props) => {
             },
             // readOnly: isReadOnly,
           }}
+          disabled={isReadOnly}
           component={TextField}
           label="Pot. Lainnya"
           name="othersPercentage"
@@ -507,11 +516,11 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+          sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           name="othersKg"
         />
       </Grid>
@@ -528,8 +537,8 @@ export const SortasiTBS = (props) => {
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
-            readOnly: true,
           }}
+          disabled={isReadOnly}
           component={TextField}
           value={totalPotongan}
           label="Total Potongan [KG]"

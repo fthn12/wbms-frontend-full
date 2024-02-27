@@ -140,15 +140,13 @@ const PKSManualEntryDispatchIn = (props) => {
             <StorageTankSelect
               name="originSourceStorageTankId"
               label="Tangki Asal"
-              isRequired={true}
-              isReadOnly={true}
+              isRequired={false}
+              isReadOnly={false}
               sx={{ mt: 2 }}
-              backgroundColor="whitesmoke"
+              backgroundColor="transparant"
               siteId={WBMS.SITE.refId}
             />
           </Grid>
-
-         
         </Grid>
       </Grid>
 
@@ -424,6 +422,7 @@ const PKSManualEntryDispatchIn = (props) => {
                 component={TextField}
                 size="small"
                 fullWidth
+                required={true}
                 sx={{ mt: 2 }}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,

@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../../components/layout/signed/HeaderTransaction";
+import CancelConfirmation from "components/CancelConfirmation";
 import { CertificateSelect, StorageTankSelect } from "../../../../../components/FormikMUI";
 import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../../components/FormManualEntry";
 
@@ -71,6 +72,7 @@ const PKSManualEntryDispatchOut = () => {
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
+  const [isCancel, setIsCancel] = useState(false);
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,7 +88,6 @@ const PKSManualEntryDispatchOut = () => {
     loadedSeal2: Yup.string().required("Wajib diisi"),
     originWeighOutRemark: Yup.string().required("Wajib diisi"),
     deliveryOrderNo: Yup.string().required("Wajib diisi"),
-    originWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -95,65 +96,147 @@ const PKSManualEntryDispatchOut = () => {
     navigate("/wb/transactions");
   };
 
+  // const handleFormikSubmit = async (values) => {
+  //   let tempTrans = { ...values };
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+
+  //     if (selectedStorageTank) {
+  //       tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
+  //       tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+  //     }
+
+  //     const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
+
+  //     if (selectedSite) {
+  //       tempTrans.originSiteId = selectedSite.id || "";
+  //       tempTrans.originSiteCode = selectedSite.code || "";
+  //       tempTrans.originSiteName = selectedSite.name || "";
+  //     }
+
+  //     const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
+
+  //     if (selectedDestinationSite) {
+  //       tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+  //       tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+  //       tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+  //     }
+
+  //     tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
+  //     tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
+  //     tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
+  //     tempTrans.productType = parseInt(tempTrans.productType);
+  //     tempTrans.progressStatus = 21;
+  //     tempTrans.deliveryDate = moment().toDate();
+  //     tempTrans.originWeighOutTimestamp = moment().toDate();
+  //     tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
+  //     tempTrans.dtTransaction = moment()
+  //       .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //       .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+  //       .format();
+
+  //     const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+
+  //     if (!response.status) throw new Error(response?.message);
+
+  //     clearWbTransaction();
+  //     setIsLoading(false);
+
+  //     toast.success(`Transaksi WB-OUT telah tersimpan.`);
+  //     // redirect ke form view
+  //     const id = response?.data?.transaction?.id;
+  //     navigate(`/wb/transactions/pks/manual-entry-dispatch-view/${id}`);
+
+  //     return;
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     toast.error(`${error.message}.`);
+
+  //     return;
+  //   }
+  // };
+
   const handleFormikSubmit = async (values) => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
 
     try {
-      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selected = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
 
-      if (selectedStorageTank) {
-        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
-        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
-      }
-
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
-
-      if (selectedSite) {
-        tempTrans.originSiteId = selectedSite.id || "";
-        tempTrans.originSiteCode = selectedSite.code || "";
-        tempTrans.originSiteName = selectedSite.name || "";
-      }
-
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
-
-      if (selectedDestinationSite) {
-        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
-        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
-        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
-      }
-
-      if (WBMS.USE_WB === true) {
-        tempTrans.originWeighOutKg = wb.weight;
+      if (selected) {
+        tempTrans.originSourceStorageTankCode = selected.code || "";
+        tempTrans.originSourceStorageTankName = selected.name || "";
       }
 
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
       tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.progressStatus = 21;
-      tempTrans.deliveryDate = moment().toDate();
-      tempTrans.originWeighOutTimestamp = moment().toDate();
-      tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+      if (isCancel) {
+        if (WBMS.USE_WB === true) {
+          tempTrans.returnWeighInKg = wb.weight;
+        }
 
-      if (!response.status) throw new Error(response?.message);
+        tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
+        tempTrans.returnWeighInTimestamp = moment().toDate();
+        tempTrans.progressStatus = 6;
+        tempTrans.dtTransaction = moment()
+          .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+          .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+          .format();
 
-      clearWbTransaction();
-      setIsLoading(false);
+        const data = { tempTrans };
 
-      toast.success(`Transaksi WB-OUT telah tersimpan.`);
-      // redirect ke form view
-      const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/pks/manual-entry-dispatch-view/${id}`);
+        const response = await transactionAPI.updateById(tempTrans.id, {
+          ...tempTrans,
+        });
 
-      return;
+        if (!response.status) throw new Error(response?.message);
+
+        clearWbTransaction();
+        setIsLoading(false);
+
+        toast.success(`Transaksi CANCEL WB-IN telah tersimpan.`);
+
+        // redirect ke form view
+        const id = response?.data?.transaction?.id;
+        navigate(`/wb/transactions/pks/manual-entry-dispatch-cancel-in-view/${id}`);
+
+        return;
+      } else {
+        if (WBMS.USE_WB === true) {
+          tempTrans.originWeighOutKg = wb.weight;
+        }
+        tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
+        tempTrans.originWeighOutTimestamp = moment().toDate();
+        tempTrans.progressStatus = 21;
+        tempTrans.dtTransaction = moment()
+          .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+          .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+          .format();
+
+        const data = { tempTrans };
+
+        const response = await transactionAPI.updateById(tempTrans.id, {
+          ...tempTrans,
+        });
+
+        if (!response.status) throw new Error(response?.message);
+
+        clearWbTransaction();
+        setIsLoading(false);
+
+        toast.success(`Transaksi WB-OUT telah tersimpan.`);
+
+        const id = response?.data?.transaction?.id;
+        navigate(`/wb/transactions/pks/manual-entry-dispatch-view/${id}`);
+
+        return;
+      }
     } catch (error) {
       setIsLoading(false);
       toast.error(`${error.message}.`);
@@ -221,15 +304,49 @@ const PKSManualEntryDispatchOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, dirty, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, submitForm, handleChange } = props;
             // console.log("Formik props:", props);
+            const handleSubmit = () => {
+              submitForm();
+            };
+
+            const handleCancel = (cancelReason) => {
+              if (cancelReason.trim().length <= 10)
+                return toast.error("Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter.");
+
+              setFieldValue("returnWeighInRemark", cancelReason);
+              setIsCancel(true);
+
+              submitForm();
+            };
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
                   {selectedOption === 1 && WBMS.USE_WB === true && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={!(isValid && dirty && values.originWeighOutKg > WBMS.WB_MIN_WEIGHT)}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
-                      type="submit"
+                      onClick={() => handleSubmit()}
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
@@ -247,10 +364,17 @@ const PKSManualEntryDispatchOut = () => {
                   )}
                   {selectedOption === 1 && WBMS.USE_WB === false && (
                     <Button
-                      type="submit"
+                      onClick={() => handleSubmit()}
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.progressStatus === 1)}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 1
+                        )
+                      }
                     >
                       SIMPAN
                     </Button>
@@ -657,7 +781,7 @@ const PKSManualEntryDispatchOut = () => {
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator WB-IN"
                                 name="originWeighInOperatorName"
-                                value={user.name}
+                                value={values?.originWeighInOperatorName || "-"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -670,7 +794,7 @@ const PKSManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator WB-OUT"
-                                value={values?.originWeighOutOperatorName || "-"}
+                                value={user.name}
                                 name="originWeighOutOperatorName"
                                 inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
                               />
@@ -686,7 +810,11 @@ const PKSManualEntryDispatchOut = () => {
                                 label="Waktu WB-IN"
                                 name="originWeighInTimestamp"
                                 inputProps={{ readOnly: true }}
-                                value={dtTrx || "-"}
+                                value={
+                                  values?.originWeighInTimestamp
+                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -700,11 +828,7 @@ const PKSManualEntryDispatchOut = () => {
                                 label="Waktu WB-Out"
                                 name="originWeighOutTimestamp"
                                 inputProps={{ readOnly: true }}
-                                value={
-                                  values?.originWeighOutTimestamp
-                                    ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                                    : "-"
-                                }
+                                value={dtTrx || "-"}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -751,6 +875,7 @@ const PKSManualEntryDispatchOut = () => {
                                   component={TextField}
                                   size="small"
                                   fullWidth
+                                  required={true}
                                   sx={{ mt: 2, mb: 1.5 }}
                                   InputProps={{
                                     endAdornment: <InputAdornment position="end">kg</InputAdornment>,

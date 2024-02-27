@@ -25,49 +25,15 @@ import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../apis";
 
-import {
-  useAuth,
-  useConfig,
-  useTransaction,
-  useCompany,
-  useProduct,
-  useDriver,
-  useWeighbridge,
-  useTransportVehicle,
-  useApp,
-  useStorageTank,
-} from "../../../../hooks";
+import { useAuth, useConfig, useTransaction, useProduct } from "../../../../hooks";
 
 const T30ManualEntryDispatchView = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const transactionAPI = TransactionAPI();
-  const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
-    useTransaction();
-  const { useGetDriversQuery } = useDriver();
-  const { useGetCompaniesQuery } = useCompany();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const [selectedOption, setSelectedOption] = useState(0);
-
-  const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
-  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
-
-  const { useFindManyStorageTanksQuery } = useStorageTank();
-  const T30Site = eDispatchApi.getT30Site();
-
-  const storageTankFilter = {
-    where: {
-      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
-      refType: 1,
-    },
-  };
-
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
 
   const { useFindManyProductQuery } = useProduct();
 
@@ -551,7 +517,7 @@ const T30ManualEntryDispatchView = () => {
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator WB-IN"
                                 name="originWeighInOperatorName"
-                                value={user.name}
+                                value={values?.originWeighInOperatorName || "-"}
                                 inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
                               />
                             </Grid>
@@ -580,7 +546,11 @@ const T30ManualEntryDispatchView = () => {
                                 label="Waktu WB-IN"
                                 name="originWeighInTimestamp"
                                 inputProps={{ readOnly: true }}
-                                value={dtTrx || "-"}
+                                value={
+                                  values?.originWeighInTimestamp
+                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>

@@ -22,7 +22,7 @@ import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../..
 import BonTripPrintT30 from "../../../../components/BonTripPrint";
 
 import * as eDispatchApi from "../../../../apis/eDispatchApi";
-
+import CancelConfirmation from "components/CancelConfirmation";
 import { TransactionAPI } from "../../../../apis";
 
 import {
@@ -62,7 +62,7 @@ const PKSManualEntryDispatchView = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
+      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
       refType: 1,
     },
   };
@@ -85,10 +85,110 @@ const PKSManualEntryDispatchView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dtTrx, setDtTrx] = useState(null);
 
+  const validationSchema = Yup.object().shape({
+    transportVehicleId: Yup.string().required("Wajib diisi"),
+    transporterCompanyId: Yup.string().required("Wajib diisi"),
+    productId: Yup.string().required("Wajib diisi"),
+    driverId: Yup.string().required("Wajib diisi"),
+    originSourceStorageTankId: Yup.string().required("Wajib diisi"),
+    loadedSeal1: Yup.string().required("Wajib diisi"),
+    loadedSeal2: Yup.string().required("Wajib diisi"),
+    originWeighOutRemark: Yup.string().required("Wajib diisi"),
+  });
+
   const handleClose = () => {
     clearOpenedTransaction();
 
     navigate("/wb/transactions");
+  };
+
+  const handleCancel = async (values) => {
+    try {
+      const response = await transactionAPI.getById(values.id);
+  
+      if (!response.status) throw new Error(response?.message);
+  
+      const tempTrans = { ...response.data.transaction };
+      tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
+      tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
+      tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
+      tempTrans.productType = parseInt(tempTrans.productType);
+      tempTrans.returnWeighInKg = wb.weight;
+      tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
+      tempTrans.returnWeighInTimestamp = moment().toDate();
+      tempTrans.progressStatus = 6;
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+      clearOpenedTransaction();
+      clearWbTransaction();
+      setIsLoading(false);
+  
+      const updateResponse = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+  
+      if (!updateResponse.status) throw new Error(updateResponse?.message);
+  
+      const updatedTransaction = updateResponse?.data?.transaction;
+  
+      setOpenedTransaction(updatedTransaction);
+  
+      toast.success(`Transaksi WB-OUT dibatalkan.`);
+  
+      const id = updatedTransaction?.id;
+  
+      navigate(`/wb/transactions/pks/manual-entry-dispatch-cancel-in-view/${id}`);
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(`${error.message}.`);
+    }
+  };
+  
+  const handleFormikSubmit = async (values) => {
+    let tempTrans = { ...values };
+
+    setIsLoading(true);
+
+    try {
+      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+
+      if (selectedStorageTank) {
+        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
+        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+      }
+
+      tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
+      tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
+      tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
+      tempTrans.productType = parseInt(tempTrans.productType);
+      tempTrans.progressStatus = 21;
+      tempTrans.originWeighOutKg = wb.weight;
+      tempTrans.originWeighOutTimestamp = moment().toDate();
+      tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+
+      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+
+      if (!response.status) throw new Error(response?.message);
+
+      clearWbTransaction();
+      setIsLoading(false);
+
+      toast.success(`Transaksi WB-OUT telah tersimpan.`);
+      // redirect ke form view
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/t30/manual-entry-dispatch-view/${id}`);
+
+      return;
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(`${error.message}.`);
+
+      return;
+    }
   };
 
   useEffect(() => {
@@ -98,6 +198,16 @@ const PKSManualEntryDispatchView = () => {
       // console.clear();
     };
   }, []);
+
+  //validasi form
+  // const validateForm = () => {
+  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
+  // };
+
+  //weight wb
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -135,7 +245,13 @@ const PKSManualEntryDispatchView = () => {
     <Box>
       <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
       {openedTransaction && (
-        <Formik initialValues={openedTransaction}>
+        <Formik
+          // enableReinitialize
+          onSubmit={handleFormikSubmit}
+          initialValues={openedTransaction}
+          validationSchema={validationSchema}
+          // isInitialValid={false}
+        >
           {(props) => {
             const { values, isValid, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
@@ -143,19 +259,13 @@ const PKSManualEntryDispatchView = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  <Button variant="contained" onClick={() => handleCancel(values)}>
+                    Cancel Transaksi
+                  </Button>
                   <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
-                  {/* <Button
-                    variant="contained"
-                    sx={{ ml: 1 }}
-                    onClick={() => {
-                      console.log("Form:", props);
-                    }}
-                  >
-                    DEBUG
-                  </Button> */}
                 </Box>
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
                   <Grid container spacing={2}>
@@ -339,7 +449,7 @@ const PKSManualEntryDispatchView = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
+                              <Divider sx={{ mt: 4 }}>Tangki</Divider>
                             </Grid>
 
                             <Grid item xs={12}>
@@ -350,7 +460,63 @@ const PKSManualEntryDispatchView = () => {
                                 isReadOnly={true}
                                 sx={{ mt: 2 }}
                                 backgroundColor="whitesmoke"
-                                siteId={WBMS.SITE.refId}
+                                siteId={WBMS.SITE_REFID}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                              <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
+                            </Grid>
+
+                            <Grid item xs={4}>
+                              <Field
+                                name="originFfaPercentage"
+                                label="FFA"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originMoistPercentage"
+                                label="Moist"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originDirtPercentage"
+                                label="Dirt"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                inputProps={{ readOnly: true }}
                               />
                             </Grid>
                           </Grid>
@@ -474,62 +640,6 @@ const PKSManualEntryDispatchView = () => {
                                 size="small"
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
-                            </Grid>
-
-                            <Grid item xs={4}>
-                              <Field
-                                name="originFfaPercentage"
-                                label="FFA"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originMoistPercentage"
-                                label="Moist"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originDirtPercentage"
-                                label="Dirt"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>

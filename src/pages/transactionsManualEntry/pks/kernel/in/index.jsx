@@ -11,7 +11,7 @@ import {
 import { TextField, Autocomplete } from "formik-mui";
 import { Formik, Form, Field } from "formik";
 import moment from "moment";
-
+import { DriverFreeSolo } from "components/FormOthers";
 import { SortasiKernel } from "../../../../../components/SortasiKernel";
 
 import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
@@ -21,6 +21,7 @@ const PksManualEntryKernelIn = (props) => {
   console.clear();
   const { user } = useAuth();
   const { wb } = useWeighbridge();
+
   const { WBMS, SCC_MODEL } = useConfig();
   const { wbTransaction } = useTransaction();
   const { useGetDriversQuery } = useDriver();
@@ -57,33 +58,7 @@ const PksManualEntryKernelIn = (props) => {
             <Divider>DATA SUPIR & MUATAN</Divider>
           </Grid>
           <Grid item xs={12}>
-            <Field
-              name="driverName"
-              component={Autocomplete}
-              variant="outlined"
-              fullWidth
-              freeSolo
-              disableClearable
-              options={dtDrivers?.records.map((record) => record.name)}
-              onInputChange={(event, InputValue, reason) => {
-                if (reason !== "reset") {
-                  setFieldValue("driverName", InputValue.toUpperCase());
-                }
-              }}
-              renderInput={(params) => (
-                <TextFieldMUI
-                  {...params}
-                  name="driverName"
-                  size="small"
-                  label="Nama Supir"
-                  sx={{ mt: 2 }}
-                  inputProps={{
-                    ...params.inputProps,
-                    style: { textTransform: "uppercase" },
-                  }}
-                />
-              )}
-            />
+            <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
 
             <Field
               name="afdeling"
@@ -266,6 +241,7 @@ const PksManualEntryKernelIn = (props) => {
                 component={TextField}
                 size="small"
                 fullWidth
+                required={true}
                 sx={{ mt: 2 }}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,

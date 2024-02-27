@@ -57,7 +57,7 @@ const T30ManualEntryWBIn = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE.refId}, { siteRefId: WBMS.SITE.refId}],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -83,7 +83,6 @@ const T30ManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -232,7 +231,7 @@ const T30ManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                {selectedOption === 1 && WBMS.USE_WB === true && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -246,13 +245,13 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleDspSubmit()}
                     >
                       SIMPAN
                     </Button>
                   )}
-                   {selectedOption === 4 && WBMS.USE_WB === true && (
+                  {selectedOption === 4 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -266,7 +265,7 @@ const T30ManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -385,6 +384,7 @@ const T30ManualEntryWBIn = () => {
                                 label="Nomor Plat"
                                 name="transportVehiclePlateNo"
                                 size="small"
+                                required={true}
                                 inputProps={{
                                   ...params.inputProps,
                                   style: { textTransform: "uppercase" },
@@ -414,6 +414,7 @@ const T30ManualEntryWBIn = () => {
                                 name="transporterCompanyName"
                                 label="Cust/Vendor transport"
                                 size="small"
+                                required={true}
                                 sx={{ mt: 2 }}
                               />
                             )}
@@ -439,6 +440,7 @@ const T30ManualEntryWBIn = () => {
                                 name="productName"
                                 label="Nama Produk"
                                 size="small"
+                                required={true}
                                 sx={{ mt: 2 }}
                               />
                             )}

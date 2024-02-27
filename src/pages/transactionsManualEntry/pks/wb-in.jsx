@@ -70,7 +70,6 @@ const PksManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -361,7 +360,7 @@ const PksManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleDspSubmit()}
                     >
                       SIMPAN
@@ -381,7 +380,7 @@ const PksManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleTbsSubmit()}
                     >
                       SIMPAN
@@ -401,7 +400,7 @@ const PksManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleKrlSubmit()}
                     >
                       SIMPAN
@@ -421,7 +420,7 @@ const PksManualEntryWBIn = () => {
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty)}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN

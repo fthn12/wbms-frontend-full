@@ -417,6 +417,7 @@ const T30ManualEntryDispatchIn = (props) => {
                 component={TextField}
                 size="small"
                 fullWidth
+                required={true}
                 sx={{ mt: 2 }}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,

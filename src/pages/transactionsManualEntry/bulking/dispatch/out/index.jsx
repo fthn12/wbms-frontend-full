@@ -86,7 +86,6 @@ const LBNManualEntryDispatchOut = () => {
     unloadedSeal1: Yup.string().required("Wajib diisi"),
     unloadedSeal2: Yup.string().required("Wajib diisi"),
     destinationWeighOutRemark: Yup.string().required("Wajib diisi"),
-    destinationWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -241,7 +240,14 @@ const LBNManualEntryDispatchOut = () => {
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.progressStatus === 2)}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 2
+                        )
+                      }
                     >
                       SIMPAN
                     </Button>

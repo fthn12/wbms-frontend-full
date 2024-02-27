@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../../components/layout/signed/HeaderTransaction";
+import { DriverFreeSolo } from "components/FormOthers";
 
 import { TransactionAPI } from "../../../../../apis";
 
@@ -70,7 +71,6 @@ const T30ManualEntryOthersOut = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    originWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -203,12 +203,7 @@ const T30ManualEntryOthersOut = () => {
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(
-                          isValid &&
-                          wb?.isStable &&
-                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                          values.progressStatus === 37
-                        )
+                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
                       }
                     >
                       SIMPAN
@@ -219,7 +214,14 @@ const T30ManualEntryOthersOut = () => {
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.progressStatus === 37)}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 37
+                        )
+                      }
                     >
                       SIMPAN
                     </Button>
@@ -374,33 +376,7 @@ const T30ManualEntryOthersOut = () => {
                               <Divider>DATA SUPIR & MUATAN</Divider>
                             </Grid>
                             <Grid item xs={12}>
-                              <Field
-                                name="driverName"
-                                component={Autocomplete}
-                                variant="outlined"
-                                fullWidth
-                                freeSolo
-                                disableClearable
-                                options={dtDrivers?.records.map((record) => record.name)}
-                                onInputChange={(event, InputValue, reason) => {
-                                  if (reason !== "reset") {
-                                    setFieldValue("driverName", InputValue.toUpperCase());
-                                  }
-                                }}
-                                renderInput={(params) => (
-                                  <TextFieldMUI
-                                    {...params}
-                                    name="driverName"
-                                    size="small"
-                                    label="Nama Supir"
-                                    sx={{ mt: 2 }}
-                                    inputProps={{
-                                      ...params.inputProps,
-                                      style: { textTransform: "uppercase" },
-                                    }}
-                                  />
-                                )}
-                              />
+                            <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
 
                               <Field
                                 name="afdeling"
@@ -593,6 +569,7 @@ const T30ManualEntryOthersOut = () => {
                                   component={TextField}
                                   size="small"
                                   fullWidth
+                                  required={true}
                                   sx={{ mt: 2, mb: 1.5 }}
                                   InputProps={{
                                     endAdornment: <InputAdornment position="end">kg</InputAdornment>,

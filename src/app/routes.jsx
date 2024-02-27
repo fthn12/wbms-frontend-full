@@ -31,6 +31,19 @@ const PksManualEntryTbsView = lazy(() => import("../pages/transactionsManualEntr
 const PksManualEntryKernelView = lazy(() => import("../pages/transactionsManualEntry/pks/kernel/view"));
 const PksManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/pks/dispatch/view"));
 
+const PksManualEntryDispatchCancelIn = lazy(() =>
+  import("../pages/transactionsManualEntry/pks/dispatch/cancelin/index"),
+);
+const PksManualEntryDispatchCancelInView = lazy(() =>
+  import("../pages/transactionsManualEntry/pks/dispatch/cancelin/view"),
+);
+const PksManualEntryDispatchCancelOut = lazy(() =>
+  import("../pages/transactionsManualEntry/pks/dispatch/cancelout/index"),
+);
+const PksManualEntryDispatchCancelOutView = lazy(() =>
+  import("../pages/transactionsManualEntry/pks/dispatch/cancelout/view"),
+);
+
 const PksNormalIn = lazy(() => import("../pages/transactions/pks/NormalIn"));
 const PksNormalOut = lazy(() => import("../pages/transactions/pks/NormalOut"));
 const PksCancelIn = lazy(() => import("../pages/transactions/pks/CancelIn"));
@@ -55,6 +68,21 @@ const T30ManualEntryOutOthers = lazy(() => import("../pages/transactionsManualEn
 
 const T30ManualEntryDispatchView = lazy(() => import("../pages/transactionsManualEntry/t30/dispatch/view"));
 const T30ManualEntryOthersView = lazy(() => import("../pages/transactionsManualEntry/t30/others/view"));
+
+const T30ManualEntryDispatchCancelIn = lazy(() =>
+  import("../pages/transactionsManualEntry/t30/dispatch/cancelin/index"),
+);
+const T30ManualEntryDispatchCancelInView = lazy(() =>
+  import("../pages/transactionsManualEntry/t30/dispatch/cancelin/view"),
+);
+
+const T30ManualEntryDispatchCancelOut = lazy(() =>
+  import("../pages/transactionsManualEntry/t30/dispatch/cancelout/index"),
+);
+
+const T30ManualEntryDispatchCancelOutView = lazy(() =>
+  import("../pages/transactionsManualEntry/t30/dispatch/cancelout/view"),
+);
 
 const T30NormalIn = lazy(() => import("../pages/transactions/t30/NormalIn"));
 const T30NormalOut = lazy(() => import("../pages/transactions/t30/NormalOut"));
@@ -185,6 +213,27 @@ const routes = () => {
             element={<PksManualEntryDispatchView />}
           />
 
+          <Route
+            path="transactions/pks/manual-entry-dispatch-cancel-in/:id"
+            name="PksManualEntryDispatchCancelIn"
+            element={<PksManualEntryDispatchCancelIn />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-dispatch-cancel-in-view/:id"
+            name="PksManualEntryDispatchCancelInView"
+            element={<PksManualEntryDispatchCancelInView />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-dispatch-cancel-out/:id"
+            name="PksManualEntryDispatchCancelOut"
+            element={<PksManualEntryDispatchCancelOut />}
+          />
+          <Route
+            path="transactions/pks/manual-entry-dispatch-cancel-out-view/:id"
+            name="PksManualEntryDispatchCancelOutView"
+            element={<PksManualEntryDispatchCancelOutView />}
+          />
+
           <Route path="transactions/t30/manual-entry-in" name="T30ManualEntryWbIn" element={<T30ManualEntryIn />} />
 
           <Route
@@ -207,6 +256,27 @@ const routes = () => {
             path="transactions/t30/manual-entry-others-view/:id"
             name="T30ManualEntryOthersView"
             element={<T30ManualEntryOthersView />}
+          />
+
+          <Route
+            path="transactions/t30/manual-entry-dispatch-cancel-in/:id"
+            name="T30ManualEntryDispatchCancelIn"
+            element={<T30ManualEntryDispatchCancelIn />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-dispatch-cancel-in-view/:id"
+            name="T30ManualEntryDispatchCancelInView"
+            element={<T30ManualEntryDispatchCancelInView />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-dispatch-cancel-out/:id"
+            name="T30ManualEntryDispatchCancelOut"
+            element={<T30ManualEntryDispatchCancelOut />}
+          />
+          <Route
+            path="transactions/t30/manual-entry-dispatch-cancel-out-view/:id"
+            name="T30ManualEntryDispatchCancelOutView"
+            element={<T30ManualEntryDispatchCancelOutView />}
           />
 
           <Route path="transactions/t30-edispatch-normal-in" element={<T30NormalIn />} />

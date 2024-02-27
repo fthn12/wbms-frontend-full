@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
 import BonTripPrint from "../../../../components/BontripManualEntry";
+import { DriverFreeSolo } from "components/FormOthers";
 
 import { TransactionAPI } from "../../../../apis";
 
@@ -224,31 +225,7 @@ const BulkingManualEntryOthersView = () => {
                           <Divider>DATA SUPIR & MUATAN</Divider>
                         </Grid>
                         <Grid item xs={12}>
-                          <Field
-                            name="driverName"
-                            component={Autocomplete}
-                            variant="outlined"
-                            fullWidth
-                            freeSolo
-                            disableClearable
-                            options={dtDrivers?.records.map((record) => record.name)}
-                            // onInputChange={(event, InputValue, reason) => {
-                            //   if (reason !== "reset") {
-                            //     setFieldValue("driverName", InputValue);
-                            //   }
-                            // }}
-
-                            readOnly={true}
-                            renderInput={(params) => (
-                              <TextFieldMUI
-                                {...params}
-                                name="driverName"
-                                size="small"
-                                label="Nama Supir"
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                              />
-                            )}
-                          />
+                        <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mt: 2 }} />
 
                           <Field
                             name="afdeling"
