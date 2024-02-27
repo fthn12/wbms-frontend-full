@@ -70,6 +70,7 @@ const PksManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
+    originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -77,7 +78,7 @@ const PksManualEntryWBIn = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -104,7 +105,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.originSiteName = selectedStorageTank.name || "";
       }
 
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
@@ -112,7 +113,7 @@ const PksManualEntryWBIn = () => {
         tempTrans.originSiteName = selectedSite.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -346,7 +347,7 @@ const PksManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -356,7 +357,17 @@ const PksManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 2 && (
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
+                      onClick={() => handleDspSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 2 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -366,7 +377,17 @@ const PksManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 3 && (
+                  {selectedOption === 2 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
+                      onClick={() => handleTbsSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 3 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -376,11 +397,31 @@ const PksManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 4 && (
+                  {selectedOption === 3 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
+                      onClick={() => handleKrlSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 4 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      onClick={() => handleOtrSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 4 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -457,7 +498,8 @@ const PksManualEntryWBIn = () => {
                             required
                             size="small"
                             fullWidth
-                            sx={{ mb: 2, backgroundColor: "transparant" }}
+                            inputProps={{ readOnly: true }}
+                            sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                           />
                           <TransportVehicleACP
                             name="transportVehicleId"

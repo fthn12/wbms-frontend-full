@@ -53,7 +53,7 @@ const PKSManualEntryDispatchOut = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -86,6 +86,7 @@ const PKSManualEntryDispatchOut = () => {
     loadedSeal2: Yup.string().required("Wajib diisi"),
     originWeighOutRemark: Yup.string().required("Wajib diisi"),
     deliveryOrderNo: Yup.string().required("Wajib diisi"),
+    originWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -107,7 +108,7 @@ const PKSManualEntryDispatchOut = () => {
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
@@ -115,7 +116,7 @@ const PKSManualEntryDispatchOut = () => {
         tempTrans.originSiteName = selectedSite.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -132,6 +133,7 @@ const PKSManualEntryDispatchOut = () => {
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 21;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -167,11 +169,6 @@ const PKSManualEntryDispatchOut = () => {
       // console.clear();
     };
   }, []);
-
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
 
   //weight wb
   // useEffect(() => {
@@ -210,6 +207,8 @@ const PKSManualEntryDispatchOut = () => {
     }
   }, [openedTransaction]);
 
+  console.log(WBMS.SITE.refId, "id");
+
   return (
     <Box>
       <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-OUT" />
@@ -222,20 +221,36 @@ const PKSManualEntryDispatchOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 1)
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty &&
+                          values.progressStatus === 1
+                        )
                       }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty && values.progressStatus === 1)}
                     >
                       SIMPAN
                     </Button>
@@ -434,7 +449,7 @@ const PKSManualEntryDispatchOut = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <Divider sx={{ mt: 4 }}>Tangki</Divider>
+                              <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
                             </Grid>
 
                             <Grid item xs={12}>
@@ -445,60 +460,7 @@ const PKSManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
-                            </Grid>
-
-                            <Grid item xs={4}>
-                              <Field
-                                name="originFfaPercentage"
-                                label="FFA"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originMoistPercentage"
-                                label="Moist"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originDirtPercentage"
-                                label="Dirt"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                siteId={WBMS.SITE.refId}
                               />
                             </Grid>
                           </Grid>
@@ -625,6 +587,58 @@ const PKSManualEntryDispatchOut = () => {
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
+                            <Grid item xs={12}>
+                              <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+                            </Grid>
+
+                            <Grid item xs={4}>
+                              <Field
+                                name="originFfaPercentage"
+                                label="FFA"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originMoistPercentage"
+                                label="Moist"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originDirtPercentage"
+                                label="Dirt"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                              />
+                            </Grid>
                           </Grid>
                         </Grid>
 
@@ -706,7 +720,7 @@ const PKSManualEntryDispatchOut = () => {
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -766,7 +780,7 @@ const PKSManualEntryDispatchOut = () => {
                                 value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
                               />
                             </Grid>
-                            <Grid item xs={12} sx={{ mt: 2 }}>
+                            <Grid item xs={12} sx={{ mt: 2.5 }}>
                               <Divider>Catatan</Divider>
                             </Grid>
 

@@ -51,7 +51,7 @@ const T30ManualEntryDispatchOut = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -84,6 +84,8 @@ const T30ManualEntryDispatchOut = () => {
     loadedSeal1: Yup.string().required("Wajib diisi"),
     loadedSeal2: Yup.string().required("Wajib diisi"),
     originWeighOutRemark: Yup.string().required("Wajib diisi"),
+    deliveryOrderNo: Yup.string().required("Wajib diisi"),
+    originWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -105,7 +107,7 @@ const T30ManualEntryDispatchOut = () => {
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
@@ -113,7 +115,7 @@ const T30ManualEntryDispatchOut = () => {
         tempTrans.originSiteName = selectedSite.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -130,6 +132,7 @@ const T30ManualEntryDispatchOut = () => {
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 21;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -220,20 +223,36 @@ const T30ManualEntryDispatchOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 1)
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty &&
+                          values.progressStatus === 1
+                        )
                       }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty && values.progressStatus === 1)}
                     >
                       SIMPAN
                     </Button>
@@ -432,7 +451,7 @@ const T30ManualEntryDispatchOut = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <Divider sx={{ mt: 4 }}>Tangki</Divider>
+                              <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
                             </Grid>
 
                             <Grid item xs={12}>
@@ -443,60 +462,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
-                            </Grid>
-
-                            <Grid item xs={4}>
-                              <Field
-                                name="originFfaPercentage"
-                                label="FFA"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originMoistPercentage"
-                                label="Moist"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originDirtPercentage"
-                                label="Dirt"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                siteId={WBMS.SITE.refId}
                               />
                             </Grid>
                           </Grid>
@@ -507,7 +473,6 @@ const T30ManualEntryDispatchOut = () => {
                             <Grid item xs={12}>
                               <Divider>Segel Saat ini</Divider>
                             </Grid>
-
                             <Grid item xs={6}>
                               <Field
                                 name="currentSeal1"
@@ -564,11 +529,9 @@ const T30ManualEntryDispatchOut = () => {
                                 value={values?.currentSeal4 ? values.currentSeal4 : "-"}
                               />
                             </Grid>
-
                             <Grid item xs={12} sx={{ mt: 2 }}>
                               <Divider>Segel Tangki Isi</Divider>
                             </Grid>
-
                             <Grid item xs={6}>
                               <Field
                                 name="loadedSeal1"
@@ -621,6 +584,57 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "tranparant" }}
                                 // inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originFfaPercentage"
+                                label="FFA"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originMoistPercentage"
+                                label="Moist"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originDirtPercentage"
+                                label="Dirt"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1 }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
                               />
                             </Grid>
                           </Grid>
@@ -735,7 +749,7 @@ const T30ManualEntryDispatchOut = () => {
                                   component={TextField}
                                   size="small"
                                   fullWidth
-                                  sx={{ mt: 2, mb: 1.5 }}
+                                  sx={{ mt: 2, mb: 2}}
                                   InputProps={{
                                     endAdornment: <InputAdornment position="end">kg</InputAdornment>,
                                   }}

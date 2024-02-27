@@ -23,7 +23,8 @@ export const useWeighbridge = () => {
     if (WBMS && WBMS?.WB_PORT && !wsClient) {
       wsClient = new w3cwebsocket(`ws://localhost:${WBMS?.WB_PORT}/GetWeight`);
 
-      if (WBMS.NODE_ENV === "production") {
+      // if (WBMS.NODE_ENV === "production") {
+      if (WBMS.USE_WB === true) {
         dispatch(
           wbRedux.setWb({
             weight: -1,
@@ -38,6 +39,21 @@ export const useWeighbridge = () => {
       } else {
         dispatch(
           wbRedux.setWb({
+            weight: 0,
+            // weight: wb?.weight > 0 ? wb.weight + 10 : 10,
+            lastChange: 0,
+            // isStable: false,
+            isStable: true,
+            onProcessing: false,
+            canStartScalling: false,
+          }),
+        );
+      }
+
+      /*
+      } else {
+        dispatch(
+          wbRedux.setWb({
             // weight: -1,
             weight: wb?.weight > 0 ? wb.weight + 10 : 10,
             lastChange: 0,
@@ -47,7 +63,7 @@ export const useWeighbridge = () => {
             canStartScalling: false,
           }),
         );
-      }
+      }*/
 
       wsClient.onmessage = (message) => {
         let isChange = false;

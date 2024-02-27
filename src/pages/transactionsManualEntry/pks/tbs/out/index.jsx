@@ -74,6 +74,7 @@ const PksManualEntryTbsOut = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
+    originWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -239,22 +240,34 @@ const PksManualEntryTbsOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, handleChange } = props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ mr: 1 }}
-                    disabled={
-                      !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 35)
-                    }
-                  >
-                    SIMPAN
-                  </Button>
+                  {WBMS.USE_WB === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={
+                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 35)
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {WBMS.USE_WB === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty && values.progressStatus === 35)}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
@@ -378,7 +391,7 @@ const PksManualEntryTbsOut = () => {
                             value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
                             onChange={(event, newValue) => {
                               setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
-                          
+
                               setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
                               setFieldValue("productName", newValue ? newValue.name : "");
                               setFieldValue("productId", newValue ? newValue.id : "");

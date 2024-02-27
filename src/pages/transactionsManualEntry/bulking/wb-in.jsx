@@ -67,7 +67,8 @@ const BulkingManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    // destinationWeighInKg: Yup.string().required("Wajib diisi"),
+    // originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
+    // destinationWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -75,7 +76,7 @@ const BulkingManualEntryWBIn = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
     orderBy: [{ name: "asc" }],
@@ -101,7 +102,7 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.destinationSinkStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -153,6 +154,9 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
+      if (WBMS.USE_WB === true) {
+        tempTrans.originWeighInKg = wb.weight;
+      }
       tempTrans.typeTransaction = 4;
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -213,7 +217,7 @@ const BulkingManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -223,11 +227,39 @@ const BulkingManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 4 && (
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT &&
+                          values.destinationSinkStorageTankId &&
+                          values.destinationWeighInRemark
+                        )
+                      }
+                      onClick={() => handleDspSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 4 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      onClick={() => handleOtrSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 4 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN

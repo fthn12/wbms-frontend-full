@@ -34,6 +34,7 @@ export const TransportVehicleACP = (props) => {
             onChange={(event, newValue) => {
               setFieldValue("transportVehicleId", newValue ? newValue.id : "");
               setFieldValue("transportVehiclePlateNo", newValue ? newValue.plateNo : "");
+              
             }}
             renderInput={(params) => (
               <TextField

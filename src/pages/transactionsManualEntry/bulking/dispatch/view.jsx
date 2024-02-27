@@ -369,7 +369,7 @@ const LBNManualEntryDispatchView = () => {
                                 isReadOnly={true}
                                 sx={{ mt: 2 }}
                                 backgroundColor="whitesmoke"
-                                siteId={WBMS.SITE_REFID}
+                                siteId={WBMS.SITE.refId}
                               />
                             </Grid>
                           </Grid>

@@ -57,7 +57,7 @@ const T30ManualEntryWBIn = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId}, { siteRefId: WBMS.SITE.refId}],
       refType: 1,
     },
   };
@@ -79,14 +79,11 @@ const T30ManualEntryWBIn = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
-    transportVehicleId: Yup.string().required("Wajib diisi"),
-    transporterCompanyId: Yup.string().required("Wajib diisi"),
-    productId: Yup.string().required("Wajib diisi"),
-    driverId: Yup.string().required("Wajib diisi"),
-    // originSourceStorageTankId: Yup.string().required("Wajib diisi"),
-    // loadedSeal1: Yup.string().required("Wajib diisi"),
-    // loadedSeal2: Yup.string().required("Wajib diisi"),
-    // originWeighInRemark: Yup.string().required("Wajib diisi"),
+    transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
+    transporterCompanyName: Yup.string().required("Wajib diisi"),
+    productName: Yup.string().required("Wajib diisi"),
+    driverName: Yup.string().required("Wajib diisi"),
+    originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -107,7 +104,7 @@ const T30ManualEntryWBIn = () => {
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
@@ -115,7 +112,7 @@ const T30ManualEntryWBIn = () => {
         tempTrans.originSiteName = selectedSite.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -235,7 +232,7 @@ const T30ManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
@@ -245,11 +242,31 @@ const T30ManualEntryWBIn = () => {
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 4 && (
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
+                      onClick={() => handleDspSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                   {selectedOption === 4 && WBMS.USE_WB === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      onClick={() => handleOtrSubmit()}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 4 && WBMS.USE_WB === false && (
+                    <Button
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty)}
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -321,7 +338,8 @@ const T30ManualEntryWBIn = () => {
                             required
                             size="small"
                             fullWidth
-                            sx={{ mb: 2, backgroundColor: "transparant" }}
+                            inputProps={{ readOnly: true }}
+                            sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                           />
                           <TransportVehicleACP
                             name="transportVehicleId"

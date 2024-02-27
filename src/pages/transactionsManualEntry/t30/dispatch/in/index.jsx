@@ -133,7 +133,7 @@ const T30ManualEntryDispatchIn = (props) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Divider sx={{ mt: 4 }}>Tangki</Divider>
+            <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
           </Grid>
 
           <Grid item xs={12}>
@@ -144,63 +144,7 @@ const T30ManualEntryDispatchIn = (props) => {
               isReadOnly={false}
               sx={{ mt: 2 }}
               backgroundColor="transparant"
-              siteId={WBMS.SITE_REFID}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
-          </Grid>
-
-          <Grid item xs={4}>
-            <Field
-              name="originFfaPercentage"
-              label="FFA"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Field
-              name="originMoistPercentage"
-              label="Moist"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Field
-              name="originDirtPercentage"
-              label="Dirt"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
+              siteId={WBMS.SITE.refId}
             />
           </Grid>
         </Grid>
@@ -211,7 +155,6 @@ const T30ManualEntryDispatchIn = (props) => {
           <Grid item xs={12}>
             <Divider>Segel Saat ini</Divider>
           </Grid>
-
           <Grid item xs={6}>
             <Field
               name="currentSeal1"
@@ -268,17 +211,15 @@ const T30ManualEntryDispatchIn = (props) => {
               value={values?.currentSeal4 ? values.currentSeal4 : "-"}
             />
           </Grid>
-
           <Grid item xs={12} sx={{ mt: 2 }}>
             <Divider>Segel Tangki Isi</Divider>
           </Grid>
-
           <Grid item xs={6}>
             <Field
               name="loadedSeal1"
               label="Segel ISI Mainhole 1"
               type="text"
-              required={true}
+              // required={true}
               component={TextField}
               variant="outlined"
               size="small"
@@ -292,7 +233,7 @@ const T30ManualEntryDispatchIn = (props) => {
               name="loadedSeal2"
               label="Segel ISI Valve 1"
               type="text"
-              required={true}
+              // required={true}
               component={TextField}
               variant="outlined"
               size="small"
@@ -325,6 +266,60 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "tranparant" }}
               // inputProps={{ readOnly: true }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+          </Grid>
+          <Grid item xs={4}>
+            <Field
+              name="originFfaPercentage"
+              label="FFA"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Field
+              name="originMoistPercentage"
+              label="Moist"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Field
+              name="originDirtPercentage"
+              label="Dirt"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
             />
           </Grid>
         </Grid>

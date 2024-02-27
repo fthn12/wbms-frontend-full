@@ -133,7 +133,7 @@ const PKSManualEntryDispatchIn = (props) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Divider sx={{ mt: 4 }}>Tangki</Divider>
+            <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
           </Grid>
 
           <Grid item xs={12}>
@@ -141,68 +141,14 @@ const PKSManualEntryDispatchIn = (props) => {
               name="originSourceStorageTankId"
               label="Tangki Asal"
               isRequired={true}
-              isReadOnly={false}
+              isReadOnly={true}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
-              siteId={WBMS.SITE_REFID}
+              backgroundColor="whitesmoke"
+              siteId={WBMS.SITE.refId}
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
-          </Grid>
-
-          <Grid item xs={4}>
-            <Field
-              name="originFfaPercentage"
-              label="FFA"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Field
-              name="originMoistPercentage"
-              label="Moist"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <Field
-              name="originDirtPercentage"
-              label="Dirt"
-              type="number"
-              component={TextField}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              inputProps={{ readOnly: true }}
-              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.00"}
-            />
-          </Grid>
+         
         </Grid>
       </Grid>
 
@@ -283,8 +229,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
-              // inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -297,8 +243,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
-              // inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -310,8 +256,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
-              // inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -323,8 +269,64 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "tranparant" }}
-              // inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+              inputProps={{ readOnly: true }}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+          </Grid>
+
+          <Grid item xs={4}>
+            <Field
+              name="originFfaPercentage"
+              label="FFA"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Field
+              name="originMoistPercentage"
+              label="Moist"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <Field
+              name="originDirtPercentage"
+              label="Dirt"
+              type="number"
+              component={TextField}
+              variant="outlined"
+              size="small"
+              fullWidth
+              sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">%</InputAdornment>,
+              }}
+              inputProps={{ readOnly: true }}
+              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.00"}
             />
           </Grid>
         </Grid>

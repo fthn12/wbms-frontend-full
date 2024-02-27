@@ -51,7 +51,7 @@ const LBNManualEntryDispatchOut = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: WBMS.SITE_REFID }, { siteRefId: WBMS.SITE_REFID }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -86,6 +86,7 @@ const LBNManualEntryDispatchOut = () => {
     unloadedSeal1: Yup.string().required("Wajib diisi"),
     unloadedSeal2: Yup.string().required("Wajib diisi"),
     destinationWeighOutRemark: Yup.string().required("Wajib diisi"),
+    destinationWeighOutKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
   });
 
   const handleClose = () => {
@@ -107,7 +108,7 @@ const LBNManualEntryDispatchOut = () => {
         tempTrans.destinationSinkStorageTankName = selectedStorageTank.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_ID);
+      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -217,14 +218,30 @@ const LBNManualEntryDispatchOut = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <Button
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 2)
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty &&
+                          values.progressStatus === 2
+                        )
                       }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ mr: 1 }}
+                      disabled={!(isValid && dirty && values.progressStatus === 2)}
                     >
                       SIMPAN
                     </Button>
@@ -449,7 +466,7 @@ const LBNManualEntryDispatchOut = () => {
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
                                 backgroundColor="transparant"
-                                siteId={WBMS.SITE_REFID}
+                                siteId={WBMS.SITE.refid}
                               />
                             </Grid>
                           </Grid>
@@ -693,6 +710,7 @@ const LBNManualEntryDispatchOut = () => {
                                   component={TextField}
                                   size="small"
                                   fullWidth
+                                  required={true}
                                   sx={{ mt: 2 }}
                                   InputProps={{
                                     endAdornment: <InputAdornment position="end">kg</InputAdornment>,

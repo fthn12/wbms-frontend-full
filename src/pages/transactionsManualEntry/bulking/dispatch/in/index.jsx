@@ -120,7 +120,7 @@ const LBNManualEntryDispatchIn = (props) => {
               name="unloadedSeal1"
               label="Segel BONGKAR Mainhole 1"
               type="text"
-              required={true}
+              // required={true}
               component={TextField}
               variant="outlined"
               size="small"
@@ -134,7 +134,7 @@ const LBNManualEntryDispatchIn = (props) => {
               name="unloadedSeal2"
               label="Segel BONGKAR Valve 1"
               type="text"
-              required={true}
+              // required={true}
               component={TextField}
               variant="outlined"
               size="small"
@@ -181,7 +181,7 @@ const LBNManualEntryDispatchIn = (props) => {
               isReadOnly={false}
               sx={{ mt: 2 }}
               backgroundColor="transparant"
-              siteId={WBMS.SITE_REFID}
+              siteId={WBMS.SITE.refId}
             />
           </Grid>
         </Grid>
@@ -405,6 +405,7 @@ const LBNManualEntryDispatchIn = (props) => {
                 component={TextField}
                 size="small"
                 fullWidth
+                required={true}
                 sx={{ mt: 2 }}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">kg</InputAdornment>,

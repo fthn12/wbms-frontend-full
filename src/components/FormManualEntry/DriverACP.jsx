@@ -34,6 +34,7 @@ export const DriverACP = (props) => {
             onChange={(event, newValue) => {
               setFieldValue("driverId", newValue ? newValue.id : "");
               setFieldValue("driverName", newValue ? newValue.name : "");
+              setFieldValue("driverNik", newValue ? newValue.nik : "");
             }}
             renderInput={(params) => (
               <TextField
