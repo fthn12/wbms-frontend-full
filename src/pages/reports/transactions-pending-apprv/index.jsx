@@ -14,23 +14,22 @@ import { ModuleRegistry } from "@ag-grid-community/core";
 import { toast } from "react-toastify";
 import * as moment from "moment";
 
-import PlagiarismOutlinedIcon from "@mui/icons-material/PlagiarismOutlined";
+import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
 import Header from "../../../components/layout/signed/Header";
 
-import { TransactionAPI } from "../../../apis";
 import { useConfig, useTransaction, useApp } from "../../../hooks";
 import { useRef } from "react";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
 
-const ReportTransactionDaily = () => {
+const ReportTransactionPending = () => {
   const navigate = useNavigate();
   const { setSidebar } = useApp();
   const { WBMS, PROGRESS_STATUS } = useConfig();
   const { setOpenedTransaction, useFindManyTransactionQuery } = useTransaction();
 
-  const transactionAPI = TransactionAPI();
+
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,8 +38,8 @@ const ReportTransactionDaily = () => {
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      isManualEntry : 0,
-      isManualTonase : 0,
+      isManualEntry: 1,
+      isManualTonase: 1,
       progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
     },
 
@@ -63,31 +62,19 @@ const ReportTransactionDaily = () => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/pks-edispatch-normal-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/pks-edispatch-normal-out";
-        } else if (progressStatus === 6) {
-          urlPath = "/wb/transactions/pks-edispatch-cancel-in";
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/pks-edispatch-cancel-out";
-        } else if (progressStatus === 11 && bonTripRef) {
-          urlPath = "/wb/transactions/pks-edispatch-reject-bulking-in";
-        } else if (progressStatus === 11) {
-          urlPath = "/wb/transactions/pks-edispatch-reject-t300-in";
-        } else if (progressStatus === 100) {
-          urlPath = "/wb/transactions/t30-edispatch-deleted";
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
-        } else if (progressStatus === 35) {
-          urlPath = "/wb/transactions/pks/manual-entry-others-out";
-        } else if (progressStatus === 36) {
-          urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
-        } else if (progressStatus === 37) {
-          urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
         } else if (progressStatus === 40) {
           urlPath = "/wb/transactions/pks/manual-entry-other-view";
         } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
         } else if (progressStatus === 42) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 100) {
+          urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -95,11 +82,11 @@ const ReportTransactionDaily = () => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/t30-edispatch-normal-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/t30-edispatch-normal-out";
-        } else if (progressStatus === 6) {
-          urlPath = "/wb/transactions/t30-edispatch-cancel-in";
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/t30-edispatch-cancel-out";
+          urlPath = "/wb/transactions/t30/manual-entry-dispatch-cancel-out-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/t30/manual-entry-others-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -109,9 +96,9 @@ const ReportTransactionDaily = () => {
         if (progressStatus === 2) {
           urlPath = "/wb/transactions/bulking-edispatch-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/bulking-edispatch-out";
-        } else if (progressStatus === 31) {
-          urlPath = "/wb/transactions/bulking-edispatch-out";
+          urlPath = "/wb/transactions/bulking/manual-entry-dispatch-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/bulking/manual-entry-others-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -178,7 +165,7 @@ const ReportTransactionDaily = () => {
               size="small"
               onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
             >
-              <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
+              <PlagiarismIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Box>
         )}
@@ -321,4 +308,4 @@ const ReportTransactionDaily = () => {
   );
 };
 
-export default ReportTransactionDaily;
+export default ReportTransactionPending;

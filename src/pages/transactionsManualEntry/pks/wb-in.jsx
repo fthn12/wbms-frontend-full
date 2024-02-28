@@ -20,6 +20,7 @@ import TBS from "./tbs/in";
 import OTHERS from "./others/in";
 import KERNEL from "./kernel/in";
 import Header from "../../../components/layout/signed/HeaderTransaction";
+import ManualEntryConfirmation from "components/ManualEntryConfirmation";
 import moment from "moment";
 import { TransactionAPI } from "../../../apis";
 import * as eDispatchApi from "../../../apis/eDispatchApi";
@@ -339,7 +340,13 @@ const PksManualEntryWBIn = () => {
               submitForm();
             };
 
-            const handleDspSubmit = () => {
+            const handleDspSubmit = (normalReason) => {
+              if (normalReason.trim().length <= 10)
+                return toast.error("Alasan (MANUAL ENTRY) harus melebihi 10 karakter.");
+
+              setFieldValue("originWeighInRemark", normalReason);
+              setFieldValue("originWeighOutRemark", normalReason);
+
               submitForm();
             };
 
@@ -347,24 +354,26 @@ const PksManualEntryWBIn = () => {
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
                   {selectedOption === 1 && WBMS.USE_WB === true && (
-                    <Button
-                      variant="contained"
-                      sx={{ mr: 1 }}
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleDspSubmit}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
-                      onClick={() => handleDspSubmit()}
-                    >
-                      SIMPAN
-                    </Button>
+                      sx={{ mr: 1 }}
+                      variant="contained"
+                    />
                   )}
                   {selectedOption === 1 && WBMS.USE_WB === false && (
-                    <Button
-                      variant="contained"
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleDspSubmit}
+                      isDisabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
-                      onClick={() => handleDspSubmit()}
-                    >
-                      SIMPAN
-                    </Button>
+                      variant="contained"
+                    />
                   )}
                   {selectedOption === 2 && WBMS.USE_WB === true && (
                     <Button

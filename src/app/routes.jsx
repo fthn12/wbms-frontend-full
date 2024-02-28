@@ -107,6 +107,7 @@ const BulkingIn = lazy(() => import("../pages/transactions/bulking/In"));
 const BulkingOut = lazy(() => import("../pages/transactions/bulking/Out"));
 
 const ReportTransactionDaily = lazy(() => import("../pages/reports/transactions-daily"));
+const ReportTransactionPending = lazy(() => import("../pages/reports/transactions-pending-apprv"));
 
 // const MDProvince = lazy(() => import("../pages/master-data/md-province"));
 // const MDCity = lazy(() => import("../pages/master-data/md-city"));
@@ -322,6 +323,8 @@ const routes = () => {
           <Route path="transactions/bulking-edispatch-out" element={<BulkingOut />} />
 
           <Route path="reports/transactions-daily" element={<ReportTransactionDaily />} />
+          <Route path="reports/transactions-pending" element={<ReportTransactionPending />} />
+
           {/* <Route path="md/provinces" element={<MDProvince />} />
           <Route path="md/cities" element={<MDCity />} /> */}
           <Route path="md/products" element={<MDProduct />} />

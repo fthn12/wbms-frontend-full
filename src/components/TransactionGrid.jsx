@@ -234,10 +234,9 @@ const TransactionGrid = (props) => {
             <QRCodeViewer
               progressStatus={params.data.progressStatus}
               deliveryOrderId={params.data.deliveryOrderId}
-              isApproved={params.data.isApproved}
               type="grid"
             />
-            {params.data.isApproved === true && (
+            {(params.data.isManualEntry === 0 || params.data.isManualTonase === 0) && (
               <IconButton
                 size="small"
                 onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
@@ -245,7 +244,7 @@ const TransactionGrid = (props) => {
                 <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             )}
-            {params.data.isApproved === false && (
+            {(params.data.isManualEntry === 1 || params.data.isManualTonase === 1) && (
               <IconButton
                 size="small"
                 onClick={() =>

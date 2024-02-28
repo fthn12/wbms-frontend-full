@@ -45,8 +45,6 @@ const LBNManualEntryDispatchIn = (props) => {
     }
   }, [values]);
 
-  
-
   return (
     <>
       <Grid item xs={12} sm={6} lg={3}>
@@ -450,31 +448,6 @@ const LBNManualEntryDispatchIn = (props) => {
               label="TOTAL"
               name="weightNetto"
               value={destinationWeightNetto > 0 ? destinationWeightNetto.toFixed(2) : "0.00"}
-            />
-          </Grid>
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <Divider>Catatan</Divider>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Field
-              name="destinationWeighInRemark"
-              label="Alasan untuk Entri Manual"
-              type="text"
-              multiline
-              rows={5}
-              required={true}
-              component={TextField}
-              onChange={(e) => {
-                const { value } = e.target;
-                setFieldValue("destinationWeighInRemark", value);
-                setFieldValue("destinationWeighOutRemark", value);
-              }}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "lightyellow" }}
-              // inputProps={{ readOnly: true }}
             />
           </Grid>
         </Grid>

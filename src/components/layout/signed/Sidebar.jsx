@@ -277,6 +277,13 @@ const Sidebar = () => {
                 selected={sidebar.selected}
                 setSelected={setSelected}
               />
+              <Item
+                title="Transaksi Pending"
+                to="reports/transactions-pending"
+                icon={<ArrowRightOutlinedIcon />}
+                selected={sidebar.selected}
+                setSelected={setSelected}
+              />
             </SubMenu>
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Master Data" icon={<TopicOutlinedIcon />}>

@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import * as Yup from "yup";
 import Dispatch from "./dispatch/in";
 import OTHERS from "./others/in";
+import ManualEntryConfirmation from "components/ManualEntryConfirmation";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import moment from "moment";
 import { TransactionAPI } from "../../../apis";
@@ -67,8 +68,7 @@ const BulkingManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    // originWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
-    // destinationWeighInKg: Yup.number().min(WBMS.WB_MIN_WEIGHT).required("Wajib diisi."),
+    
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -210,40 +210,40 @@ const BulkingManualEntryWBIn = () => {
               submitForm();
             };
 
-            const handleDspSubmit = () => {
+            const handleDspSubmit = (normalReason) => {
+              if (normalReason.trim().length <= 10)
+                return toast.error("Alasan (MANUAL ENTRY) harus melebihi 10 karakter.");
+
+                setFieldValue("destinationWeighInRemark", normalReason);
+                setFieldValue("destinationWeighOutRemark", normalReason);
+
               submitForm();
             };
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && WBMS.USE_WB === true && (
-                    <Button
-                      variant="contained"
-                      sx={{ mr: 1 }}
+                {selectedOption === 1 && WBMS.USE_WB === true && (
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleDspSubmit}
                       disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
-                      onClick={() => handleDspSubmit()}
-                    >
-                      SIMPAN
-                    </Button>
+                      sx={{ mr: 1 }}
+                      variant="contained"
+                    />
                   )}
                   {selectedOption === 1 && WBMS.USE_WB === false && (
-                    <Button
-                      variant="contained"
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleDspSubmit}
+                      isDisabled={!(isValid && dirty && values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT)}
                       sx={{ mr: 1 }}
-                      disabled={
-                        !(
-                          isValid &&
-                          dirty &&
-                          values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT &&
-                          values.destinationSinkStorageTankId &&
-                          values.destinationWeighInRemark
-                        )
-                      }
-                      onClick={() => handleDspSubmit()}
-                    >
-                      SIMPAN
-                    </Button>
+                      variant="contained"
+                    />
                   )}
                   {selectedOption === 4 && WBMS.USE_WB === true && (
                     <Button

@@ -179,6 +179,8 @@ const PKSManualEntryDispatchOut = () => {
       if (isCancel) {
         if (WBMS.USE_WB === true) {
           tempTrans.returnWeighInKg = wb.weight;
+        } else if (WBMS.USE_WB === false) {
+          tempTrans.returnWeighInKg = tempTrans.originWeighOutKg;
         }
 
         tempTrans.returnWeighInOperatorName = user.name.toUpperCase();

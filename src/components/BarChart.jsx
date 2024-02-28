@@ -21,7 +21,8 @@ const BarChartComponent = () => {
       OR: [
         {
           progressStatus: { in: [21, 40, 41, 42] },
-          isApproved: true,
+          isManualEntry : 0,
+          isManualTonase : 0,
         },
       ],
       AND: [

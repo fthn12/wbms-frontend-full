@@ -25,18 +25,7 @@ import * as eDispatchApi from "../../../../apis/eDispatchApi";
 import CancelConfirmation from "components/CancelConfirmation";
 import { TransactionAPI } from "../../../../apis";
 
-import {
-  useAuth,
-  useConfig,
-  useTransaction,
-  useCompany,
-  useProduct,
-  useDriver,
-  useWeighbridge,
-  useTransportVehicle,
-  useApp,
-  useStorageTank,
-} from "../../../../hooks";
+import { useAuth, useConfig, useTransaction, useProduct, useWeighbridge, useStorageTank } from "../../../../hooks";
 
 const PKSManualEntryDispatchView = () => {
   const navigate = useNavigate();
@@ -47,15 +36,10 @@ const PKSManualEntryDispatchView = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
     useTransaction();
-  const { useGetDriversQuery } = useDriver();
-  const { useGetCompaniesQuery } = useCompany();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
-  const [selectedOption, setSelectedOption] = useState(0);
 
-  const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
-  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
+  const [isCancel, setIsCancel] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [isReadOnly, setIsReadOnly] = useState(true);
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
@@ -86,14 +70,12 @@ const PKSManualEntryDispatchView = () => {
   const [dtTrx, setDtTrx] = useState(null);
 
   const validationSchema = Yup.object().shape({
-    transportVehicleId: Yup.string().required("Wajib diisi"),
-    transporterCompanyId: Yup.string().required("Wajib diisi"),
-    productId: Yup.string().required("Wajib diisi"),
-    driverId: Yup.string().required("Wajib diisi"),
-    originSourceStorageTankId: Yup.string().required("Wajib diisi"),
-    loadedSeal1: Yup.string().required("Wajib diisi"),
-    loadedSeal2: Yup.string().required("Wajib diisi"),
-    originWeighOutRemark: Yup.string().required("Wajib diisi"),
+    destinationWeighInKg: Yup.number().required("Wajib diisi"),
+    destinationWeighOutKg: Yup.number().required("Wajib diisi"),
+    unloadingTimestamp: Yup.date().required("Wajib diisi"),
+    unloadingOperatorName: Yup.string().required("Wajib diisi"),
+    unloadedSeal1: Yup.string().required("Wajib diisi"),
+    unloadedSeal2: Yup.string().required("Wajib diisi"),
   });
 
   const handleClose = () => {
@@ -102,73 +84,14 @@ const PKSManualEntryDispatchView = () => {
     navigate("/wb/transactions");
   };
 
-  const handleCancel = async (values) => {
-    try {
-      const response = await transactionAPI.getById(values.id);
-  
-      if (!response.status) throw new Error(response?.message);
-  
-      const tempTrans = { ...response.data.transaction };
-      tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
-      tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
-      tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.returnWeighInKg = wb.weight;
-      tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.returnWeighInTimestamp = moment().toDate();
-      tempTrans.progressStatus = 6;
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
-      clearOpenedTransaction();
-      clearWbTransaction();
-      setIsLoading(false);
-  
-      const updateResponse = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
-  
-      if (!updateResponse.status) throw new Error(updateResponse?.message);
-  
-      const updatedTransaction = updateResponse?.data?.transaction;
-  
-      setOpenedTransaction(updatedTransaction);
-  
-      toast.success(`Transaksi WB-OUT dibatalkan.`);
-  
-      const id = updatedTransaction?.id;
-  
-      navigate(`/wb/transactions/pks/manual-entry-dispatch-cancel-in-view/${id}`);
-    } catch (error) {
-      setIsLoading(false);
-      toast.error(`${error.message}.`);
-    }
-  };
-  
   const handleFormikSubmit = async (values) => {
     let tempTrans = { ...values };
 
     setIsLoading(true);
 
     try {
-      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
-
-      if (selectedStorageTank) {
-        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
-        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
-      }
-
-      tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
-      tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
-      tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.progressStatus = 21;
-      tempTrans.originWeighOutKg = wb.weight;
-      tempTrans.originWeighOutTimestamp = moment().toDate();
-      tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
+      tempTrans.unloadingOperatorName = tempTrans.unloadingOperatorName.toUpperCase();
+      tempTrans.unloadingTimestamp = moment(tempTrans.unloadingTimestamp).toISOString();
 
       const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
 
@@ -177,11 +100,8 @@ const PKSManualEntryDispatchView = () => {
       clearWbTransaction();
       setIsLoading(false);
 
-      toast.success(`Transaksi WB-OUT telah tersimpan.`);
-      // redirect ke form view
-      const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/t30/manual-entry-dispatch-view/${id}`);
-
+      toast.success(`Transaksi dari T300 telah tersimpan.`);
+      handleClose();
       return;
     } catch (error) {
       setIsLoading(false);
@@ -253,20 +173,76 @@ const PKSManualEntryDispatchView = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, submitForm, resetForm, handleChange } = props;
             // console.log("Formik props:", props);
+
+            const handleCancel = (cancelReason) => {
+              if (cancelReason.trim().length <= 10)
+                return toast.error("Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter.");
+
+              setFieldValue("returnWeighInRemark", cancelReason);
+              setIsCancel(true);
+
+              submitForm();
+            };
+
+            const handleSubmit = async () => {
+              if (isReadOnly) setIsReadOnly(false);
+              else submitForm();
+            };
+
+            const handleReset = async () => {
+              if (isReadOnly) handleClose();
+              else {
+                resetForm();
+                setIsReadOnly(true);
+              }
+            };
 
             return (
               <Form>
-                <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button variant="contained" onClick={() => handleCancel(values)}>
-                    Cancel Transaksi
-                  </Button>
-                  <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mx: 1 }} />
-                  <Button variant="contained" onClick={handleClose}>
-                    TUTUP
-                  </Button>
+                <Box sx={{ display: "flex", mt: 3 }}>
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={!(isValid && dirty && values.originWeighOutKg > WBMS.WB_MIN_WEIGHT)}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+
+                  <Box sx={{ marginLeft: "auto" }}>
+                    <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mr: 1 }} />
+                    <Button
+                      variant="contained"
+                      color="warning"
+                      disabled={isReadOnly ? false : !(isValid && dirty)}
+                      onClick={handleSubmit}
+                      sx={{ mr: 1 }}
+                    >
+                      {isReadOnly ? "SELESAIKAN TRANSAKI T300" : "SIMPAN"}
+                    </Button>
+                    <Button variant="contained" onClick={handleReset}>
+                      {isReadOnly ? "TUTUP" : "BATAL"}
+                    </Button>
+                    {/* <Button variant="contained" onClick={handleClose}>
+                      TUTUP
+                    </Button> */}
+                  </Box>
                 </Box>
+
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} lg={3}>
@@ -449,7 +425,7 @@ const PKSManualEntryDispatchView = () => {
                             </Grid>
 
                             <Grid item xs={12}>
-                              <Divider sx={{ mt: 4 }}>Tangki</Divider>
+                              <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
                             </Grid>
 
                             <Grid item xs={12}>
@@ -464,61 +440,93 @@ const PKSManualEntryDispatchView = () => {
                               />
                             </Grid>
 
-                            <Grid item xs={12}>
-                              <Divider sx={{ mt: 4, mb: 1 }}>Kualitas</Divider>
-                            </Grid>
-
-                            <Grid item xs={4}>
-                              <Field
-                                name="originFfaPercentage"
-                                label="FFA"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originMoistPercentage"
-                                label="Moist"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
-                            <Grid item xs={4}>
-                              <Field
-                                name="originDirtPercentage"
-                                label="Dirt"
-                                type="number"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                                }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
+                            {isReadOnly === false && (
+                              <>
+                                <Grid item xs={12} sx={{ mt: 6 }}>
+                                  <Divider>Data dari T300</Divider>
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="number"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    InputProps={{
+                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    }}
+                                    label="BERAT ASAL MASUK - IN"
+                                    name="destinationWeighInKg"
+                                    value={values?.destinationWeighInKg > 0 ? values.destinationWeighInKg : "0"}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="datetime-local"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    label="WAKTU BONGKAR"
+                                    name="unloadingTimestamp"
+                                    value={moment(values?.unloadingTimestamp).format("YYYY-MM-DDTHH:mm")}
+                                    InputLabelProps={{
+                                      shrink: true,
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="number"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    InputProps={{
+                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    }}
+                                    label="BERAT ASAL KELUAR - OUT"
+                                    name="destinationWeighOutKg"
+                                    value={values?.destinationWeighOutKg > 0 ? values.destinationWeighOutKg : "0"}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadingOperatorName"
+                                    label="OPERATOR UNLOADING"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ style: { textTransform: "uppercase" }, readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                              </>
+                            )}
                           </Grid>
                         </Grid>
 
@@ -527,7 +535,6 @@ const PKSManualEntryDispatchView = () => {
                             <Grid item xs={12}>
                               <Divider>Segel Saat ini</Divider>
                             </Grid>
-
                             <Grid item xs={6}>
                               <Field
                                 name="currentSeal1"
@@ -584,11 +591,9 @@ const PKSManualEntryDispatchView = () => {
                                 value={values?.currentSeal4 ? values.currentSeal4 : "-"}
                               />
                             </Grid>
-
                             <Grid item xs={12} sx={{ mt: 2 }}>
                               <Divider>Segel Tangki Isi</Divider>
                             </Grid>
-
                             <Grid item xs={6}>
                               <Field
                                 name="loadedSeal1"
@@ -643,6 +648,137 @@ const PKSManualEntryDispatchView = () => {
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
+
+                            <Grid item xs={12}>
+                              <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originFfaPercentage"
+                                label="FFA"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originMoistPercentage"
+                                label="Moist"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+                            <Grid item xs={4}>
+                              <Field
+                                name="originDirtPercentage"
+                                label="Dirt"
+                                type="number"
+                                component={TextField}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                }}
+                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
+
+                            {isReadOnly === false && (
+                              <>
+                                <Grid item xs={12} sx={{ mt: 6 }}>
+                                  <Divider>Segel Tangki Bongkar T300</Divider>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal1"
+                                    label="Segel BONGKAR Mainhole 1"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal2"
+                                    label="Segel BONGKAR Valve 1"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal3"
+                                    label="Segel BONGKAR Mainhole 2"
+                                    type="text"
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal4"
+                                    label="Segel BONGKAR Valve 2"
+                                    type="text"
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                              </>
+                            )}
                           </Grid>
                         </Grid>
 

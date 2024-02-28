@@ -150,6 +150,8 @@ const PksManualEntryOthersOut = () => {
 
       if (WBMS.USE_WB === true) {
         tempTrans.originWeighOutKg = wb.weight;
+      } else if (WBMS.USE_WB === false) {
+        tempTrans.isManualTonase = 1;
       }
 
       tempTrans.productType = parseInt(tempTrans.productType);

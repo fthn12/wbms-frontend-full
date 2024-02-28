@@ -464,31 +464,8 @@ const T30ManualEntryDispatchIn = (props) => {
               value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
             />
           </Grid>
-          <Grid item xs={12} sx={{ mt: 2 }}>
-            <Divider>Catatan</Divider>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Field
-              name="originWeighInRemark"
-              label="Alasan untuk Entri Manual"
-              type="text"
-              multiline
-              rows={5}
-              required={true}
-              component={TextField}
-              onChange={(e) => {
-                const { value } = e.target;
-                setFieldValue("originWeighInRemark", value);
-                setFieldValue("originWeighOutRemark", value);
-              }}
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "lightyellow" }}
-              // inputProps={{ readOnly: true }}
-            />
-          </Grid>
+      
+         
         </Grid>
       </Grid>
 

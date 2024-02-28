@@ -154,7 +154,9 @@ const T30ManualEntryDispatchOut = () => {
 
         return;
       } else {
-        tempTrans.originWeighOutKg = wb.weight;
+        if (WBMS.USE_WB === true) {
+          tempTrans.originWeighOutKg = wb.weight;
+        }
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
         tempTrans.progressStatus = 21;

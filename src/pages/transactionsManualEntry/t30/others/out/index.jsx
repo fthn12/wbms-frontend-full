@@ -97,6 +97,8 @@ const T30ManualEntryOthersOut = () => {
 
       if (WBMS.USE_WB === true) {
         tempTrans.originWeighOutKg = wb.weight;
+      } else if (WBMS.USE_WB === false) {
+        tempTrans.isManualTonase = 1;
       }
 
       tempTrans.progressStatus = 42;
@@ -376,7 +378,7 @@ const T30ManualEntryOthersOut = () => {
                               <Divider>DATA SUPIR & MUATAN</Divider>
                             </Grid>
                             <Grid item xs={12}>
-                            <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
+                              <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
 
                               <Field
                                 name="afdeling"

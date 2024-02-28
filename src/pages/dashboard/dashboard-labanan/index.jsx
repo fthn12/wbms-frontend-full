@@ -28,7 +28,8 @@ const DashboardLabanan = () => {
       OR: [
         {
           progressStatus: { in: [21, 42] },
-          isApproved: true,
+          isManualEntry : 0,
+          isManualTonase : 0,
         },
       ],
     },
