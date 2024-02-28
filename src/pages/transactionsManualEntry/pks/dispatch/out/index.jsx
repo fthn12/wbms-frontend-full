@@ -33,6 +33,7 @@ import {
   useProduct,
   useWeighbridge,
   useStorageTank,
+  useKualitasCpo,
 } from "../../../../../hooks";
 
 const PKSManualEntryDispatchOut = () => {
@@ -42,8 +43,9 @@ const PKSManualEntryDispatchOut = () => {
   const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
-    useTransaction();
+
+  const { useFindFirstKualitasCpoQuery } = useKualitasCpo();
+  const { openedTransaction, clearWbTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
   const { useGetSitesQuery } = useSite();
   const [selectedOption, setSelectedOption] = useState(0);
 
@@ -70,6 +72,7 @@ const PKSManualEntryDispatchOut = () => {
   };
 
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
+  const { data: dtKualitasCpo } = useFindFirstKualitasCpoQuery();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
   const [isCancel, setIsCancel] = useState(false);
@@ -172,10 +175,17 @@ const PKSManualEntryDispatchOut = () => {
         tempTrans.originSourceStorageTankName = selected.name || "";
       }
 
+      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
+
+      if (selectedSite) {
+        tempTrans.originSiteId = selectedSite.id || "";
+        tempTrans.originSiteCode = selectedSite.code || "";
+        tempTrans.originSiteName = selectedSite.name || "";
+      }
+
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
       tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
-
       if (isCancel) {
         if (WBMS.USE_WB === true) {
           tempTrans.returnWeighInKg = wb.weight;
@@ -210,6 +220,14 @@ const PKSManualEntryDispatchOut = () => {
 
         return;
       } else {
+        const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
+
+        if (selectedDestinationSite) {
+          tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+          tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+          tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+        }
+
         if (WBMS.USE_WB === true) {
           tempTrans.originWeighOutKg = wb.weight;
         }
@@ -255,11 +273,6 @@ const PKSManualEntryDispatchOut = () => {
     };
   }, []);
 
-  //weight wb
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighOutKg: wb.weight });
-  // }, [wb.weight]);
-
   useEffect(() => {
     if (!id) return handleClose();
 
@@ -292,8 +305,6 @@ const PKSManualEntryDispatchOut = () => {
     }
   }, [openedTransaction]);
 
-  console.log(WBMS.SITE.refId, "id");
-
   return (
     <Box>
       <Header title="Transaksi PKS" subtitle="Transaksi Manual Entry WB-OUT" />
@@ -301,13 +312,19 @@ const PKSManualEntryDispatchOut = () => {
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={openedTransaction}
+          initialValues={{
+            ...openedTransaction,
+            originFfaPercentage: dtKualitasCpo?.FfaPercentage,
+            originMoistPercentage: dtKualitasCpo?.MoistPercentage,
+            originDirtPercentage: dtKualitasCpo?.DirtPercentage,
+          }}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
             const { values, isValid, dirty, setFieldValue, submitForm, handleChange } = props;
             // console.log("Formik props:", props);
+
             const handleSubmit = () => {
               submitForm();
             };
@@ -357,7 +374,7 @@ const PKSManualEntryDispatchOut = () => {
                           wb?.isStable &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT &&
                           dirty &&
-                          values.progressStatus === 1
+                          values.progressStatus === 21
                         )
                       }
                     >
@@ -416,22 +433,17 @@ const PKSManualEntryDispatchOut = () => {
                         label="Tipe Produk"
                         component={Select}
                         size="small"
+                        inputProps={{ readOnly: true }}
                         formControl={{
                           fullWidth: true,
                           required: true,
                           size: "small",
                         }}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
                         }}
                       >
                         {dtTypeProduct &&
@@ -713,13 +725,13 @@ const PKSManualEntryDispatchOut = () => {
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
+
                             <Grid item xs={12}>
                               <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
                             </Grid>
-
                             <Grid item xs={4}>
                               <Field
-                                name="originFfaPercentage"
+                                name="originFfaPeCrcentage"
                                 label="FFA"
                                 type="number"
                                 component={TextField}

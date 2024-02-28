@@ -25,9 +25,13 @@ ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, 
 const KualitasCpo = () => {
   const { MD_SOURCE } = useConfig();
   const { useGetProductsQuery, useEDispatchProductSyncMutation } = useProduct();
-  const { useGetKualitasCpoQuery } = useKualitasCpo();
+  const { useFindManyKualitasCpoQuery } = useKualitasCpo();
 
-  const { data, error, refetch } = useGetKualitasCpoQuery();
+  const KualitasCpoFilter = {
+    orderBy: [{ dtCreated: "desc" }],
+  };
+
+  const { data, error, refetch } = useFindManyKualitasCpoQuery(KualitasCpoFilter);
   const [eDispatchSync, { isLoading }] = useEDispatchProductSyncMutation();
 
   const [isOpen, setIsOpen] = useState(false);

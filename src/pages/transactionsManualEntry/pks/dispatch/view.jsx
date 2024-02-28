@@ -232,7 +232,7 @@ const PKSManualEntryDispatchView = () => {
                       onClick={handleSubmit}
                       sx={{ mr: 1 }}
                     >
-                      {isReadOnly ? "SELESAIKAN TRANSAKI T300" : "SIMPAN"}
+                      {isReadOnly ? "SELESAIKAN TRANSAKSI T300" : "SIMPAN"}
                     </Button>
                     <Button variant="contained" onClick={handleReset}>
                       {isReadOnly ? "TUTUP" : "BATAL"}
@@ -439,94 +439,6 @@ const PKSManualEntryDispatchView = () => {
                                 siteId={WBMS.SITE_REFID}
                               />
                             </Grid>
-
-                            {isReadOnly === false && (
-                              <>
-                                <Grid item xs={12} sx={{ mt: 6 }}>
-                                  <Divider>Data dari T300</Divider>
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    type="number"
-                                    variant="outlined"
-                                    component={TextField}
-                                    size="small"
-                                    fullWidth
-                                    required={true}
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    InputProps={{
-                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                    }}
-                                    label="BERAT ASAL MASUK - IN"
-                                    name="destinationWeighInKg"
-                                    value={values?.destinationWeighInKg > 0 ? values.destinationWeighInKg : "0"}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    type="datetime-local"
-                                    variant="outlined"
-                                    component={TextField}
-                                    size="small"
-                                    fullWidth
-                                    required={true}
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    label="WAKTU BONGKAR"
-                                    name="unloadingTimestamp"
-                                    value={moment(values?.unloadingTimestamp).format("YYYY-MM-DDTHH:mm")}
-                                    InputLabelProps={{
-                                      shrink: true,
-                                    }}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    type="number"
-                                    variant="outlined"
-                                    component={TextField}
-                                    size="small"
-                                    fullWidth
-                                    required={true}
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    InputProps={{
-                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                                    }}
-                                    label="BERAT ASAL KELUAR - OUT"
-                                    name="destinationWeighOutKg"
-                                    value={values?.destinationWeighOutKg > 0 ? values.destinationWeighOutKg : "0"}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    name="unloadingOperatorName"
-                                    label="OPERATOR UNLOADING"
-                                    type="text"
-                                    required={true}
-                                    component={TextField}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    inputProps={{ style: { textTransform: "uppercase" }, readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                              </>
-                            )}
                           </Grid>
                         </Grid>
 
@@ -704,81 +616,30 @@ const PKSManualEntryDispatchView = () => {
                               />
                             </Grid>
 
-                            {isReadOnly === false && (
-                              <>
-                                <Grid item xs={12} sx={{ mt: 6 }}>
-                                  <Divider>Segel Tangki Bongkar T300</Divider>
-                                </Grid>
-
-                                <Grid item xs={6}>
-                                  <Field
-                                    name="unloadedSeal1"
-                                    label="Segel BONGKAR Mainhole 1"
-                                    type="text"
-                                    required={true}
-                                    component={TextField}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-
-                                <Grid item xs={6}>
-                                  <Field
-                                    name="unloadedSeal2"
-                                    label="Segel BONGKAR Valve 1"
-                                    type="text"
-                                    required={true}
-                                    component={TextField}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    name="unloadedSeal3"
-                                    label="Segel BONGKAR Mainhole 2"
-                                    type="text"
-                                    component={TextField}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Field
-                                    name="unloadedSeal4"
-                                    label="Segel BONGKAR Valve 2"
-                                    type="text"
-                                    component={TextField}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                      mt: 2,
-                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
-                                    }}
-                                    inputProps={{ readOnly: isReadOnly }}
-                                  />
-                                </Grid>
-                              </>
-                            )}
+                            <Grid item xs={12} sx={{ mt: 2 }}>
+                              <Divider>Catatan</Divider>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <Field
+                                name="originWeighInRemark"
+                                label="Alasan untuk Entri Manual"
+                                type="text"
+                                multiline
+                                rows={5}
+                                required={true}
+                                component={TextField}
+                                onChange={(e) => {
+                                  const { value } = e.target;
+                                  setFieldValue("originWeighInRemark", value);
+                                  setFieldValue("originWeighOutRemark", value);
+                                }}
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                                inputProps={{ readOnly: true }}
+                              />
+                            </Grid>
                           </Grid>
                         </Grid>
 
@@ -900,31 +761,169 @@ const PKSManualEntryDispatchView = () => {
                                 value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
                               />
                             </Grid>
-                            <Grid item xs={12} sx={{ mt: 2 }}>
-                              <Divider>Catatan</Divider>
-                            </Grid>
 
-                            <Grid item xs={12}>
-                              <Field
-                                name="originWeighInRemark"
-                                label="Alasan untuk Entri Manual"
-                                type="text"
-                                multiline
-                                rows={5}
-                                required={true}
-                                component={TextField}
-                                onChange={(e) => {
-                                  const { value } = e.target;
-                                  setFieldValue("originWeighInRemark", value);
-                                  setFieldValue("originWeighOutRemark", value);
-                                }}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
+                            {isReadOnly === false && (
+                              <>
+                                <Grid item xs={12} sx={{ mt: 2 }}>
+                                  <Divider>DATA DARI T300</Divider>
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="number"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    InputProps={{
+                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    }}
+                                    label="BERAT ASAL MASUK - IN"
+                                    name="destinationWeighInKg"
+                                    value={values?.destinationWeighInKg > 0 ? values.destinationWeighInKg : "0"}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="datetime-local"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    label="WAKTU BONGKAR"
+                                    name="unloadingTimestamp"
+                                    value={moment(values?.unloadingTimestamp).format("YYYY-MM-DDTHH:mm")}
+                                    InputLabelProps={{
+                                      shrink: true,
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    type="number"
+                                    variant="outlined"
+                                    component={TextField}
+                                    size="small"
+                                    fullWidth
+                                    required={true}
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    InputProps={{
+                                      endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    }}
+                                    label="BERAT ASAL KELUAR - OUT"
+                                    name="destinationWeighOutKg"
+                                    value={values?.destinationWeighOutKg > 0 ? values.destinationWeighOutKg : "0"}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadingOperatorName"
+                                    label="OPERATOR UNLOADING"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ style: { textTransform: "uppercase" }, readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                              </>
+                            )}
+                            {isReadOnly === false && (
+                              <>
+                                <Grid item xs={12} sx={{ mt: 2 }}>
+                                  <Divider>Segel Tangki Bongkar T300</Divider>
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal1"
+                                    label="Segel BONGKAR Mainhole 1"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal2"
+                                    label="Segel BONGKAR Valve 1"
+                                    type="text"
+                                    required={true}
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal3"
+                                    label="Segel BONGKAR Mainhole 2"
+                                    type="text"
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                                <Grid item xs={6}>
+                                  <Field
+                                    name="unloadedSeal4"
+                                    label="Segel BONGKAR Valve 2"
+                                    type="text"
+                                    component={TextField}
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    sx={{
+                                      mt: 2,
+                                      backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow",
+                                    }}
+                                    inputProps={{ readOnly: isReadOnly }}
+                                  />
+                                </Grid>
+                              </>
+                            )}
                           </Grid>
                         </Grid>
                       </>

@@ -1,5 +1,15 @@
-import { useGetKualitasCpoQuery, useCreateKualitasCpoMutation } from "../slices/kualitas/kualitasCpoSliceApi";
+import {
+  useGetKualitasCpoQuery,
+  useCreateKualitasCpoMutation,
+  useFindFirstKualitasCpoQuery,
+  useFindManyKualitasCpoQuery,
+} from "../slices/kualitas/kualitasCpoSliceApi";
 
 export const useKualitasCpo = () => {
-  return { useGetKualitasCpoQuery, useCreateKualitasCpoMutation };
+  return {
+    useGetKualitasCpoQuery,
+    useCreateKualitasCpoMutation,
+    useFindFirstKualitasCpoQuery,
+    useFindManyKualitasCpoQuery,
+  };
 };

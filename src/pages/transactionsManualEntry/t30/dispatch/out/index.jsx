@@ -33,6 +33,7 @@ import {
   useProduct,
   useWeighbridge,
   useStorageTank,
+  useKualitasCpo,
 } from "../../../../../hooks";
 
 const T30ManualEntryDispatchOut = () => {
@@ -49,6 +50,7 @@ const T30ManualEntryDispatchOut = () => {
   const [selectedOption, setSelectedOption] = useState(0);
   const [isCancel, setIsCancel] = useState(false);
 
+  const { useFindFirstKualitasCpoQuery } = useKualitasCpo();
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
 
@@ -71,6 +73,7 @@ const T30ManualEntryDispatchOut = () => {
 
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
   const { data: dtSite } = useGetSitesQuery();
+  const { data: dtKualitasCpo } = useFindFirstKualitasCpoQuery();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
@@ -102,20 +105,20 @@ const T30ManualEntryDispatchOut = () => {
     setIsLoading(true);
 
     try {
+      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+
+      if (selectedStorageTank) {
+        tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
+        tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
+        tempTrans.originSiteCode = selectedStorageTank.code || "";
+        tempTrans.originSiteName = selectedStorageTank.name || "";
+      }
       const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
         tempTrans.originSiteCode = selectedSite.code || "";
         tempTrans.originSiteName = selectedSite.name || "";
-      }
-
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
-
-      if (selectedDestinationSite) {
-        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
-        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
-        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
       if (WBMS.USE_WB === true) {
@@ -154,6 +157,14 @@ const T30ManualEntryDispatchOut = () => {
 
         return;
       } else {
+        const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
+
+        if (selectedDestinationSite) {
+          tempTrans.destinationSiteId = selectedDestinationSite.id || "";
+          tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
+          tempTrans.destinationSiteName = selectedDestinationSite.name || "";
+        }
+
         if (WBMS.USE_WB === true) {
           tempTrans.originWeighOutKg = wb.weight;
         }
@@ -248,7 +259,12 @@ const T30ManualEntryDispatchOut = () => {
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={openedTransaction}
+          initialValues={{
+            ...openedTransaction,
+            originFfaPercentage: dtKualitasCpo?.FfaPercentage,
+            originMoistPercentage: dtKualitasCpo?.MoistPercentage,
+            originDirtPercentage: dtKualitasCpo?.DirtPercentage,
+          }}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
@@ -273,7 +289,7 @@ const T30ManualEntryDispatchOut = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                {selectedOption === 1 && WBMS.USE_WB === true && (
+                  {selectedOption === 1 && WBMS.USE_WB === true && (
                     <CancelConfirmation
                       title="Alasan CANCEL (PEMBATALAN)"
                       caption="SIMPAN CANCEL (IN)"
@@ -364,22 +380,17 @@ const T30ManualEntryDispatchOut = () => {
                         label="Tipe Produk"
                         component={Select}
                         size="small"
+                        inputProps={{ readOnly: true }}
                         formControl={{
                           fullWidth: true,
                           required: true,
                           size: "small",
                         }}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
                         }}
                       >
                         {dtTypeProduct &&
@@ -658,12 +669,13 @@ const T30ManualEntryDispatchOut = () => {
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
+                            
                             <Grid item xs={12}>
                               <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
                             </Grid>
                             <Grid item xs={4}>
                               <Field
-                                name="originFfaPercentage"
+                                name="originFfaPeCrcentage"
                                 label="FFA"
                                 type="number"
                                 component={TextField}

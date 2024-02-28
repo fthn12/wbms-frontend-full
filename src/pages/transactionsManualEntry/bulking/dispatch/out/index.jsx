@@ -287,22 +287,17 @@ const LBNManualEntryDispatchOut = () => {
                         label="Tipe Produk"
                         component={Select}
                         size="small"
+                        inputProps={{ readOnly: true }}
                         formControl={{
                           fullWidth: true,
                           required: true,
                           size: "small",
                         }}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
                         }}
                       >
                         {dtTypeProduct &&
