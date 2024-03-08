@@ -75,7 +75,7 @@ const T30ManualEntryDispatchView = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
@@ -267,7 +267,10 @@ const T30ManualEntryDispatchView = () => {
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header
+        title="Transaksi T30"
+        subtitle="Transaksi Manual Entry Timbang WB-OUT"
+      />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -321,7 +324,7 @@ const T30ManualEntryDispatchView = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         formControl={{
@@ -515,7 +518,7 @@ const T30ManualEntryDispatchView = () => {
                                 isReadOnly={true}
                                 sx={{ mt: 2 }}
                                 backgroundColor="whitesmoke"
-                                siteId={T30Site.id}
+                                siteId={WBMS.SITE.refId}
                               />
                             </Grid>
 

@@ -1,12 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Divider, Grid } from "@mui/material";
-import { TextField as TextFieldMUI, InputAdornment, CircularProgress } from "@mui/material";
+import {
+  TextField as TextFieldMUI,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
 import { Field } from "formik";
 import { TextField, Autocomplete } from "formik-mui";
-import { CertificateSelect, StorageTankSelect } from "../../../../../components/FormikMUI";
+import {
+  CertificateSelect,
+  StorageTankSelect,
+} from "../../../../../components/FormikMUI";
 
 import * as eDispatchApi from "../../../../../apis/eDispatchApi";
-import { useAuth, useConfig, useTransaction, useWeighbridge, useApp, useDriver } from "hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useWeighbridge,
+  useApp,
+  useDriver,
+} from "hooks";
 
 import moment from "moment";
 
@@ -29,10 +43,15 @@ const T30ManualEntryDispatchIn = (props) => {
   }, []);
 
   useEffect(() => {
-    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [wbTransaction]);
@@ -79,7 +98,11 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               inputProps={{ readOnly: true }}
-              value={values?.rspoCertificateNumber ? values.rspoCertificateNumber : "-"}
+              value={
+                values?.rspoCertificateNumber
+                  ? values.rspoCertificateNumber
+                  : "-"
+              }
             />
           </Grid>
 
@@ -104,7 +127,11 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               inputProps={{ readOnly: true }}
-              value={values?.isccCertificateNumber ? values.isccCertificateNumber : "-"}
+              value={
+                values?.isccCertificateNumber
+                  ? values.isccCertificateNumber
+                  : "-"
+              }
             />
           </Grid>
 
@@ -129,7 +156,11 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               inputProps={{ readOnly: true }}
-              value={values?.ispoCertificateNumber ? values.ispoCertificateNumber : "-"}
+              value={
+                values?.ispoCertificateNumber
+                  ? values.ispoCertificateNumber
+                  : "-"
+              }
             />
           </Grid>
           <Grid item xs={12}>
@@ -285,7 +316,11 @@ const T30ManualEntryDispatchIn = (props) => {
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               inputProps={{ readOnly: true }}
-              value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+              value={
+                values?.originFfaPercentage > 0
+                  ? values.originFfaPercentage.toFixed(2)
+                  : "0.00"
+              }
             />
           </Grid>
           <Grid item xs={4}>
@@ -302,7 +337,11 @@ const T30ManualEntryDispatchIn = (props) => {
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               inputProps={{ readOnly: true }}
-              value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+              value={
+                values?.originMoistPercentage > 0
+                  ? values.originMoistPercentage.toFixed(2)
+                  : "0.00"
+              }
             />
           </Grid>
           <Grid item xs={4}>
@@ -319,7 +358,11 @@ const T30ManualEntryDispatchIn = (props) => {
                 endAdornment: <InputAdornment position="end">%</InputAdornment>,
               }}
               inputProps={{ readOnly: true }}
-              value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(3) : "0.000"}
+              value={
+                values?.originDirtPercentage > 0
+                  ? values.originDirtPercentage.toFixed(3)
+                  : "0.000"
+              }
             />
           </Grid>
         </Grid>
@@ -355,7 +398,10 @@ const T30ManualEntryDispatchIn = (props) => {
               label="Operator WB-OUT"
               value={values?.originWeighOutOperatorName || "-"}
               name="originWeighOutOperatorName"
-              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+              inputProps={{
+                readOnly: true,
+                style: { textTransform: "uppercase" },
+              }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -385,12 +431,14 @@ const T30ManualEntryDispatchIn = (props) => {
               inputProps={{ readOnly: true }}
               value={
                 values?.originWeighOutTimestamp
-                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                  ? moment(values.originWeighOutTimestamp)
+                      .local()
+                      .format(`DD/MM/YYYY - HH:mm:ss`)
                   : "-"
               }
             />
           </Grid>
-          {WBMS.USE_WB === true && (
+          {WBMS.WB_STATUS === true && (
             <Grid item xs={6}>
               <Field
                 type="number"
@@ -400,7 +448,9 @@ const T30ManualEntryDispatchIn = (props) => {
                 fullWidth
                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">kg</InputAdornment>
+                  ),
                 }}
                 label="BERAT MASUK - IN"
                 name="originWeighInKg"
@@ -409,7 +459,7 @@ const T30ManualEntryDispatchIn = (props) => {
               />
             </Grid>
           )}
-          {WBMS.USE_WB === false && (
+          {WBMS.WB_STATUS === false && (
             <Grid item xs={6}>
               <Field
                 type="number"
@@ -418,13 +468,17 @@ const T30ManualEntryDispatchIn = (props) => {
                 size="small"
                 fullWidth
                 required={true}
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">kg</InputAdornment>
+                  ),
                 }}
                 label="BERAT MASUK - IN"
                 name="originWeighInKg"
-                value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
+                value={
+                  values?.originWeighInKg > 0 ? values.originWeighInKg : "0"
+                }
               />
             </Grid>
           )}
@@ -437,9 +491,15 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
-              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              value={
+                values?.originWeighOutKg > 0
+                  ? values.originWeighOutKg.toFixed(2)
+                  : "0.00"
+              }
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
               inputProps={{ readOnly: true }}
@@ -457,15 +517,17 @@ const T30ManualEntryDispatchIn = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL"
               name="weightNetto"
-              value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+              value={
+                originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"
+              }
             />
           </Grid>
-      
-         
         </Grid>
       </Grid>
 

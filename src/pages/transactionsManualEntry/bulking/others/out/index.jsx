@@ -40,8 +40,13 @@ const BulkingManualEntryOthersOut = () => {
   const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
-    useTransaction();
+  const {
+    openedTransaction,
+    clearWbTransaction,
+    setOpenedTransaction,
+    setWbTransaction,
+    clearOpenedTransaction,
+  } = useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useFindManyProductQuery } = useProduct();
@@ -96,9 +101,9 @@ const BulkingManualEntryOthersOut = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      if (WBMS.USE_WB === true) {
+      if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighOutKg = wb.weight;
-      } else if (WBMS.USE_WB === false) {
+      } else if (WBMS.WB_STATUS === false) {
         tempTrans.isManualTonase = 1;
       }
 
@@ -111,7 +116,9 @@ const BulkingManualEntryOthersOut = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+      const response = await transactionAPI.updateById(tempTrans.id, {
+        ...tempTrans,
+      });
 
       if (!response.status) throw new Error(response?.message);
 
@@ -177,14 +184,19 @@ const BulkingManualEntryOthersOut = () => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
 
   return (
     <Box>
-      <Header title="Transaksi Bulking" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header
+        title="Transaksi Bulking"
+        subtitle="Transaksi Manual Entry Timbang WB-OUT"
+      />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -194,30 +206,38 @@ const BulkingManualEntryOthersOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, dirty, setFieldValue, handleChange } = props;
+            const { values, isValid, dirty, setFieldValue, handleChange } =
+              props;
             // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 4 && WBMS.USE_WB === true && (
+                  {selectedOption === 4 && WBMS.WB_STATUS === true && (
                     <Button
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && values.progressStatus === 37)
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 37
+                        )
                       }
                     >
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 4 && WBMS.USE_WB === false && (
+                  {selectedOption === 4 && WBMS.WB_STATUS === false && (
                     <Button
                       type="submit"
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.progressStatus === 37)}
+                      disabled={
+                        !(isValid && dirty && values.progressStatus === 37)
+                      }
                     >
                       SIMPAN
                     </Button>
@@ -254,7 +274,7 @@ const BulkingManualEntryOthersOut = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         formControl={{
@@ -265,7 +285,9 @@ const BulkingManualEntryOthersOut = () => {
                         sx={{ mb: 2 }}
                         onChange={(event, newValue) => {
                           handleChange(event);
-                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
                           setSelectedOption(selectedProductType.id);
                           // setFieldValue("productName", "");
                           // setFieldValue("productId", "");
@@ -292,10 +314,15 @@ const BulkingManualEntryOthersOut = () => {
                             fullWidth
                             freeSolo
                             disableClearable
-                            options={dtTransport?.records.map((record) => record.plateNo)}
+                            options={dtTransport?.records.map(
+                              (record) => record.plateNo
+                            )}
                             onInputChange={(event, InputValue, reason) => {
                               if (reason !== "reset") {
-                                setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
+                                setFieldValue(
+                                  "transportVehiclePlateNo",
+                                  InputValue.toUpperCase()
+                                );
                               }
                             }}
                             renderInput={(params) => (
@@ -317,13 +344,32 @@ const BulkingManualEntryOthersOut = () => {
                             variant="outlined"
                             fullWidth
                             options={dtCompany?.records || []}
-                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                            value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
+                            getOptionLabel={(option) =>
+                              `[${option.code}] - ${option.name}`
+                            }
+                            value={
+                              dtCompany?.records?.find(
+                                (item) =>
+                                  item.id === values.transporterCompanyId
+                              ) || null
+                            }
                             onChange={(event, newValue) => {
-                              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
-                              setFieldValue("mandatoryDeductionPercentage", newValue ? newValue.potonganWajib : "");
+                              setFieldValue(
+                                "transporterCompanyName",
+                                newValue ? newValue.name : ""
+                              );
+                              setFieldValue(
+                                "transporterCompanyId",
+                                newValue ? newValue.id : ""
+                              );
+                              setFieldValue(
+                                "transporterCompanyCode",
+                                newValue ? newValue.code : ""
+                              );
+                              setFieldValue(
+                                "mandatoryDeductionPercentage",
+                                newValue ? newValue.potonganWajib : ""
+                              );
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI
@@ -341,15 +387,36 @@ const BulkingManualEntryOthersOut = () => {
                             variant="outlined"
                             fullWidth
                             options={dtProduct?.records || []}
-                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                            value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
+                            getOptionLabel={(option) =>
+                              `[${option.code}] - ${option.name}`
+                            }
+                            value={
+                              dtProduct?.records?.find(
+                                (item) => item.id === values.productId
+                              ) || null
+                            }
                             onChange={(event, newValue) => {
-                              setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                              setFieldValue(
+                                "transportVehicleProductName",
+                                newValue ? newValue.name : ""
+                              );
 
-                              setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                              setFieldValue("productName", newValue ? newValue.name : "");
-                              setFieldValue("productId", newValue ? newValue.id : "");
-                              setFieldValue("productCode", newValue ? newValue.code : "");
+                              setFieldValue(
+                                "transportVehicleProductCode",
+                                newValue ? newValue.code : ""
+                              );
+                              setFieldValue(
+                                "productName",
+                                newValue ? newValue.name : ""
+                              );
+                              setFieldValue(
+                                "productId",
+                                newValue ? newValue.id : ""
+                              );
+                              setFieldValue(
+                                "productCode",
+                                newValue ? newValue.code : ""
+                              );
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI
@@ -372,7 +439,12 @@ const BulkingManualEntryOthersOut = () => {
                               <Divider>DATA SUPIR & MUATAN</Divider>
                             </Grid>
                             <Grid item xs={12}>
-                              <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
+                              <DriverFreeSolo
+                                name="driverName"
+                                label="Nama Supir"
+                                isReadOnly={false}
+                                sx={{ mt: 2 }}
+                              />
 
                               <Field
                                 name="afdeling"
@@ -486,7 +558,10 @@ const BulkingManualEntryOthersOut = () => {
                                 label="Operator WB-OUT"
                                 value={user.name}
                                 name="originWeighOutOperatorName"
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -502,7 +577,9 @@ const BulkingManualEntryOthersOut = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighInTimestamp
-                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighInTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -530,15 +607,23 @@ const BulkingManualEntryOthersOut = () => {
                                 component={TextField}
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                                value={
+                                  values?.originWeighInKg > 0
+                                    ? values.originWeighInKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
-                            {WBMS.USE_WB === true && (
+                            {WBMS.WB_STATUS === true && (
                               <Grid item xs={6}>
                                 <Field
                                   type="number"
@@ -546,18 +631,30 @@ const BulkingManualEntryOthersOut = () => {
                                   size="small"
                                   fullWidth
                                   component={TextField}
-                                  sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                                  sx={{
+                                    mt: 2,
+                                    mb: 1.5,
+                                    backgroundColor: "whitesmoke",
+                                  }}
                                   InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        kg
+                                      </InputAdornment>
+                                    ),
                                   }}
                                   label="BERAT KELUAR - OUT"
                                   name="originWeighOutKg"
-                                  value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                  value={
+                                    wb?.weight > 0
+                                      ? wb.weight.toFixed(2)
+                                      : "0.00"
+                                  }
                                   inputProps={{ readOnly: true }}
                                 />
                               </Grid>
                             )}
-                            {WBMS.USE_WB === false && (
+                            {WBMS.WB_STATUS === false && (
                               <Grid item xs={6}>
                                 <Field
                                   type="number"
@@ -566,13 +663,25 @@ const BulkingManualEntryOthersOut = () => {
                                   size="small"
                                   fullWidth
                                   required={true}
-                                  sx={{ mt: 2, mb: 1.5 }}
+                                  sx={{
+                                    mt: 2,
+                                    mb: 1.5,
+                                    backgroundColor: "lightyellow",
+                                  }}
                                   InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        kg
+                                      </InputAdornment>
+                                    ),
                                   }}
                                   label="BERAT KELUAR - OUT"
                                   name="originWeighOutKg"
-                                  value={values?.originWeighOutKg > 0 ? values.originWeighOutKg : "0"}
+                                  value={
+                                    values?.originWeighOutKg > 0
+                                      ? values.originWeighOutKg
+                                      : "0"
+                                  }
                                 />
                               </Grid>
                             )}
@@ -589,11 +698,19 @@ const BulkingManualEntryOthersOut = () => {
                                 fullWidth
                                 sx={{ mt: 3, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="TOTAL"
                                 name="weightNetto"
-                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                                value={
+                                  originWeighNetto > 0
+                                    ? originWeighNetto.toFixed(2)
+                                    : "0.00"
+                                }
                               />
                             </Grid>
                           </Grid>

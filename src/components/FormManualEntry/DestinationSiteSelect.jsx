@@ -8,7 +8,7 @@ import SyncIcon from "@mui/icons-material/Sync";
 
 import { useSite } from "../../hooks";
 
-export const SiteSelected = (props) => {
+export const DestinationSiteSelect = (props) => {
   const { isRequired, isReadOnly, backgroundColor, name, sx, ...others } = props;
 
   const { useGetSitesQuery, useEDispatchSiteSyncMutation } = useSite();

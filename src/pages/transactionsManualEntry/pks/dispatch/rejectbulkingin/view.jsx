@@ -3,7 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
-import { Button, TextField as TextFieldMUI, InputAdornment } from "@mui/material";
+import {
+  Button,
+  TextField as TextFieldMUI,
+  InputAdornment,
+} from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-mui";
@@ -27,7 +31,12 @@ import {
 
 import { TransactionAPI } from "../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useApp } from "../../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useApp,
+} from "../../../../../hooks";
 
 const TransactionPksRejectBulkingInView = (props) => {
   const navigate = useNavigate();
@@ -39,7 +48,8 @@ const TransactionPksRejectBulkingInView = (props) => {
   const { user } = useAuth();
   const { WBMS } = useConfig();
   const { urlPrev, setUrlPrev } = useApp();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [returnWeighNetto, setReturnWeighNetto] = useState(0);
@@ -56,7 +66,10 @@ const TransactionPksRejectBulkingInView = (props) => {
       .string()
       .required("Wajib diisi.")
       .min(11, "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter.")
-      .max(500, "Alasan REJECT (PENGEMBALIAN) tidak boleh melebihi 500 karakter."),
+      .max(
+        500,
+        "Alasan REJECT (PENGEMBALIAN) tidak boleh melebihi 500 karakter."
+      ),
   });
 
   const handleClose = () => {
@@ -74,7 +87,9 @@ const TransactionPksRejectBulkingInView = (props) => {
     setIsLoading(true);
 
     try {
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+      const response = await transactionAPI.updateById(tempTrans.id, {
+        ...tempTrans,
+      });
 
       if (!response.status) throw new Error(response?.message);
 
@@ -118,7 +133,9 @@ const TransactionPksRejectBulkingInView = (props) => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
     if (
@@ -127,7 +144,9 @@ const TransactionPksRejectBulkingInView = (props) => {
     ) {
       setReturnWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.returnWeighInKg - openedTransaction?.returnWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.returnWeighInKg - openedTransaction?.returnWeighOutKg
+      );
       setReturnWeighNetto(total);
     }
   }, [openedTransaction]);
@@ -177,7 +196,11 @@ const TransactionPksRejectBulkingInView = (props) => {
                   >
                     TAMPILKAN QR
                   </QRCodeViewer> */}
-                  <Button variant="contained" sx={{ ml: 1 }} onClick={handleReset}>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleReset}
+                  >
                     {isReadOnly ? "TUTUP" : "BATAL PERUBAHAN"}
                   </Button>
                   {/* <Button
@@ -228,7 +251,12 @@ const TransactionPksRejectBulkingInView = (props) => {
                           />
                         </Grid>
                         <Grid item xs={6}>
-                          <DriverAC name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mt: 2 }} />
+                          <DriverAC
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
                         </Grid>
 
                         <Grid item xs={6}>
@@ -579,7 +607,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             isReadOnly={false}
                             sx={{ mt: 1 }}
                             backgroundColor="white"
-                            siteId={T30Site.id}
+                            siteId={WBMS.SITE.refId}
                           />
                         </Grid> */}
                         <Grid item xs={12}>
@@ -592,7 +620,10 @@ const TransactionPksRejectBulkingInView = (props) => {
                             sx={{
                               mt: 2,
                               backgroundColor: "transparent",
-                              input: { cursor: "default", borderColor: "transparent" },
+                              input: {
+                                cursor: "default",
+                                borderColor: "transparent",
+                              },
                               "& .MuiOutlinedInput-root": {
                                 "& fieldset": {
                                   borderColor: "transparent",
@@ -624,9 +655,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originFfaPercentage > 0
+                                ? values.originFfaPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -641,9 +680,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originMoistPercentage > 0
+                                ? values.originMoistPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -658,9 +705,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originDirtPercentage > 0
+                                ? values.originDirtPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -700,7 +755,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -734,7 +791,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutTimestamp
-                                ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -750,9 +809,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -767,9 +834,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -784,9 +859,17 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -848,7 +931,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.returnWeighInTimestamp
-                                ? moment(values.returnWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.returnWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -882,7 +967,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.returnWeighOutTimestamp
-                                ? moment(values.returnWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.returnWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -898,10 +985,18 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             inputProps={{ readOnly: true }}
-                            value={values?.returnWeighInKg > 0 ? values.returnWeighInKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.returnWeighInKg > 0
+                                ? values.returnWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -915,10 +1010,18 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             inputProps={{ readOnly: true }}
-                            value={values?.returnWeighOutKg > 0 ? values.returnWeighOutKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.returnWeighOutKg > 0
+                                ? values.returnWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
                           />
                         </Grid>
                         <Grid item xs={12}>
@@ -932,10 +1035,18 @@ const TransactionPksRejectBulkingInView = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             inputProps={{ readOnly: true }}
-                            value={returnWeighNetto > 0 ? returnWeighNetto.toFixed(2) : "0.00"}
+                            value={
+                              returnWeighNetto > 0
+                                ? returnWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                           />
                         </Grid>
 
@@ -951,7 +1062,12 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             multiline
                             rows={2}
-                            sx={{ mt: 2, backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
+                            sx={{
+                              mt: 2,
+                              backgroundColor: isReadOnly
+                                ? "whitesmoke"
+                                : "lightyellow",
+                            }}
                             inputProps={{ readOnly: isReadOnly }}
                           />
                         </Grid>

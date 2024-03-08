@@ -3,7 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
-import { Button, TextField as TextFieldMUI, InputAdornment } from "@mui/material";
+import {
+  Button,
+  TextField as TextFieldMUI,
+  InputAdornment,
+} from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-mui";
@@ -40,7 +44,8 @@ const TransactionPksNormalIn = (props) => {
   const { user } = useAuth();
   const { WBMS } = useConfig();
   const { urlPrev, setUrlPrev } = useApp();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
@@ -67,6 +72,11 @@ const TransactionPksNormalIn = (props) => {
     url ? navigate(url) : navigate("/wb/transactions");
   };
 
+  const handleManualWBOUT = () => {
+    clearOpenedTransaction();
+    navigate(`/wb/transactions/pks/manual-entry-dispatch-out/${id}`);
+  };
+
   const handleFormikSubmit = async (values) => {
     let tempTrans = { ...values };
 
@@ -78,7 +88,9 @@ const TransactionPksNormalIn = (props) => {
         tempTrans.isDeleted = true;
       }
 
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+      const response = await transactionAPI.updateById(tempTrans.id, {
+        ...tempTrans,
+      });
 
       if (!response.status) throw new Error(response?.message);
 
@@ -122,7 +134,9 @@ const TransactionPksNormalIn = (props) => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
@@ -138,7 +152,14 @@ const TransactionPksNormalIn = (props) => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, dirty, isValid, submitForm, resetForm, setFieldValue } = props;
+            const {
+              values,
+              dirty,
+              isValid,
+              submitForm,
+              resetForm,
+              setFieldValue,
+            } = props;
             // console.log("Formik props:", props)
 
             const handleSubmit = async () => {
@@ -152,7 +173,9 @@ const TransactionPksNormalIn = (props) => {
 
             const handleDelete = (deleteReason) => {
               if (deleteReason.trim().length <= 10)
-                return toast.error("Alasan HAPUS TRANSAKSI harus melebihi 10 karakter");
+                return toast.error(
+                  "Alasan HAPUS TRANSAKSI harus melebihi 10 karakter"
+                );
 
               setFieldValue("originWeighInRemark", deleteReason);
               setIsDelete(true);
@@ -186,24 +209,36 @@ const TransactionPksNormalIn = (props) => {
                     disabled={!isReadOnly}
                     sx={{ ml: 1, mr: 1, backgroundColor: "darkred" }}
                   /> */}
+                  <Button
+                    variant="contained"
+                    sx={{ backgroundColor: "forestgreen" }}
+                    onClick={() => handleManualWBOUT(values)}
+                  >
+                    Manual (Timbang Keluar)
+                  </Button>
                   <QRCodeViewer
                     progressStatus={values.progressStatus}
                     deliveryOrderId={values.deliveryOrderId}
                     type="form"
                     disabled={!isReadOnly}
+                    sx={{ marginLeft: "auto" }}
                   >
                     TAMPILKAN QR
                   </QRCodeViewer>
-                  <Button variant="contained" sx={{ ml: 1 }} onClick={handleReset}>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleReset}
+                  >
                     {isReadOnly ? "TUTUP" : "BATAL EDIT"}
                   </Button>
                 </Box>
 
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={3}>
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
                           <Divider>DATA KENDARAAN</Divider>
                         </Grid>
 
@@ -228,7 +263,7 @@ const TransactionPksNormalIn = (props) => {
                           />
                         </Grid>
 
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
                           <TransportVehicleAC
                             name="transportVehiclePlateNo"
                             label="Nomor Plat Kendaraan"
@@ -237,7 +272,7 @@ const TransactionPksNormalIn = (props) => {
                             sx={{ mt: 2 }}
                           />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={12}>
                           <DriverAC
                             name="driverName"
                             label="Nama Supir"
@@ -303,189 +338,12 @@ const TransactionPksNormalIn = (props) => {
                             backgroundColor="whitesmoke"
                           />
                         </Grid> */}
-
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Saat ini</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="currentSeal1"
-                            label="Segel Mainhole 1 Saat Ini"
-                            type="text"
-                            required={true}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="currentSeal2"
-                            label="Segel Valve 1 Saat Ini"
-                            type="text"
-                            required={true}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="currentSeal3"
-                            label="Segel Mainhole 2 Saat Ini"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="currentSeal4"
-                            label="Segel Valve 2 Saat Ini"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-
-                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Tangki Kosong</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal1"
-                            label="Segel KOSONG Mainhole 1"
-                            type="text"
-                            required={true}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal2"
-                            label="Segel KOSONG Valve 1"
-                            type="text"
-                            required={true}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal3"
-                            label="Segel KOSONG Mainhole 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal4"
-                            label="Segel KOSONG Valve 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid> */}
-
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Tangki Isi</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal1"
-                            label="Segel ISI Mainhole 1"
-                            type="text"
-                            required={false}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal2"
-                            label="Segel ISI Valve 1"
-                            type="text"
-                            required={false}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal3"
-                            label="Segel ISI Mainhole 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal4"
-                            label="Segel ISI Valve 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
                       </Grid>
                     </Grid>
 
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
                           <Divider>DATA PRODUK</Divider>
                         </Grid>
 
@@ -578,7 +436,7 @@ const TransactionPksNormalIn = (props) => {
                         </Grid>
 
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 2 }}>Tangki</Divider>
+                          <Divider sx={{ mt: 6 }}>Tangki</Divider>
                         </Grid>
 
                         <Grid item xs={12}>
@@ -586,9 +444,9 @@ const TransactionPksNormalIn = (props) => {
                             name="originSourceStorageTankId"
                             label="Tangki Asal"
                             isRequired={false}
-                            isReadOnly={isReadOnly}
-                            sx={{ mt: 1 }}
-                            backgroundColor={isReadOnly ? "whitesmoke" : "lightyellow"}
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                            backgroundColor="whitesmoke"
                             siteId={null}
                           />
                         </Grid>
@@ -598,12 +456,13 @@ const TransactionPksNormalIn = (props) => {
                             label="Tangki Tujuan"
                             isRequired={true}
                             isReadOnly={false}
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 2 }}
                             backgroundColor="white"
-                            siteId={T30Site.id}
+                            siteId={null}
                           />
                         </Grid> */}
-                        <Grid item xs={12}>
+
+                        {/* <Grid item xs={12}>
                           <TextFieldMUI
                             label=""
                             type="text"
@@ -613,7 +472,10 @@ const TransactionPksNormalIn = (props) => {
                             sx={{
                               mt: 2,
                               backgroundColor: "transparent",
-                              input: { cursor: "default", borderColor: "transparent" },
+                              input: {
+                                cursor: "default",
+                                borderColor: "transparent",
+                              },
                               "& .MuiOutlinedInput-root": {
                                 "& fieldset": {
                                   borderColor: "transparent",
@@ -628,10 +490,193 @@ const TransactionPksNormalIn = (props) => {
                             }}
                             inputProps={{ readOnly: true }}
                           />
+                        </Grid> */}
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
+                          <Divider>Segel Saat ini</Divider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Field
+                            name="currentSeal1"
+                            label="Segel Mainhole 1 Saat Ini"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="currentSeal2"
+                            label="Segel Valve 1 Saat Ini"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="currentSeal3"
+                            label="Segel Mainhole 2 Saat Ini"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="currentSeal4"
+                            label="Segel Valve 2 Saat Ini"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+
+                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Segel Tangki Kosong</Divider>
+                        </Grid> */}
+
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal1"
+                            label="Segel KOSONG Mainhole 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal2"
+                            label="Segel KOSONG Valve 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal3"
+                            label="Segel KOSONG Mainhole 2"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal4"
+                            label="Segel KOSONG Valve 2"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+
+                        <Grid item xs={12} sx={{ mt: 2, mb: 1 }}>
+                          <Divider>Segel Tangki Isi</Divider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal1"
+                            label="Segel ISI Mainhole 1"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal2"
+                            label="Segel ISI Valve 1"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal3"
+                            label="Segel ISI Mainhole 2"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal4"
+                            label="Segel ISI Valve 2"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
                         </Grid>
 
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 2 }}>Kualitas</Divider>
+                          <Divider sx={{ mt: 1.5 }}>Kualitas Asal</Divider>
                         </Grid>
 
                         <Grid item xs={4}>
@@ -643,11 +688,19 @@ const TransactionPksNormalIn = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originFfaPercentage > 0
+                                ? values.originFfaPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -660,11 +713,19 @@ const TransactionPksNormalIn = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originMoistPercentage > 0
+                                ? values.originMoistPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -677,11 +738,19 @@ const TransactionPksNormalIn = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originDirtPercentage > 0
+                                ? values.originDirtPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -690,126 +759,156 @@ const TransactionPksNormalIn = (props) => {
 
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
                           <Divider>DATA TIMBANG KENDARAAN</Divider>
                         </Grid>
 
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighInKg"
-                            label="Berat WB-IN"
-                            type="number"
-                            component={TextField}
+                            type="text"
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            inputProps={{ readOnly: true }}
-                            value={values.originWeighInKg.toFixed(2) || "0.00"}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originWeighOutKg"
-                            label="Berat WB-OUT"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            inputProps={{ readOnly: true }}
-                            value={values.originWeighOutKg.toFixed(2) || "0.00"}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originWeighNetto"
-                            label="NETTO"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                            }}
-                            value={originWeighNetto.toFixed(2) || "0.00"}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={5}>
-                          <Field
-                            name="originWeighInOperatorName"
                             label="Operator WB-IN"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required={true}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            name="originWeighInOperatorName"
+                            value={values?.originWeighInOperatorName || "-"}
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        <Grid item xs={7}>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighInTimestamp"
-                            label="Waktu WB-IN"
                             type="text"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required={true}
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            label="Operator WB-OUT"
+                            value={values?.originWeighOutOperatorName || "-"}
+                            name="originWeighOutOperatorName"
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-IN"
+                            name="originWeighInTimestamp"
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-Out"
+                            name="originWeighOutTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.originWeighOutTimestamp
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
                         </Grid>
 
-                        <Grid item xs={5}>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighOutOperatorName"
-                            label="Operator WB-OUT"
-                            type="text"
-                            component={TextField}
+                            type="number"
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required={true}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            label="BERAT MASUK - IN"
+                            name="originWeighInKg"
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        <Grid item xs={7}>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighOutTimestamp"
-                            label="Waktu WB-OUT"
-                            type="text"
-                            component={TextField}
+                            type="number"
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required={true}
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
                             value={
-                              values?.originWeighOutTimestamp
-                                ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
-                                : "-"
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
+                            label="BERAT KELUAR - OUT"
+                            name="originWeighOutKg"
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Divider>TOTAL</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            label="TOTAL"
+                            name="weightNetto"
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
                             }
                           />
                         </Grid>

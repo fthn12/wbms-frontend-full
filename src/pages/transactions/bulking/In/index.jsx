@@ -1,105 +1,149 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
 import {
   Button,
-  Grid,
+  TextField as TextFieldMUI,
   InputAdornment,
-  TextField,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Paper,
-  Box,
 } from "@mui/material";
-import { toast } from "react-toastify";
+
+import { Formik, Form, Field } from "formik";
+import { TextField } from "formik-mui";
+import * as yup from "yup";
+
 import moment from "moment";
+import numeral from "numeral";
 
 import Header from "../../../../components/layout/signed/HeaderTransaction";
-import QRCodeViewer from "../../../../components/QRCodeViewer";
+import ProgressStatus from "../../../../components/ProgressStatus";
 
-import { useForm } from "../../../../utils/useForm";
+import {
+  TransportVehicleAC,
+  DriverAC,
+  CompanyAC,
+  SiteSelect,
+  CertificateSelect,
+  StorageTankSelect,
+} from "../../../../components/FormikMUI";
+
 import { TransactionAPI } from "../../../../apis";
-import * as eDispatchAPI from "../../../../apis/eDispatchApi";
+import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
-import { useAuth, useConfig, useTransaction, useWeighbridge, useApp } from "../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useWeighbridge,
+  useApp,
+} from "../../../../hooks";
 import { useStorageTank } from "../../../../hooks";
 
-const TransactionBulkingWbInNormal = (props) => {
+const TransactionBulkingNormalIN = (props) => {
   const navigate = useNavigate();
 
   const transactionAPI = TransactionAPI();
 
   const { user } = useAuth();
-  const { setSidebar } = useApp();
-  const { WBMS, SCC_MODEL } = useConfig();
-  const { wbTransaction, clearWbTransaction } = useTransaction();
+  const { WBMS } = useConfig();
+  const { urlPrev, setUrlPrev, setSidebar } = useApp();
+  const { wbTransaction, setWbTransaction, clearWbTransaction } =
+    useTransaction();
   const { wb } = useWeighbridge();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
 
-  const BulkingSite = eDispatchAPI.getBulkingSite();
-
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: BulkingSite.id }, { siteRefId: BulkingSite.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
-    orderBy: [{ name: "asc" }],
   };
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
-  const { data: dtStorageTanks } = useFindManyStorageTanksQuery(storageTankFilter);
+  const [originWeighNetto, setOriginWeightNetto] = useState(0);
+  const [destinationWeighNetto, setDestinationWeightNetto] = useState(0);
+  const [dtTrx, setDtTrx] = useState(null);
 
-  const { values, setValues, handleInputChange } = useForm({
-    ...transactionAPI.InitialData,
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validationSchema = yup.object().shape({
+    // tidak bisa dari sini, karena ada pengaruh dari external form
+    // originWeighInKg: yup.number().required("Wajib diisi.").min(WBMS.WB_MIN_WEIGHT),
+
+    destinationSinkStorageTankId: yup.string().required("Wajib diisi."),
+    unloadedSeal1: yup
+      .string()
+      .required("Wajib diisi.")
+      .max(30, "maksimal 30 karakter"),
+    unloadedSeal2: yup
+      .string()
+      .required("Wajib diisi.")
+      .max(30, "maksimal 30 karakter"),
+    unloadedSeal3: yup.string().max(30, "maksimal 30 karakter"),
+    unloadedSeal4: yup.string().max(30, "maksimal 30 karakter"),
   });
-
-  const [originWeightNetto, setOriginWeightNetto] = useState(0);
-  const [destinationWeightNetto, setDestinationWeightNetto] = useState(0);
-
-  const [canSubmit, setCanSubmit] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleClose = () => {
     clearWbTransaction();
 
-    navigate("/wb/transactions");
+    const url = urlPrev;
+    setUrlPrev("");
+
+    url ? navigate(url) : navigate("/wb/transactions");
   };
 
-  const handleSubmit = async () => {
-    let tempTrans = { ...values };
+  const handleFormikSubmit = async (values) => {
+    let wbTransaction = { ...values };
+
+    setIsLoading(true);
 
     try {
-      // tempTrans.originWeighInTimestamp = SemaiUtils.GetDateStr();
-      tempTrans.destinationWeighInTimestamp = moment().toDate();
-      tempTrans.destinationWeighInOperatorName = user.name;
-      tempTrans.dtTransaction = moment()
+      const selected = dtStorageTank.records.find(
+        (item) => item.id === values.destinationSinkStorageTankId
+      );
+
+      if (selected) {
+        wbTransaction.destinationSinkStorageTankCode = selected.code || "";
+        wbTransaction.destinationSinkStorageTankName = selected.name || "";
+      }
+
+      wbTransaction.destinationWeighInKg = wb.weight;
+      wbTransaction.destinationWeighInOperatorName = user.name.toUpperCase();
+      wbTransaction.destinationWeighInTimestamp = moment().toDate();
+      wbTransaction.destinationWeighInOperatorName = user.name;
+      wbTransaction.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { wbTransaction: { ...tempTrans } };
+      const data = { wbTransaction };
 
       const response = await transactionAPI.eDispatchBulkingNormalInAfter(data);
 
       if (!response.status) throw new Error(response?.message);
 
-      // setWbTransaction(response.data.transaction);
       clearWbTransaction();
-      setValues({ ...response.data.transaction });
-      setIsSubmitted(true);
+      setIsLoading(false);
 
       toast.success(`Transaksi WB-IN telah tersimpan.`);
+
+      // redirect ke form view
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/bulking-edispatch-in/${id}`);
     } catch (error) {
-      return toast.error(`${error.message}..!!`);
+      setIsLoading(false);
+      toast.error(`${error.message}.`);
+
+      return;
     }
   };
 
   useEffect(() => {
-    if (!wbTransaction) return handleClose();
-
+    setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
     setSidebar({ selected: "Transaksi WB Bulking" });
-    setValues(wbTransaction);
 
     return () => {
       // console.clear();
@@ -107,461 +151,785 @@ const TransactionBulkingWbInNormal = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!isSubmitted) {
-      setValues((prev) => ({
-        ...prev,
-        destinationWeighInKg: wb.weight,
-      }));
-    }
+    setWbTransaction({ destinationWeighInKg: wb.weight });
   }, [wb.weight]);
 
   useEffect(() => {
-    if (values.originWeighInKg < WBMS.WB_MIN_WEIGHT || values.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (!wbTransaction) {
+      return;
+    }
+
+    if (
+      wbTransaction.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeightNetto(0);
     } else {
-      let total = Math.abs(values.originWeighInKg - values.originWeighOutKg);
+      let total = Math.abs(
+        wbTransaction.originWeighInKg - wbTransaction.originWeighOutKg
+      );
       setOriginWeightNetto(total);
     }
 
-    if (values.destinationWeighInKg < WBMS.WB_MIN_WEIGHT || values.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      wbTransaction.destinationWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setDestinationWeightNetto(0);
     } else {
-      let total = Math.abs(values.destinationWeighInKg - values.destinationWeighOutKg);
+      let total = Math.abs(
+        wbTransaction.destinationWeighInKg -
+          wbTransaction.destinationWeighOutKg
+      );
       setDestinationWeightNetto(total);
     }
-  }, [values]);
-
-  // Untuk validasi field
-  useEffect(() => {
-    let cSubmit = false;
-
-    if (
-      values.destinationWeighInKg >= WBMS.WB_MIN_WEIGHT &&
-      values?.destinationSinkStorageTankId?.trim().length > 0 &&
-      values?.unloadedSeal1?.trim().length > 0 &&
-      values?.unloadedSeal2?.trim().length > 0
-    ) {
-      cSubmit = true;
-    }
-
-    setCanSubmit(cSubmit);
-  }, [WBMS.WB_MIN_WEIGHT, values]);
-
-  let cbStorageTanks;
-  cbStorageTanks = (
-    <FormControl fullWidth size="small" sx={{ mt: 2 }} required>
-      <InputLabel id="destinationSinkStorageTankId">Tangki Tujuan</InputLabel>
-      <Select
-        labelId="destinationSinkStorageTankId"
-        label="Tangki Tujuan"
-        name="destinationSinkStorageTankId"
-        disabled={isSubmitted}
-        value={values?.destinationSinkStorageTankId || ""}
-        onChange={(e) => {
-          handleInputChange(e);
-
-          let selected = dtStorageTanks?.records?.find((item) => item.id === e.target.value);
-
-          if (selected) {
-            setValues((prev) => {
-              prev.destinationSinkStorageTankCode = selected.code;
-              prev.destinationSinkStorageTankName = selected.name;
-              return { ...prev };
-            });
-          }
-        }}
-      >
-        {dtStorageTanks?.records &&
-          dtStorageTanks?.records.map((item, index) => (
-            <MenuItem key={index} value={item.id}>
-              {`${item.name} - ${item.productName} (${item.siteName})`}
-            </MenuItem>
-          ))}
-      </Select>
-    </FormControl>
-  );
+  }, [wbTransaction]);
 
   return (
     <Box>
-      <Header title="TRANSAKSI BULKING" subtitle="WB-IN" />
+      <Header title="TRANSAKSI BULKING" subtitle="TIMBANG WB-IN" />
+      {wbTransaction && (
+        <Formik
+          // enableReinitialize
+          onSubmit={handleFormikSubmit}
+          initialValues={wbTransaction}
+          validationSchema={validationSchema}
+          isInitialError={true}
+        >
+          {(props) => {
+            const { values, isValid, dirty } = props;
+            // console.log("Formik props:", props);
 
-      <Box display="flex" sx={{ mt: 3 }}>
-        <Box flex={1}></Box>
-        <Button variant="contained" disabled={!isSubmitted} onClick={handleClose}>
-          TUTUP
-        </Button>
-      </Box>
+            return (
+              <Form>
+                <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={
+                      !(
+                        isValid &&
+                        wb?.isStable &&
+                        wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                        dirty
+                      )
+                    }
+                  >
+                    SIMPAN
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleClose}
+                  >
+                    TUTUP
+                  </Button>
+                </Box>
 
-      <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
-        <Grid container spacing={1}>
-          <Grid item xs={3}>
-            <TextField
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ backgroundColor: "whitesmoke" }}
-              label="Nomor BON Trip"
-              name="bonTripNo"
-              value={values?.bonTripNo || ""}
-            />
+                <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
+                          <Divider>DATA KENDARAAN</Divider>
+                        </Grid>
 
-            <Grid container columnSpacing={1}>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Nama Supir"
-                  name="driverFullName"
-                  value={values?.driverName || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="NIK"
-                  name="driverNik"
-                  value={values?.driverNik || ""}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Nomor Polisi"
-                  name="transportVehiclePlateNo"
-                  value={values?.transportVehiclePlateNo || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="SIM"
-                  name="driverFullName"
-                  value={values?.driverLicenseNo || ""}
-                />
-              </Grid>
-            </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="bonTripNo"
+                            label="NO BONTRIP"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <ProgressStatus
+                            progressStatus={values?.progressStatus}
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                          />
+                        </Grid>
 
-            <TextField
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Nama Vendor"
-              name="transporterCompanyName"
-              value={`${values?.transporterCompanyName} - ${values?.transporterCompanyCode}` || ""}
-            />
+                        <Grid item xs={12}>
+                          <TransportVehicleAC
+                            name="transportVehiclePlateNo"
+                            label="Nomor Plat Kendaraan"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <DriverAC
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
+                        </Grid>
 
-            <Grid container columnSpacing={1}>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Kode Produk Kendaraan"
-                  name="transportVehicleProductCode"
-                  value={values?.transportVehicleProductCode || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Kode Produk"
-                  name="productCode"
-                  value={values?.productCode || ""}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Nama Produk Kendaraan"
-                  name="transportVehicleProductName"
-                  value={values?.transportVehicleProductName || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Nama Produk"
-                  name="productName"
-                  value={values?.productName || ""}
-                />
-              </Grid>
-            </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="transportVehicleProduct"
+                            label="Produk Kendaraan"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={`${values?.transportVehicleProductCode} - ${values?.transportVehicleProductName}`}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <CertificateSelect
+                            name="transportVehicleSccModel"
+                            label="Sertifikasi Kendaraan"
+                            isRequired={false}
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                            backgroundColor="whitesmoke"
+                          />
+                        </Grid>
 
-            <TextField
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              label="Vehicle Allowable Scc Model"
-              name="transportVehicleSccModel"
-              value={SCC_MODEL[values?.transportVehicleSccModel || 0]}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Grid container columnSpacing={1}>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ backgroundColor: "whitesmoke" }}
-                  label="Segel 1 Saat Ini"
-                  name="currentSeal1"
-                  value={values?.currentSeal1 || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mt: 2,
-                    backgroundColor: isSubmitted ? "whitesmoke" : "white",
-                  }}
-                  required
-                  label="Segel Mainhole 1 (unloaded)"
-                  name="unloadedSeal1"
-                  disabled={isSubmitted}
-                  value={values?.unloadedSeal1 || ""}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mt: 2,
-                    backgroundColor: isSubmitted ? "whitesmoke" : "white",
-                  }}
-                  required
-                  label="Segel Valve 1 (unloaded)"
-                  name="unloadedSeal2"
-                  disabled={isSubmitted}
-                  value={values?.unloadedSeal2 || ""}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ backgroundColor: "whitesmoke" }}
-                  label="Segel 2 Saat Ini"
-                  name="currentSeal2"
-                  value={values?.currentSeal2 || ""}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mt: 2,
-                    backgroundColor: isSubmitted ? "whitesmoke" : "white",
-                  }}
-                  label="Segel Mainhole 2 (unloaded)"
-                  name="unloadedSeal3"
-                  disabled={isSubmitted}
-                  value={values?.unloadedSeal3 || ""}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mt: 2,
-                    backgroundColor: isSubmitted ? "whitesmoke" : "white",
-                  }}
-                  label="Segel Valve 2 (unloaded)"
-                  name="unloadedSeal4"
-                  disabled={isSubmitted}
-                  value={values?.unloadedSeal4 || ""}
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                />
-              </Grid>
-            </Grid>
-            {cbStorageTanks}
-          </Grid>
-          <Grid item xs={3}>
-            <Grid container columnSpacing={1}>
-              <Grid item xs={5}>
-                <TextField
-                  type="number"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ backgroundColor: "whitesmoke" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                  }}
-                  label="Berat Asal WB-IN"
-                  name="originWeighInKg"
-                  value={values?.originWeighInKg || 0}
-                />
-                <TextField
-                  type="number"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                  }}
-                  label="Berat Asal WB-OUT"
-                  name="originWeighOutKg"
-                  value={values?.originWeighOutKg || 0}
-                />
-              </Grid>
-              <Grid item xs={7}>
-                <TextField
-                  type="datetime-local"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ backgroundColor: "whitesmoke" }}
-                  label="Waktu Asal WB-IN"
-                  name="originWeighInTimestamp"
-                  disabled
-                  value={moment(values?.originWeighInTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
-                />
-                <TextField
-                  type="datetime-local"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Waktu Asal WB-OUT"
-                  name="originWeighOutTimestamp"
-                  disabled
-                  value={moment(values?.originWeighOutTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
-                />
-              </Grid>
-            </Grid>
-            <TextField
-              type="number"
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-              }}
-              label="TOTAL Berat Asal"
-              name="weightNetto"
-              value={originWeightNetto || 0}
-            />
+                        <Grid item xs={12}>
+                          <CompanyAC
+                            name="transporterCompanyName"
+                            label="Nama Vendor"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
+                        </Grid>
 
-            <Grid container columnSpacing={1}>
-              <Grid item xs={5}>
-                <TextField
-                  type="number"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                  }}
-                  label="Berat Timbang Masuk"
-                  name="destinationWeighInKg"
-                  value={values?.destinationWeighInKg || 0}
-                />
-                <TextField
-                  type="number"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-                  }}
-                  label="Berat Timbang Keluar"
-                  name="destinationWeighOutKg"
-                  value={values?.destinationWeighOutKg || 0}
-                />
-              </Grid>
-              <Grid item xs={7}>
-                <TextField
-                  type="datetime-local"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Waktu Timbang Masuk"
-                  name="destinationWeighInTimestamp"
-                  disabled
-                  value={moment(values?.destinationWeighInTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
-                />
-                <TextField
-                  type="datetime-local"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                  label="Waktu Timbang Keluar"
-                  name="destinationWeighOutTimestamp"
-                  disabled
-                  value={values?.destinationWeighOutTimestamp || "-"}
-                />
-              </Grid>
-            </Grid>
-            <TextField
-              type="number"
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
-              }}
-              label="TOTAL"
-              name="destinationWeightNetto"
-              value={destinationWeightNetto || 0}
-            />
+                        {/* <Grid item xs={6}>
+                          <SiteSelect
+                            name="originSiteId"
+                            label="Site Asal"
+                            isRequired={true}
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                            backgroundColor="whitesmoke"
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <SiteSelect
+                            name="destinationSiteId"
+                            label="Site Tujuan"
+                            isRequired={true}
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                            backgroundColor="whitesmoke"
+                          />
+                        </Grid> */}
+                      </Grid>
+                    </Grid>
 
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{ mt: 1, mb: 1, height: 50 }}
-              onClick={handleSubmit}
-              disabled={!(canSubmit && !isSubmitted && wb?.isStable)}
-            >
-              Simpan
-            </Button>
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12} sx={{ mb: 1 }}>
+                          <Divider>Segel Tangki Asal</Divider>
+                        </Grid>
 
-            <QRCodeViewer
-              progressStatus={values.progressStatus}
-              deliveryOrderId={values.deliveryOrderId}
-              type="form"
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-      </Paper>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal1"
+                            label="Segel Mainhole 1 Asal"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.loadedSeal1 ? values.loadedSeal1 : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal2"
+                            label="Segel Valve 1 Asal"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.loadedSeal2 ? values.loadedSeal2 : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal3"
+                            label="Segel Mainhole 2 Asal"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.loadedSeal3 ? values.loadedSeal3 : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="loadedSeal4"
+                            label="Segel Valve 2 Asal"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.loadedSeal4 ? values.loadedSeal4 : "-"
+                            }
+                          />
+                        </Grid>
+
+                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Segel Tangki Kosong</Divider>
+                        </Grid> */}
+
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal1"
+                            label="Segel KOSONG Mainhole 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal2"
+                            label="Segel KOSONG Valve 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal3"
+                            label="Segel KOSONG Mainhole 2"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal4"
+                            label="Segel KOSONG Valve 2"
+                            type="text"
+                            required={false}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid> */}
+
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Segel Tangki Bongkar</Divider>
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal1"
+                            label="Segel BONGKAR Mainhole 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal2"
+                            label="Segel BONGKAR Valve 1"
+                            type="text"
+                            required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal3"
+                            label="Segel BONGKAR Mainhole 2"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="unloadedSeal4"
+                            label="Segel BONGKAR Valve 2"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Divider sx={{ mt: 2 }}>Tangki</Divider>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <StorageTankSelect
+                            name="destinationSinkStorageTankId"
+                            label="Tangki Tujuan"
+                            isRequired={true}
+                            isReadOnly={false}
+                            sx={{ mt: 2 }}
+                            backgroundColor="lightyellow"
+                            siteId={WBMS.SITE.refId}
+                          />
+                        </Grid>
+                        {/* <Grid item xs={12}>
+                          <StorageTankSelect
+                            name="destinationSinkStorageTankId"
+                            label="Tangki Asal"
+                            isRequired={true}
+                            isReadOnly={isReadOnly}
+                            sx={{ mt: 1 }}
+                            backgroundColor={
+                              isReadOnly ? "whitesmoke" : "lightyellow"
+                            }
+                            siteId={WBMS.SITE.refId}
+                          />
+                        </Grid> */}
+                        {/* <Grid item xs={12}>
+                          <StorageTankSelect
+                            name="destinationSinkStorageTankId"
+                            label="Tangki Tujuan"
+                            isRequired={true}
+                            isReadOnly={false}
+                            sx={{ mt: 1 }}
+                            backgroundColor="white"
+                            siteId={WBMS.SITE.refId}
+                          />
+                        </Grid> */}
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12}>
+                          <Divider>DATA TIMBANG ASAL</Divider>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Operator Asal WB-IN"
+                            name="originWeighInOperatorName"
+                            value={values?.originWeighInOperatorName || "-"}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Operator Asal WB-OUT"
+                            value={values?.originWeighOutOperatorName || "-"}
+                            name="originWeighOutOperatorName"
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu Asal WB-IN"
+                            name="originWeighInTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.originWeighInTimestamp
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu Asal WB-Out"
+                            name="originWeighOutTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.originWeighOutTimestamp
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            label="BERAT ASAL MASUK - IN"
+                            name="originWeighInKg"
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            value={
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
+                            label="BERAT ASAL KELUAR - OUT"
+                            name="originWeighOutKg"
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Divider>TOTAL ASAL</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            label="TOTAL ASAL"
+                            name="weightNetto"
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
+                          />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
+                        <Grid item xs={12}>
+                          <Divider>DATA TIMBANG KENDARAAN</Divider>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Operator WB-IN"
+                            name="destinationWeighInOperatorName"
+                            value={user.name}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Operator WB-OUT"
+                            value={
+                              values?.destinationWeighOutOperatorName || "-"
+                            }
+                            name="destinationWeighOutOperatorName"
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-IN"
+                            name="destinationWeighInTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={dtTrx || "-"}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            type="text"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-Out"
+                            name="destinationWeighOutTimestamp"
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.destinationWeighOutTimestamp
+                                ? moment(values.destinationWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                          />
+                        </Grid>
+                        {WBMS.WB_STATUS === true && (
+                          <Grid item xs={6}>
+                            <Field
+                              type="number"
+                              variant="outlined"
+                              component={TextField}
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              label="BERAT MASUK - IN"
+                              name="destinationWeighInKg"
+                              value={
+                                wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"
+                              }
+                              inputProps={{ readOnly: true }}
+                            />
+                          </Grid>
+                        )}
+                        {WBMS.WB_STATUS === false && (
+                          <Grid item xs={6}>
+                            <Field
+                              type="number"
+                              variant="outlined"
+                              component={TextField}
+                              size="small"
+                              fullWidth
+                              required={true}
+                              sx={{ mt: 2 }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              label="BERAT MASUK - IN"
+                              name="destinationWeighInKg"
+                              value={
+                                values?.destinationWeighInKg > 0
+                                  ? values.destinationWeighInKg
+                                  : "0"
+                              }
+                            />
+                          </Grid>
+                        )}
+                        <Grid item xs={6}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            value={
+                              values?.destinationWeighOutKg > 0
+                                ? values.destinationWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
+                            label="BERAT KELUAR - OUT"
+                            name="destinationWeighOutKg"
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Divider>TOTAL</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            component={TextField}
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            label="TOTAL"
+                            name="weightNetto"
+                            value={
+                              destinationWeighNetto > 0
+                                ? destinationWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
+                          />
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Paper>
+
+                {isLoading && (
+                  <CircularProgress
+                    size={50}
+                    sx={{
+                      color: "goldenrod",
+                      position: "absolute",
+                      top: "50%",
+                      left: "48.5%",
+                      zIndex: 999,
+                    }}
+                  />
+                )}
+              </Form>
+            );
+          }}
+        </Formik>
+      )}
+      {!wbTransaction && (
+        <CircularProgress
+          size={50}
+          sx={{
+            color: "goldenrod",
+            position: "absolute",
+            top: "50%",
+            left: "48.5%",
+            zIndex: 999,
+          }}
+        />
+      )}
     </Box>
   );
 };
 
-export default TransactionBulkingWbInNormal;
+export default TransactionBulkingNormalIN;

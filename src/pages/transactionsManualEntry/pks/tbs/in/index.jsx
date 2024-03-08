@@ -15,7 +15,14 @@ import { Formik, Form, Field, useFormikContext } from "formik";
 import moment from "moment";
 import SortasiTBS from "../../../../../components/SortasiTBS";
 
-import { useAuth, useConfig, useTransaction, useDriver, useWeighbridge, useApp } from "../../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useDriver,
+  useWeighbridge,
+  useApp,
+} from "../../../../../hooks";
 
 const PksManualEntryTbsIn = (props) => {
   // const { setFieldValue, values } = props;
@@ -54,10 +61,15 @@ const PksManualEntryTbsIn = (props) => {
   // }, []);
 
   useEffect(() => {
-    if (wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT || wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [wbTransaction]);
@@ -70,7 +82,12 @@ const PksManualEntryTbsIn = (props) => {
             <Divider>DATA SUPIR & MUATAN</Divider>
           </Grid>
           <Grid item xs={12}>
-            <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mt: 2 }} />
+            <DriverFreeSolo
+              name="driverName"
+              label="Nama Supir"
+              isReadOnly={false}
+              sx={{ mt: 2 }}
+            />
 
             <Field
               name="afdeling"
@@ -206,7 +223,10 @@ const PksManualEntryTbsIn = (props) => {
               label="Operator WB-OUT"
               value="-"
               name="originWeighOutOperatorName"
-              inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+              inputProps={{
+                readOnly: true,
+                style: { textTransform: "uppercase" },
+              }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -236,12 +256,14 @@ const PksManualEntryTbsIn = (props) => {
               inputProps={{ readOnly: true }}
               value={
                 values?.originWeighOutTimestamp
-                  ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                  ? moment(values.originWeighOutTimestamp)
+                      .local()
+                      .format(`DD/MM/YYYY - HH:mm:ss`)
                   : "-"
               }
             />
           </Grid>
-          {WBMS.USE_WB === true && (
+          {WBMS.WB_STATUS === true && (
             <Grid item xs={6}>
               <Field
                 type="number"
@@ -251,7 +273,9 @@ const PksManualEntryTbsIn = (props) => {
                 fullWidth
                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">kg</InputAdornment>
+                  ),
                 }}
                 label="BERAT MASUK - IN"
                 name="originWeighInKg"
@@ -260,7 +284,7 @@ const PksManualEntryTbsIn = (props) => {
               />
             </Grid>
           )}
-          {WBMS.USE_WB === false && (
+          {WBMS.WB_STATUS === false && (
             <Grid item xs={6}>
               <Field
                 type="number"
@@ -269,13 +293,17 @@ const PksManualEntryTbsIn = (props) => {
                 size="small"
                 fullWidth
                 required={true}
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">kg</InputAdornment>
+                  ),
                 }}
                 label="BERAT MASUK - IN"
                 name="originWeighInKg"
-                value={values?.originWeighInKg > 0 ? values.originWeighInKg : "0"}
+                value={
+                  values?.originWeighInKg > 0 ? values.originWeighInKg : "0"
+                }
               />
             </Grid>
           )}
@@ -288,11 +316,17 @@ const PksManualEntryTbsIn = (props) => {
               component={TextField}
               sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="BERAT KELUAR - OUT"
               name="originWeighOutKg"
-              value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+              value={
+                values?.originWeighOutKg > 0
+                  ? values.originWeighOutKg.toFixed(2)
+                  : "0.00"
+              }
               inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -308,11 +342,15 @@ const PksManualEntryTbsIn = (props) => {
               component={TextField}
               sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL SEBELUM"
               name="weightNetto"
-              value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+              value={
+                originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"
+              }
               inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -339,7 +377,9 @@ const PksManualEntryTbsIn = (props) => {
               component={TextField}
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL SESUDAH"
               name="weightNetto"

@@ -22,7 +22,13 @@ import { useForm } from "../../../../utils/useForm";
 import { TransactionAPI } from "../../../../apis";
 import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
-import { useAuth, useConfig, useTransaction, useWeighbridge, useApp } from "../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useWeighbridge,
+  useApp,
+} from "../../../../hooks";
 import { useStorageTank } from "../../../../hooks";
 
 const TransactionT30WbInCancel = (props) => {
@@ -42,12 +48,13 @@ const TransactionT30WbInCancel = (props) => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
 
-  const { data: dtStorageTanks } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTanks } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const { values, setValues, handleInputChange } = useForm({
     ...transactionAPI.InitialData,
@@ -123,7 +130,10 @@ const TransactionT30WbInCancel = (props) => {
   }, [wb.weight]);
 
   useEffect(() => {
-    if (values.originWeighInKg < WBMS.WB_MIN_WEIGHT || values.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      values.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      values.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeighNetto(0);
     } else {
       let total = Math.abs(values.originWeighInKg - values.originWeighOutKg);
@@ -131,7 +141,10 @@ const TransactionT30WbInCancel = (props) => {
       setOriginWeighNetto(total);
     }
 
-    if (values.returnWeighInKg < WBMS.WB_MIN_WEIGHT || values.returnWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      values.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      values.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setReturnWeighNetto(0);
     } else {
       let total = Math.abs(values.returnWeighInKg - values.returnWeighOutKg);
@@ -153,9 +166,20 @@ const TransactionT30WbInCancel = (props) => {
 
   let cbRspoScc;
   cbRspoScc = (
-    <FormControl fullWidth size="small" sx={{ mt: 2, backgroundColor: "whitesmoke" }} required>
+    <FormControl
+      fullWidth
+      size="small"
+      sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+      required
+    >
       <InputLabel id="rspoScc">Sertifikasi RSPO</InputLabel>
-      <Select labelId="rspoScc" label="RSPO SCC Model" name="rspoSccModel" disabled value={values?.rspoSccModel || 0}>
+      <Select
+        labelId="rspoScc"
+        label="RSPO SCC Model"
+        name="rspoSccModel"
+        disabled
+        value={values?.rspoSccModel || 0}
+      >
         {dtRspoScc &&
           dtRspoScc.length > 0 &&
           dtRspoScc?.map((data, index) => {
@@ -171,9 +195,20 @@ const TransactionT30WbInCancel = (props) => {
 
   let cbIsccScc;
   cbIsccScc = (
-    <FormControl fullWidth size="small" sx={{ mt: 2, backgroundColor: "whitesmoke" }} required>
+    <FormControl
+      fullWidth
+      size="small"
+      sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+      required
+    >
       <InputLabel id="isccScc">Sertifikasi ISCC</InputLabel>
-      <Select labelId="isccScc" label="Sertifikasi ISCC" name="isccSccModel" disabled value={values?.isccSccModel || 0}>
+      <Select
+        labelId="isccScc"
+        label="Sertifikasi ISCC"
+        name="isccSccModel"
+        disabled
+        value={values?.isccSccModel || 0}
+      >
         {dtIsccScc &&
           dtIsccScc.length > 0 &&
           dtIsccScc?.map((data, index) => {
@@ -214,7 +249,11 @@ const TransactionT30WbInCancel = (props) => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        <Button variant="contained" disabled={!isSubmitted} onClick={handleClose}>
+        <Button
+          variant="contained"
+          disabled={!isSubmitted}
+          onClick={handleClose}
+        >
           TUTUP
         </Button>
       </Box>
@@ -282,7 +321,10 @@ const TransactionT30WbInCancel = (props) => {
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Nama Vendor"
               name="transporterCompanyName"
-              value={`${values?.transporterCompanyName} - ${values?.transporterCompanyCode}` || ""}
+              value={
+                `${values?.transporterCompanyName} - ${values?.transporterCompanyCode}` ||
+                ""
+              }
             />
 
             <Grid container columnSpacing={1}>
@@ -429,7 +471,9 @@ const TransactionT30WbInCancel = (props) => {
                   fullWidth
                   sx={{ backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Berat WB-IN"
                   name="originWeighInKg"
@@ -442,7 +486,9 @@ const TransactionT30WbInCancel = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Berat WB-OUT"
                   name="originWeighOutKg"
@@ -459,7 +505,11 @@ const TransactionT30WbInCancel = (props) => {
                   label="Waktu WB-IN"
                   name="originWeighInTimestamp"
                   disabled
-                  value={moment(values?.originWeighInTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
+                  value={
+                    moment(values?.originWeighInTimestamp)
+                      .local()
+                      .format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"
+                  }
                 />
                 <TextField
                   type="datetime-local"
@@ -470,7 +520,11 @@ const TransactionT30WbInCancel = (props) => {
                   label="Waktu WB-OUT"
                   name="originWeighOutTimestamp"
                   disabled
-                  value={moment(values?.originWeighOutTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
+                  value={
+                    moment(values?.originWeighOutTimestamp)
+                      .local()
+                      .format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"
+                  }
                 />
               </Grid>
             </Grid>
@@ -481,7 +535,9 @@ const TransactionT30WbInCancel = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL"
               name="weightNetto"
@@ -497,7 +553,9 @@ const TransactionT30WbInCancel = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Cancel WB-IN"
                   name="returnWeighInKg"
@@ -510,7 +568,9 @@ const TransactionT30WbInCancel = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Cancel WB-OUT"
                   name="returnWeighOutKg"
@@ -527,7 +587,11 @@ const TransactionT30WbInCancel = (props) => {
                   label="Waktu Cancel WB-IN"
                   name="returnWeighInTimestamp"
                   disabled
-                  value={moment(values?.returnWeighInTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
+                  value={
+                    moment(values?.returnWeighInTimestamp)
+                      .local()
+                      .format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"
+                  }
                 />
                 <TextField
                   type="datetime-local"
@@ -538,7 +602,11 @@ const TransactionT30WbInCancel = (props) => {
                   label="Waktu Cancel WB-OUT"
                   name="returnWeighOutTimestamp"
                   disabled
-                  value={moment(values?.returnWeighOutTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
+                  value={
+                    moment(values?.returnWeighOutTimestamp)
+                      .local()
+                      .format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"
+                  }
                 />
               </Grid>
             </Grid>
@@ -549,7 +617,9 @@ const TransactionT30WbInCancel = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL CANCEL"
               name="weightNetto"
@@ -560,7 +630,10 @@ const TransactionT30WbInCancel = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: isSubmitted ? "whitesmoke" : "white" }}
+              sx={{
+                mt: 2,
+                backgroundColor: isSubmitted ? "whitesmoke" : "white",
+              }}
               multiline
               rows={3}
               label="Catatan Cancel"

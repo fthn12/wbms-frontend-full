@@ -258,7 +258,7 @@ const ReportTransactionPending = () => {
 
   return (
     <Box>
-      <Header title="LAPORAN TRANSAKSI" subtitle="LAPORAN TRANSAKSI" />
+      <Header title="LAPORAN TRANSAKSI PENDING" subtitle="LAPORAN TRANSAKSI PENDING" />
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>

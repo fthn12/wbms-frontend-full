@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Box, Button, MenuItem, CircularProgress, Grid, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  MenuItem,
+  CircularProgress,
+  Grid,
+  Paper,
+} from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
 import { TextField, Select } from "formik-mui";
 import * as yup from "yup";
 import { SiteSelect } from "../../../components/FormikMUI";
-import { SiteSelected } from "../../../components/FormManualEntry";
+import { DestinationSiteSelect } from "../../../components/FormManualEntry";
 
 import Header from "../../../components/layout/signed/Header";
 
@@ -28,7 +35,6 @@ const validationSchema = yup.object().shape({
     .required("Wajib diisi."),
 
   siteId: yup.string().required("Wajib diisi."),
-  siteRefId: yup.string().required("Wajib diisi."),
 
   btSiteCode: yup.string().required("Wajib diisi."),
   btSuffixTrx: yup.string().required("Wajib diisi."),
@@ -39,8 +45,11 @@ const validationSchema = yup.object().shape({
 
   wbPort: yup.number().required("Wajib diisi."),
   wbMinWeight: yup.number().required("Wajib diisi."),
-  wbStablePeriod: yup.number().min(3000, "Minimal 3.000 ms (3s)").required("Wajib diisi."),
-  useWb: yup.boolean().required("Wajib diisi."),
+  wbStablePeriod: yup
+    .number()
+    .min(3000, "Minimal 3.000 ms (3s)")
+    .required("Wajib diisi."),
+  wbStatus: yup.boolean().required("Wajib diisi."),
 
   logErrorToFile: yup.boolean().required("Wajib diisi."),
   logErrorToDB: yup.boolean().required("Wajib diisi."),
@@ -48,12 +57,18 @@ const validationSchema = yup.object().shape({
   logTrxToDB: yup.boolean().required("Wajib diisi."),
 
   eDispatchApiKey: yup.string().required("Wajib diisi."),
-  eDispatchApiUrl1: yup.string().url("Diisi dengan alamat URL yang valid.").required("Wajib diisi."),
-  eDispatchApiUrl2: yup.string().url("Diisi dengan alamat URL yang valid.").required("Wajib diisi."),
+  eDispatchApiUrl1: yup
+    .string()
+    .url("Diisi dengan alamat URL yang valid.")
+    .required("Wajib diisi."),
+  eDispatchApiUrl2: yup
+    .string()
+    .url("Diisi dengan alamat URL yang valid.")
+    .required("Wajib diisi."),
   eDispatchApi: yup.number().required("Wajib diisi."),
 });
 
-const UserCreate = () => {
+const EditConfig = () => {
   const { useGetSitesQuery } = useSite();
   const { data, refetch } = useGetSitesQuery();
   const navigate = useNavigate();
@@ -74,18 +89,18 @@ const UserCreate = () => {
     setIsLoading(true);
 
     try {
-      const selected = data.records.find((item) => item.id === values.siteId);
-
-      if (selected) {
-        editConfig.siteId = selected.id || "";
-        editConfig.siteRefId = selected.refId || "";
+      if (editConfig.wbStatus) {
+        editConfig.wbStatus =
+          editConfig.wbStatus === "true"
+            ? true
+            : editConfig.wbStatus === "false"
+            ? false
+            : undefined;
       }
 
-      if (editConfig.useWb) {
-        editConfig.useWb = editConfig.useWb === "true" ? true : editConfig.useWb === "false" ? false : undefined;
-      }
-
-      const response = await configApi.updateById(editConfig.id, { ...editConfig });
+      const response = await configApi.updateById(editConfig.id, {
+        ...editConfig,
+      });
       localStorage.setItem("res", "success");
       localStorage.setItem("message", "Config Berhasil di Edit.");
     } catch (error) {
@@ -134,7 +149,11 @@ const UserCreate = () => {
     <Box mt={1}>
       <Header title="EDIT CONFIG" subtitle="Edit Config" />
       {openedConfig && (
-        <Formik onSubmit={handleFormikSubmit} initialValues={openedConfig} validationSchema={validationSchema}>
+        <Formik
+          onSubmit={handleFormikSubmit}
+          initialValues={openedConfig}
+          validationSchema={validationSchema}
+        >
           {({ errors }) => {
             return (
               <Form>
@@ -149,13 +168,22 @@ const UserCreate = () => {
                 <Button variant="contained" disabled sx={{ ml: 0.5 }} onClick={() => {}}>
                   HAPUS
                 </Button> */}
-                  <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => navigate("/wb/administration/configs")}>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 0.5 }}
+                    onClick={() => navigate("/wb/administration/configs")}
+                  >
                     BATAL
                   </Button>
                 </Box>
 
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
-                  <Grid container justifyContent="center" spacing={3} sx={{ mt: 1 }}>
+                  <Grid
+                    container
+                    justifyContent="center"
+                    spacing={3}
+                    sx={{ mt: 1 }}
+                  >
                     <Grid item xs={12} sm={6}>
                       <Grid container justifyContent="center" spacing={2}>
                         <Grid item xs={12} sm={6}>
@@ -290,7 +318,7 @@ const UserCreate = () => {
                             size="small"
                             fullWidth
                           />
-                        </Grid>{" "}
+                        </Grid>
                         <Grid item xs={12} sm={6}>
                           <Field
                             name="wbMinWeight"
@@ -316,10 +344,18 @@ const UserCreate = () => {
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <SiteSelect name="siteId" label="Site" isReadOnly={false} />
+                          <SiteSelect
+                            name="siteId"
+                            label="Site"
+                            isReadOnly={false}
+                          />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                          <SiteSelected name="destinationSiteId" label="Site Tujuan" isReadOnly={false} />
+                          <DestinationSiteSelect
+                            name="destinationSiteId"
+                            label="Site Tujuan"
+                            isReadOnly={false}
+                          />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Field
@@ -335,9 +371,9 @@ const UserCreate = () => {
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Field
-                            // id="useWbId"
-                            // labelId="useWbLbl"
-                            name="useWb"
+                            // id="wbStatusId"
+                            // labelId="wbStatusLbl"
+                            name="wbStatus"
                             label="TONASE :"
                             component={Select}
                             size="small"
@@ -535,4 +571,4 @@ const UserCreate = () => {
   );
 };
 
-export default UserCreate;
+export default EditConfig;

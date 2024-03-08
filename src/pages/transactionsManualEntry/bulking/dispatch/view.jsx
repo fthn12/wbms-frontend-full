@@ -17,8 +17,16 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
-import { CertificateSelect, StorageTankSelect } from "../../../../components/FormikMUI";
-import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../components/FormManualEntry";
+import {
+  CertificateSelect,
+  StorageTankSelect,
+} from "../../../../components/FormikMUI";
+import {
+  DriverACP,
+  CompanyACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "../../../../components/FormManualEntry";
 // import BonTripPrintT30 from "../../../../components/BonTripPrint";
 
 import * as eDispatchApi from "../../../../apis/eDispatchApi";
@@ -45,8 +53,13 @@ const LBNManualEntryDispatchView = () => {
   const { wb } = useWeighbridge();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
-    useTransaction();
+  const {
+    openedTransaction,
+    clearWbTransaction,
+    setOpenedTransaction,
+    setWbTransaction,
+    clearOpenedTransaction,
+  } = useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
@@ -62,12 +75,13 @@ const LBNManualEntryDispatchView = () => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
 
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const { useFindManyProductQuery } = useProduct();
 
@@ -122,24 +136,37 @@ const LBNManualEntryDispatchView = () => {
   }, []);
 
   useEffect(() => {
-    if (openedView.originWeighInKg < WBMS.WB_MIN_WEIGHT || openedView.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      openedView.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      openedView.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeightNetto(0);
     } else {
-      let total = Math.abs(openedView.originWeighInKg - openedView.originWeighOutKg);
+      let total = Math.abs(
+        openedView.originWeighInKg - openedView.originWeighOutKg
+      );
       setOriginWeightNetto(total);
     }
 
-    if (openedView.destinationWeighInKg < WBMS.WB_MIN_WEIGHT || openedView.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      openedView.destinationWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      openedView.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setDestinationWeightNetto(0);
     } else {
-      let total = Math.abs(openedView.destinationWeighInKg - openedView.destinationWeighOutKg);
+      let total = Math.abs(
+        openedView.destinationWeighInKg - openedView.destinationWeighOutKg
+      );
       setDestinationWeightNetto(total);
     }
   }, [openedView]);
 
   return (
     <Box>
-      <Header title="Transaksi BULKING" subtitle="Data Timbangan Manual Entry" />
+      <Header
+        title="Transaksi BULKING"
+        subtitle="Data Timbangan Manual Entry"
+      />
       {openedView && (
         <Formik
           // enableReinitialize
@@ -186,7 +213,7 @@ const LBNManualEntryDispatchView = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         formControl={{
@@ -198,7 +225,9 @@ const LBNManualEntryDispatchView = () => {
                         sx={{ backgroundColor: "whitesmoke", mb: 2 }}
                         onChange={(event, newValue) => {
                           handleChange(event);
-                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
                           setSelectedOption(selectedProductType.id);
                         }}
                       >
@@ -218,7 +247,12 @@ const LBNManualEntryDispatchView = () => {
                             isReadOnly={true}
                             sx={{ mb: 2 }}
                           />
-                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mb: 2 }} />
+                          <DriverACP
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mb: 2 }}
+                          />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
@@ -253,7 +287,11 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal1 ? values.currentSeal1 : "-"}
+                                value={
+                                  values?.currentSeal1
+                                    ? values.currentSeal1
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -267,7 +305,11 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal2 ? values.currentSeal2 : "-"}
+                                value={
+                                  values?.currentSeal2
+                                    ? values.currentSeal2
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -281,7 +323,11 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal3 ? values.currentSeal3 : "-"}
+                                value={
+                                  values?.currentSeal3
+                                    ? values.currentSeal3
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -295,7 +341,11 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal4 ? values.currentSeal4 : "-"}
+                                value={
+                                  values?.currentSeal4
+                                    ? values.currentSeal4
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -403,9 +453,14 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator Asal WB-OUT"
-                                value={values?.originWeighOutOperatorName || "-"}
+                                value={
+                                  values?.originWeighOutOperatorName || "-"
+                                }
                                 name="originWeighOutOperatorName"
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -421,7 +476,9 @@ const LBNManualEntryDispatchView = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighInTimestamp
-                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighInTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -439,7 +496,9 @@ const LBNManualEntryDispatchView = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighOutTimestamp
-                                    ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighOutTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -453,11 +512,19 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="BERAT ASAL MASUK - IN"
                                 name="originWeighInKg"
-                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                                value={
+                                  values?.originWeighInKg > 0
+                                    ? values.originWeighInKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -469,11 +536,23 @@ const LBNManualEntryDispatchView = () => {
                                 component={TextField}
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                sx={{
+                                  mt: 2,
+                                  mb: 2,
+                                  backgroundColor: "whitesmoke",
                                 }}
-                                value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                value={
+                                  values?.originWeighOutKg > 0
+                                    ? values.originWeighOutKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 label="BERAT ASAL KELUAR - OUT"
                                 name="originWeighOutKg"
                                 inputProps={{ readOnly: true }}
@@ -489,13 +568,25 @@ const LBNManualEntryDispatchView = () => {
                                 component={TextField}
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                                sx={{
+                                  mt: 2,
+                                  mb: 2,
+                                  backgroundColor: "whitesmoke",
+                                }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="TOTAL ASAL"
                                 name="originweightNetto"
-                                value={originWeightNetto > 0 ? originWeightNetto.toFixed(2) : "0.00"}
+                                value={
+                                  originWeightNetto > 0
+                                    ? originWeightNetto.toFixed(2)
+                                    : "0.00"
+                                }
                               />
                             </Grid>
                           </Grid>
@@ -516,7 +607,9 @@ const LBNManualEntryDispatchView = () => {
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator WB-IN"
                                 name="destinationWeighInOperatorName"
-                                value={values?.destinationWeighInOperatorName || "-"}
+                                value={
+                                  values?.destinationWeighInOperatorName || "-"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -531,7 +624,10 @@ const LBNManualEntryDispatchView = () => {
                                 label="Operator WB-OUT"
                                 value={user.name}
                                 name="destinationWeighOutOperatorName"
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -546,7 +642,9 @@ const LBNManualEntryDispatchView = () => {
                                 name="destinationWeighInTimestamp"
                                 value={
                                   values?.destinationWeighInTimestamp
-                                    ? moment(values.destinationWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.destinationWeighInTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                                 inputProps={{ readOnly: true }}
@@ -576,10 +674,16 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 value={
-                                  values?.destinationWeighInKg > 0 ? values.destinationWeighInKg.toFixed(2) : "0.00"
+                                  values?.destinationWeighInKg > 0
+                                    ? values.destinationWeighInKg.toFixed(2)
+                                    : "0.00"
                                 }
                                 label="BERAT MASUK - IN"
                                 name="destinationWeighInKg"
@@ -596,13 +700,19 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="BERAT KELUAR - OUT"
                                 name="destinationWeighOutKg"
                                 inputProps={{ readOnly: true }}
                                 value={
-                                  values?.destinationWeighOutKg > 0 ? values.destinationWeighOutKg.toFixed(2) : "0.00"
+                                  values?.destinationWeighOutKg > 0
+                                    ? values.destinationWeighOutKg.toFixed(2)
+                                    : "0.00"
                                 }
                               />
                             </Grid>
@@ -619,11 +729,19 @@ const LBNManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="TOTAL"
                                 name="destinationweightNetto"
-                                value={destinationWeightNetto > 0 ? destinationWeightNetto.toFixed(2) : "0.00"}
+                                value={
+                                  destinationWeightNetto > 0
+                                    ? destinationWeightNetto.toFixed(2)
+                                    : "0.00"
+                                }
                               />
                             </Grid>
                             <Grid item xs={12} sx={{ mt: 2 }}>
@@ -641,8 +759,14 @@ const LBNManualEntryDispatchView = () => {
                                 component={TextField}
                                 onChange={(e) => {
                                   const { value } = e.target;
-                                  setFieldValue("destinationWeighInRemark", value);
-                                  setFieldValue("destinationWeighOutRemark", value);
+                                  setFieldValue(
+                                    "destinationWeighInRemark",
+                                    value
+                                  );
+                                  setFieldValue(
+                                    "destinationWeighOutRemark",
+                                    value
+                                  );
                                 }}
                                 variant="outlined"
                                 size="small"

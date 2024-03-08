@@ -17,22 +17,36 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
-import { CertificateSelect, StorageTankSelect } from "../../../../components/FormikMUI";
-import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../components/FormManualEntry";
+import {
+  CertificateSelect,
+  StorageTankSelect,
+} from "../../../../components/FormikMUI";
+import {
+  DriverACP,
+  CompanyACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "../../../../components/FormManualEntry";
 import BonTripPrintT30 from "../../../../components/BontripPrintT30";
 
 import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
 import { TransactionAPI } from "../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useProduct } from "../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useProduct,
+} from "../../../../hooks";
 
 const T30ManualEntryDispatchView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
   const [selectedOption, setSelectedOption] = useState(0);
 
   const { useFindManyProductQuery } = useProduct();
@@ -55,6 +69,11 @@ const T30ManualEntryDispatchView = () => {
     clearOpenedTransaction();
 
     navigate("/wb/transactions");
+  };
+
+  const handleCancel = () => {
+    clearOpenedTransaction();
+    navigate(`/wb/transactions/t30/manual-entry-dispatch-cancel-in/${id}`);
   };
 
   useEffect(() => {
@@ -92,14 +111,19 @@ const T30ManualEntryDispatchView = () => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header
+        title="Transaksi T30"
+        subtitle="Transaksi Manual Entry Timbang WB-OUT"
+      />
       {openedTransaction && (
         <Formik initialValues={openedTransaction}>
           {(props) => {
@@ -109,6 +133,12 @@ const T30ManualEntryDispatchView = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => handleCancel(values)}
+                  >
+                    Cancel Transaksi
+                  </Button>
                   <BonTripPrintT30 dtTrans={{ ...values }} sx={{ mx: 1 }} />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
@@ -141,7 +171,7 @@ const T30ManualEntryDispatchView = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         formControl={{
@@ -153,7 +183,9 @@ const T30ManualEntryDispatchView = () => {
                         sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
-                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
                           setSelectedOption(selectedProductType.id);
                           // setFieldValue("productName", "");
                           // setFieldValue("productId", "");
@@ -191,7 +223,12 @@ const T30ManualEntryDispatchView = () => {
                             isReadOnly={true}
                             sx={{ mb: 2 }}
                           />
-                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mb: 2 }} />
+                          <DriverACP
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mb: 2 }}
+                          />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
@@ -250,7 +287,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.rspoCertificateNumber ? values.rspoCertificateNumber : "-"}
+                                value={
+                                  values?.rspoCertificateNumber
+                                    ? values.rspoCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -275,7 +316,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.isccCertificateNumber ? values.isccCertificateNumber : "-"}
+                                value={
+                                  values?.isccCertificateNumber
+                                    ? values.isccCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -300,7 +345,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.ispoCertificateNumber ? values.ispoCertificateNumber : "-"}
+                                value={
+                                  values?.ispoCertificateNumber
+                                    ? values.ispoCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -339,7 +388,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal1 ? values.currentSeal1 : "-"}
+                                value={
+                                  values?.currentSeal1
+                                    ? values.currentSeal1
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -353,7 +406,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal2 ? values.currentSeal2 : "-"}
+                                value={
+                                  values?.currentSeal2
+                                    ? values.currentSeal2
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -367,7 +424,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal3 ? values.currentSeal3 : "-"}
+                                value={
+                                  values?.currentSeal3
+                                    ? values.currentSeal3
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -381,7 +442,11 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal4 ? values.currentSeal4 : "-"}
+                                value={
+                                  values?.currentSeal4
+                                    ? values.currentSeal4
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -459,9 +524,17 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                                value={
+                                  values?.originFfaPercentage > 0
+                                    ? values.originFfaPercentage
+                                    : "0"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -476,9 +549,17 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                                value={
+                                  values?.originMoistPercentage > 0
+                                    ? values.originMoistPercentage
+                                    : "0"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -493,9 +574,17 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                value={
+                                  values?.originDirtPercentage > 0
+                                    ? values.originDirtPercentage
+                                    : "0"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -518,7 +607,10 @@ const T30ManualEntryDispatchView = () => {
                                 label="Operator WB-IN"
                                 name="originWeighInOperatorName"
                                 value={values?.originWeighInOperatorName || "-"}
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -530,9 +622,14 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 label="Operator WB-OUT"
-                                value={values?.originWeighOutOperatorName || "-"}
+                                value={
+                                  values?.originWeighOutOperatorName || "-"
+                                }
                                 name="originWeighOutOperatorName"
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -548,7 +645,9 @@ const T30ManualEntryDispatchView = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighInTimestamp
-                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighInTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -566,7 +665,9 @@ const T30ManualEntryDispatchView = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighOutTimestamp
-                                    ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighOutTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -580,11 +681,19 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                                value={
+                                  values?.originWeighInKg > 0
+                                    ? values.originWeighInKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -595,11 +704,23 @@ const T30ManualEntryDispatchView = () => {
                                 component={TextField}
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                sx={{
+                                  mt: 2,
+                                  mb: 2,
+                                  backgroundColor: "whitesmoke",
                                 }}
-                                value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                value={
+                                  values?.originWeighOutKg > 0
+                                    ? values.originWeighOutKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 label="BERAT KELUAR - OUT"
                                 name="originWeighOutKg"
                                 inputProps={{ readOnly: true }}
@@ -617,11 +738,19 @@ const T30ManualEntryDispatchView = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="TOTAL"
                                 name="weightNetto"
-                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                                value={
+                                  originWeighNetto > 0
+                                    ? originWeighNetto.toFixed(2)
+                                    : "0.00"
+                                }
                               />
                             </Grid>
                             <Grid item xs={12} sx={{ mt: 2 }}>

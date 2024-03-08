@@ -22,13 +22,19 @@ import { TransactionAPI } from "../apis";
 import { useConfig, useTransaction } from "../hooks";
 import QRCodeViewer from "./QRCodeViewer";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  RangeSelectionModule,
+  RowGroupingModule,
+  RichSelectModule,
+]);
 
 const TransactionGrid = (props) => {
   const navigate = useNavigate();
 
   const { WBMS, PROGRESS_STATUS } = useConfig();
-  const { wbTransaction, setOpenedTransaction, useFindManyTransactionQuery } = useTransaction();
+  const { wbTransaction, setOpenedTransaction, useFindManyTransactionQuery } =
+    useTransaction();
 
   const transactionAPI = TransactionAPI();
 
@@ -55,12 +61,13 @@ const TransactionGrid = (props) => {
       typeSite: WBMS.SITE_TYPE,
       OR: [
         { dtModified: { gte: moment().subtract(3, "hours").format() } },
-        { progressStatus: { in: [1, 2, 6, 11, 35, 36, 37] } },
+        { progressStatus: { in: [1, 2, 6, 11, 20, 35, 36, 37] } },
       ],
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
-  const { data: results, refetch } = useFindManyTransactionQuery(transactionFilter);
+  const { data: results, refetch } =
+    useFindManyTransactionQuery(transactionFilter);
 
   const handleViewClick = async (id, progressStatus, bonTripRef) => {
     try {
@@ -162,10 +169,18 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-out";
         } else if (progressStatus === 6) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out";
+        } else if (progressStatus === 11) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-reject-out";
+        } else if (progressStatus === 20) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
+          urlPath =
+            "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
+        } else if (progressStatus === 31) {
+          urlPath =
+            "/wb/transactions/pks/manual-entry-dispatch-reject-out-view";
         } else if (progressStatus === 35) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
         } else if (progressStatus === 36) {
@@ -191,7 +206,8 @@ const TransactionGrid = (props) => {
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/t30/manual-entry-dispatch-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/t30/manual-entry-dispatch-cancel-out-view";
+          urlPath =
+            "/wb/transactions/t30/manual-entry-dispatch-cancel-out-view";
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/t30/manual-entry-others-out";
         } else if (progressStatus === 42) {
@@ -208,6 +224,8 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks-edispatch-reject-out-manual";
         } else if (progressStatus === 21) {
           urlPath = "/wb/transactions/bulking/manual-entry-dispatch-view";
+        } else if (progressStatus === 31) {
+          urlPath = "/wb/transactions/pks/manual-entry-dispatch-reject-out";
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/bulking/manual-entry-others-out";
         } else if (progressStatus === 42) {
@@ -236,19 +254,31 @@ const TransactionGrid = (props) => {
               deliveryOrderId={params.data.deliveryOrderId}
               type="grid"
             />
-            {(params.data.isManualEntry === 0 || params.data.isManualTonase === 0) && (
-              <IconButton
-                size="small"
-                onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
-              >
-                <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            )}
-            {(params.data.isManualEntry === 1 || params.data.isManualTonase === 1) && (
+            {params.data.isManualEntry === 0 &&
+              params.data.isManualTonase === 0 && (
+                <IconButton
+                  size="small"
+                  onClick={() =>
+                    handleViewClick(
+                      params.data.id,
+                      params.data.progressStatus,
+                      params.data.bonTripRef
+                    )
+                  }
+                >
+                  <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
+            {(params.data.isManualEntry === 1 ||
+              params.data.isManualTonase === 1) && (
               <IconButton
                 size="small"
                 onClick={() =>
-                  handleManualEntryClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)
+                  handleManualEntryClick(
+                    params.data.id,
+                    params.data.progressStatus,
+                    params.data.bonTripRef
+                  )
                 }
               >
                 <PlagiarismIcon sx={{ fontSize: 18 }} />
@@ -265,7 +295,8 @@ const TransactionGrid = (props) => {
   };
 
   const dateFormatter = (params) => {
-    if (params.data) return moment(params.value).format("DD MMM YYYY").toUpperCase();
+    if (params.data)
+      return moment(params.value).format("DD MMM YYYY").toUpperCase();
   };
 
   const timeFormatter = (params) => {
@@ -280,9 +311,14 @@ const TransactionGrid = (props) => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.originWeighInKg - params.data.originWeighOutKg);
+      netto = Math.abs(
+        params.data.originWeighInKg - params.data.originWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -290,9 +326,14 @@ const TransactionGrid = (props) => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.returnWeighInKg - params.data.returnWeighOutKg);
+      netto = Math.abs(
+        params.data.returnWeighInKg - params.data.returnWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -310,7 +351,12 @@ const TransactionGrid = (props) => {
     },
     { headerName: "NO BONTRIP", field: "bonTripNo", hide: true },
     { headerName: "NOPOL", field: "transportVehiclePlateNo", maxWidth: 95 },
-    { headerName: "NAMA SUPIR", field: "driverName", maxWidth: 130, cellStyle: { textAlign: "center" } },
+    {
+      headerName: "NAMA SUPIR",
+      field: "driverName",
+      maxWidth: 130,
+      cellStyle: { textAlign: "center" },
+    },
     {
       headerName: "STATUS",
       field: "progressStatus",
@@ -319,10 +365,30 @@ const TransactionGrid = (props) => {
       rowGroup: true,
       hide: true,
     },
-    { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115, cellStyle: { textAlign: "center" } },
-    { headerName: "PRODUK", field: "productName", maxWidth: 140, cellStyle: { textAlign: "center" } },
-    { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 80, cellStyle: { textAlign: "right" } },
-    { headerName: "WB-OUT", field: "originWeighOutKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "NO DO",
+      field: "deliveryOrderNo",
+      maxWidth: 115,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "PRODUK",
+      field: "productName",
+      maxWidth: 140,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "WB-IN",
+      field: "originWeighInKg",
+      maxWidth: 80,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "WB-OUT",
+      field: "originWeighOutKg",
+      maxWidth: 90,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "NETTO",
       field: "id",
@@ -330,8 +396,18 @@ const TransactionGrid = (props) => {
       cellStyle: { textAlign: "right" },
       valueFormatter: originNettoFormatter,
     },
-    { headerName: "RJCT-IN", field: "returnWeighInKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
-    { headerName: "RJCT-OUT", field: "returnWeighOutKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "RJCT-IN",
+      field: "returnWeighInKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "RJCT-OUT",
+      field: "returnWeighOutKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "RJCT NETTO",
       field: "id",
@@ -376,7 +452,7 @@ const TransactionGrid = (props) => {
       minWidth: "200",
       // flex: 1,
     }),
-    [],
+    []
   );
 
   useEffect(() => {
@@ -392,7 +468,11 @@ const TransactionGrid = (props) => {
   return (
     <Box
       className="ag-theme-balham"
-      sx={{ "& .ag-header-cell-label": { justifyContent: "center" }, width: "auto", height: "71.5vh" }}
+      sx={{
+        "& .ag-header-cell-label": { justifyContent: "center" },
+        width: "auto",
+        height: "71.5vh",
+      }}
     >
       <AgGridReact
         rowData={results?.records} // Row Data for Rows

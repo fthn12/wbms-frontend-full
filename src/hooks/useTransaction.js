@@ -1,7 +1,10 @@
 import { useSelector, useDispatch } from "react-redux";
 
 import * as transactionRedux from "../slices/transaction/transactionSlice";
-import { useFindManyTransactionQuery } from "../slices/transaction/transactionSliceApi";
+import {
+  useFindManyTransactionQuery,
+  useEDispatchTransactionMdispatchMutation,
+} from "../slices/transaction/transactionSliceApi";
 
 import { useWeighbridge } from "./useWeighbridge";
 
@@ -10,7 +13,9 @@ export const useTransaction = () => {
 
   const { setWb } = useWeighbridge();
 
-  const { wbTransaction, openedTransaction } = useSelector((state) => state.transaction);
+  const { wbTransaction, openedTransaction } = useSelector(
+    (state) => state.transaction
+  );
 
   const setWbTransaction = (values) => {
     dispatch(transactionRedux.setWbTransaction(values));
@@ -40,5 +45,6 @@ export const useTransaction = () => {
     setOpenedTransaction,
     clearOpenedTransaction,
     useFindManyTransactionQuery,
+    useEDispatchTransactionMdispatchMutation,
   };
 };

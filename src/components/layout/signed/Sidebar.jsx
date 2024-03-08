@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Avatar, Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Sidebar as SidebarPS, Menu, SubMenu, MenuItem, menuClasses } from "react-pro-sidebar";
+import {
+  Sidebar as SidebarPS,
+  Menu,
+  SubMenu,
+  MenuItem,
+  menuClasses,
+} from "react-pro-sidebar";
 
 import { colorTokens, useAuth, useApp, useConfig } from "../../../hooks";
 
@@ -22,9 +28,11 @@ import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import TopicOutlinedIcon from "@mui/icons-material/TopicOutlined";
 import ArrowRightOutlinedIcon from "@mui/icons-material/ArrowRightOutlined";
 import DragHandleOutlinedIcon from "@mui/icons-material/DragHandleOutlined";
+import DvrOutlinedIcon from "@mui/icons-material/DvrOutlined";
+import LibraryAddCheckOutlinedIcon from "@mui/icons-material/LibraryAddCheckOutlined";
 import DisplaySettingsOutlinedIcon from "@mui/icons-material/DisplaySettingsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import DvrOutlinedIcon from '@mui/icons-material/DvrOutlined';
+import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 
 // hex to rgba converter
 // pakai rgba agar bisa set transparansi
@@ -38,7 +46,12 @@ const hexToRgba = (hex, alpha) => {
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   return (
-    <MenuItem active={selected === title} onClick={() => setSelected(title)} icon={icon} component={<Link to={to} />}>
+    <MenuItem
+      active={selected === title}
+      onClick={() => setSelected(title)}
+      icon={icon}
+      component={<Link to={to} />}
+    >
       {title}
     </MenuItem>
   );
@@ -131,7 +144,8 @@ const Sidebar = () => {
     root: {
       fontSize: "13px",
       fontWeight: 600,
-      backgroundColor: themes[theme.palette.mode].menu.menuContent.backgroundColor,
+      backgroundColor:
+        themes[theme.palette.mode].menu.menuContent.backgroundColor,
       color: themes[theme.palette.mode].menu.menuContent.color,
       // padding: "5px 35px 5px 20px",
     },
@@ -148,7 +162,8 @@ const Sidebar = () => {
       color: themes[theme.palette.mode].menu.menuContent.color,
     },
     subMenuContent: ({ level }) => ({
-      backgroundColor: themes[theme.palette.mode].menu.submenuContent.backgroundColor,
+      backgroundColor:
+        themes[theme.palette.mode].menu.submenuContent.backgroundColor,
     }),
     button: {
       [`&.${menuClasses.disabled}`]: {
@@ -160,7 +175,10 @@ const Sidebar = () => {
         fontWeight: 600,
       },
       "&:hover": {
-        backgroundColor: hexToRgba(themes[theme.palette.mode].menu.hover.backgroundColor, 1),
+        backgroundColor: hexToRgba(
+          themes[theme.palette.mode].menu.hover.backgroundColor,
+          1
+        ),
         color: themes[theme.palette.mode].menu.hover.color,
       },
     },
@@ -181,7 +199,10 @@ const Sidebar = () => {
         onBackdropClick={() => setToggled(false)}
         onBreakPoint={setBroken}
         breakPoint="md"
-        backgroundColor={hexToRgba(themes[theme.palette.mode].sidebar.backgroundColor, 1)}
+        backgroundColor={hexToRgba(
+          themes[theme.palette.mode].sidebar.backgroundColor,
+          1
+        )}
         // backgroundColor={theme.palette.neutral.light}
         rootStyles={{
           color: themes[theme.palette.mode].sidebar.color,
@@ -209,16 +230,29 @@ const Sidebar = () => {
 
           <Box sx={styles.avatarContainer}>
             {/* <Box display="flex" justifyContent="center" alignItems="center"> */}
-            <Avatar src={require("../../../assets/images/photo/profile.png")} sx={styles.avatar}>
+            <Avatar
+              src={require("../../../assets/images/photo/profile.png")}
+              sx={styles.avatar}
+            >
               SN
             </Avatar>
             {/* </Box> */}
             {!sidebar.isCollapsed && (
               <Box textAlign="center">
-                <Typography variant="h3" color={colors.grey[400]} fontWeight="bold" sx={{ m: "10px 0 0 0" }}>
+                <Typography
+                  variant="h3"
+                  color={colors.grey[400]}
+                  fontWeight="bold"
+                  sx={{ m: "10px 0 0 0" }}
+                >
                   {user.name}
                 </Typography>
-                <Typography variant="body2" color={colors.grey[500]} fontWeight={600} letterSpacing="0.5px">
+                <Typography
+                  variant="body2"
+                  color={colors.grey[500]}
+                  fontWeight={600}
+                  letterSpacing="0.5px"
+                >
                   {`${user.position} - ${user.division}`}
                 </Typography>
               </Box>
@@ -261,7 +295,6 @@ const Sidebar = () => {
                 setSelected={setSelected}
               />
             )}
-
             {/* <Item
               title="Approval Request"
               to="#"
@@ -269,6 +302,43 @@ const Sidebar = () => {
               selected={sidebar.selected}
               setSelected={setSelected}
             /> */}
+            <SubMenu label="Transaksi Manual" icon={<ListAltOutlinedIcon />}>
+              <Item
+                title="Transaksi Pending"
+                to="transactions-manual-pending"
+                icon={<ArrowRightOutlinedIcon />}
+                selected={sidebar.selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Transaksi Complete"
+                to="transactions-manual-complete"
+                icon={<ArrowRightOutlinedIcon />}
+                selected={sidebar.selected}
+                setSelected={setSelected}
+              />
+            </SubMenu>
+            {(user.role === 5 || user.role === 6) && (
+              <SubMenu
+                label="Setujui Transaksi"
+                icon={<LibraryAddCheckOutlinedIcon />}
+              >
+                <Item
+                  title="Transaksi Pending"
+                  to="approve/transactions-manual-pending"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="Transaksi Complete"
+                  to="approve/transactions-manual-complete"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+              </SubMenu>
+            )}
             <SubMenu label="Laporan" icon={<BarChartOutlinedIcon />}>
               <Item
                 title="Transaksi Harian"
@@ -277,13 +347,13 @@ const Sidebar = () => {
                 selected={sidebar.selected}
                 setSelected={setSelected}
               />
-              <Item
+              {/* <Item
                 title="Transaksi Pending"
                 to="reports/transactions-pending"
                 icon={<ArrowRightOutlinedIcon />}
                 selected={sidebar.selected}
                 setSelected={setSelected}
-              />
+              /> */}
             </SubMenu>
             {(user.role === 5 || user.role === 6) && (
               <SubMenu label="Master Data" icon={<TopicOutlinedIcon />}>
@@ -361,11 +431,20 @@ const Sidebar = () => {
                   selected={sidebar.selected}
                   setSelected={setSelected}
                 />
+                 <Item
+                  title="KERNEL"
+                  to="kualitas/kernel"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
               </SubMenu>
             )}
-
             {(user.role === 5 || user.role === 6) && (
-              <SubMenu label="Administrasi" icon={<DisplaySettingsOutlinedIcon />}>
+              <SubMenu
+                label="Administrasi"
+                icon={<DisplaySettingsOutlinedIcon />}
+              >
                 <Item
                   title="Config"
                   to="/wb/administration/configs/1"

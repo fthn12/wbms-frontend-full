@@ -4,6 +4,14 @@ const API_URL = "/transactions";
 
 export const transactionApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    eDispatchTransactionMdispatch: builder.mutation({
+      query: () => ({
+        url: `${API_URL}/mdispatch-submit-all`,
+        method: "POST",
+      }),
+      invalidatesTags: ["transaction"],
+    }),
+
     findManyTransaction: builder.query({
       query: (data) => ({
         url: `${API_URL}/find-many`,
@@ -16,4 +24,7 @@ export const transactionApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useFindManyTransactionQuery } = transactionApiSlice;
+export const {
+  useFindManyTransactionQuery,
+  useEDispatchTransactionMdispatchMutation,
+} = transactionApiSlice;

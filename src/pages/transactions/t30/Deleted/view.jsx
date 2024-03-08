@@ -3,7 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
-import { Button, TextField as TextFieldMUI, InputAdornment } from "@mui/material";
+import {
+  Button,
+  TextField as TextFieldMUI,
+  InputAdornment,
+} from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
 import { TextField } from "formik-mui";
@@ -42,18 +46,20 @@ const TransactionT30Deleted = (props) => {
   const { user } = useAuth();
   const { WBMS, SCC_MODEL } = useConfig();
   const { urlPrev, setUrlPrev } = useApp();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
 
   const T30Site = eDispatchApi.getT30Site();
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
@@ -84,7 +90,9 @@ const TransactionT30Deleted = (props) => {
     setIsLoading(true);
 
     try {
-      const selected = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selected = dtStorageTank.records.find(
+        (item) => item.id === values.originSourceStorageTankId
+      );
 
       if (selected) {
         tempTrans.originSourceStorageTankCode = selected.code || "";
@@ -96,7 +104,9 @@ const TransactionT30Deleted = (props) => {
         tempTrans.isDeleted = true;
       }
 
-      const response = await transactionAPI.updateById(tempTrans.id, { ...tempTrans });
+      const response = await transactionAPI.updateById(tempTrans.id, {
+        ...tempTrans,
+      });
 
       if (!response.status) throw new Error(response?.message);
 
@@ -140,7 +150,9 @@ const TransactionT30Deleted = (props) => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
@@ -156,7 +168,14 @@ const TransactionT30Deleted = (props) => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, dirty, isValid, submitForm, resetForm, setFieldValue } = props;
+            const {
+              values,
+              dirty,
+              isValid,
+              submitForm,
+              resetForm,
+              setFieldValue,
+            } = props;
             // console.log("Formik props:", props)
 
             const handleSubmit = async () => {
@@ -170,7 +189,9 @@ const TransactionT30Deleted = (props) => {
 
             const handleDelete = (deleteReason) => {
               if (deleteReason.trim().length <= 10)
-                return toast.error("Alasan HAPUS TRANSAKSI harus melebihi 10 karakter");
+                return toast.error(
+                  "Alasan HAPUS TRANSAKSI harus melebihi 10 karakter"
+                );
 
               setFieldValue("originWeighInRemark", deleteReason);
               setIsDelete(true);
@@ -196,7 +217,11 @@ const TransactionT30Deleted = (props) => {
                   >
                     {isReadOnly ? "EDIT" : "SIMPAN"}
                   </Button> */}
-                  <Button variant="contained" sx={{ ml: 1 }} onClick={handleReset}>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleReset}
+                  >
                     {isReadOnly ? "TUTUP" : "BATAL EDIT"}
                   </Button>
                 </Box>
@@ -238,7 +263,12 @@ const TransactionT30Deleted = (props) => {
                           />
                         </Grid>
                         <Grid item xs={6}>
-                          <DriverAC name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mt: 2 }} />
+                          <DriverAC
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
                         </Grid>
 
                         <Grid item xs={6}>
@@ -577,8 +607,10 @@ const TransactionT30Deleted = (props) => {
                             isRequired={true}
                             isReadOnly={isReadOnly}
                             sx={{ mt: 1 }}
-                            backgroundColor={isReadOnly ? "whitesmoke" : "lightyellow"}
-                            siteId={T30Site.id}
+                            backgroundColor={
+                              isReadOnly ? "whitesmoke" : "lightyellow"
+                            }
+                            siteId={WBMS.SITE.refId}
                           />
                         </Grid>
                         {/* <Grid item xs={12}>
@@ -589,7 +621,7 @@ const TransactionT30Deleted = (props) => {
                             isReadOnly={false}
                             sx={{ mt: 1 }}
                             backgroundColor="white"
-                            siteId={T30Site.id}
+                            siteId={WBMS.SITE.refId}
                           />
                         </Grid> */}
                         <Grid item xs={12}>
@@ -602,7 +634,10 @@ const TransactionT30Deleted = (props) => {
                             sx={{
                               mt: 2,
                               backgroundColor: "transparent",
-                              input: { cursor: "default", borderColor: "transparent" },
+                              input: {
+                                cursor: "default",
+                                borderColor: "transparent",
+                              },
                               "& .MuiOutlinedInput-root": {
                                 "& fieldset": {
                                   borderColor: "transparent",
@@ -634,9 +669,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originFfaPercentage > 0 ? values.originFfaPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originFfaPercentage > 0
+                                ? values.originFfaPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -651,9 +694,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originMoistPercentage > 0 ? values.originMoistPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originMoistPercentage > 0
+                                ? values.originMoistPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -668,9 +719,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originDirtPercentage > 0 ? values.originDirtPercentage.toFixed(2) : "0.00"}
+                            value={
+                              values?.originDirtPercentage > 0
+                                ? values.originDirtPercentage.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -694,9 +753,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -711,9 +778,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -728,9 +803,17 @@ const TransactionT30Deleted = (props) => {
                             fullWidth
                             sx={{ mt: 1, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -763,7 +846,9 @@ const TransactionT30Deleted = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -797,7 +882,9 @@ const TransactionT30Deleted = (props) => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutTimestamp
-                                ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />

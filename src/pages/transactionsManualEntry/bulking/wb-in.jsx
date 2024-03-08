@@ -11,7 +11,12 @@ import {
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
-import { DriverACP, TransportVehicleACP, CompanyACP, ProductACP } from "components/FormManualEntry";
+import {
+  DriverACP,
+  TransportVehicleACP,
+  CompanyACP,
+  ProductACP,
+} from "components/FormManualEntry";
 import { TextField, Autocomplete, Select } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -41,7 +46,8 @@ const BulkingManualEntryWBIn = () => {
   const { wb } = useWeighbridge();
   const { user } = useAuth();
   const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { setWbTransaction, wbTransaction, clearOpenedTransaction } = useTransaction();
+  const { setWbTransaction, wbTransaction, clearOpenedTransaction } =
+    useTransaction();
   const { useGetCompaniesQuery } = useCompany();
   const { useFindManyProductQuery } = useProduct();
   const { useGetSitesQuery } = useSite();
@@ -68,7 +74,6 @@ const BulkingManualEntryWBIn = () => {
     transporterCompanyName: Yup.string().required("Wajib diisi"),
     productName: Yup.string().required("Wajib diisi"),
     driverName: Yup.string().required("Wajib diisi"),
-    
   });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
@@ -82,7 +87,8 @@ const BulkingManualEntryWBIn = () => {
     orderBy: [{ name: "asc" }],
   };
 
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -95,14 +101,20 @@ const BulkingManualEntryWBIn = () => {
 
     setIsLoading(true);
     try {
-      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.destinationSinkStorageTankId);
+      const selectedStorageTank = dtStorageTank.records.find(
+        (item) => item.id === values.destinationSinkStorageTankId
+      );
 
       if (selectedStorageTank) {
-        tempTrans.destinationSinkStorageTankCode = selectedStorageTank.code || "";
-        tempTrans.destinationSinkStorageTankName = selectedStorageTank.name || "";
+        tempTrans.destinationSinkStorageTankCode =
+          selectedStorageTank.code || "";
+        tempTrans.destinationSinkStorageTankName =
+          selectedStorageTank.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
+      const selectedDestinationSite = dtSite.records.find(
+        (item) => item.id === WBMS.SITE.id
+      );
 
       if (selectedDestinationSite) {
         tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -110,7 +122,7 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
-      if (WBMS.USE_WB === true) {
+      if (WBMS.WB_STATUS === true) {
         tempTrans.destinationWeighInKg = wb.weight;
       }
 
@@ -154,7 +166,7 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.npb = tempTrans.npb.toUpperCase();
       }
 
-      if (WBMS.USE_WB === true) {
+      if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
       }
       tempTrans.typeTransaction = 4;
@@ -182,12 +194,19 @@ const BulkingManualEntryWBIn = () => {
   };
 
   useEffect(() => {
-    setWbTransaction({ bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format("YYMMDDHHmmss")}` });
+    setWbTransaction({
+      bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format(
+        "YYMMDDHHmmss"
+      )}`,
+    });
   }, []);
 
   return (
     <Box>
-      <Header title="Transaksi Bulking" subtitle="Transaksi Manual Entry WB-IN" />
+      <Header
+        title="Transaksi Bulking"
+        subtitle="Transaksi Manual Entry Timbang Masuk"
+      />
       {wbTransaction && (
         <Formik
           enableReinitialize
@@ -203,7 +222,14 @@ const BulkingManualEntryWBIn = () => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, isValid, dirty, submitForm, setFieldValue, handleChange } = props;
+            const {
+              values,
+              isValid,
+              dirty,
+              submitForm,
+              setFieldValue,
+              handleChange,
+            } = props;
             // console.log("Formik props:", props);
 
             const handleOtrSubmit = () => {
@@ -212,10 +238,12 @@ const BulkingManualEntryWBIn = () => {
 
             const handleDspSubmit = (normalReason) => {
               if (normalReason.trim().length <= 10)
-                return toast.error("Alasan (MANUAL ENTRY) harus melebihi 10 karakter.");
+                return toast.error(
+                  "Alasan (MANUAL ENTRY) harus melebihi 10 karakter."
+                );
 
-                setFieldValue("destinationWeighInRemark", normalReason);
-                setFieldValue("destinationWeighOutRemark", normalReason);
+              setFieldValue("destinationWeighInRemark", normalReason);
+              setFieldValue("destinationWeighOutRemark", normalReason);
 
               submitForm();
             };
@@ -223,43 +251,69 @@ const BulkingManualEntryWBIn = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                {selectedOption === 1 && WBMS.USE_WB === true && (
+                  {selectedOption === 1 && WBMS.WB_STATUS === true && (
                     <ManualEntryConfirmation
                       title="Alasan (MANUAL ENTRY)"
                       caption="SIMPAN"
                       content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleDspSubmit}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty
+                        )
+                      }
                       sx={{ mr: 1 }}
                       variant="contained"
                     />
                   )}
-                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                  {selectedOption === 1 && WBMS.WB_STATUS === false && (
                     <ManualEntryConfirmation
                       title="Alasan (MANUAL ENTRY)"
                       caption="SIMPAN"
                       content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleDspSubmit}
-                      isDisabled={!(isValid && dirty && values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT)}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
                       sx={{ mr: 1 }}
                       variant="contained"
                     />
                   )}
-                  {selectedOption === 4 && WBMS.USE_WB === true && (
+                  {selectedOption === 4 && WBMS.WB_STATUS === true && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT && dirty)}
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
+                          dirty
+                        )
+                      }
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
                     </Button>
                   )}
-                  {selectedOption === 4 && WBMS.USE_WB === false && (
+                  {selectedOption === 4 && WBMS.WB_STATUS === false && (
                     <Button
                       variant="contained"
                       sx={{ mr: 1 }}
-                      disabled={!(isValid && dirty && values.originWeighInKg > WBMS.WB_MIN_WEIGHT)}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.originWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
                       onClick={() => handleOtrSubmit()}
                     >
                       SIMPAN
@@ -300,7 +354,7 @@ const BulkingManualEntryWBIn = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         formControl={{
@@ -311,7 +365,9 @@ const BulkingManualEntryWBIn = () => {
                         sx={{ mb: 2 }}
                         onChange={(event, newValue) => {
                           handleChange(event);
-                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
                           setSelectedOption(selectedProductType.id);
                         }}
                       >
@@ -331,7 +387,12 @@ const BulkingManualEntryWBIn = () => {
                             isReadOnly={false}
                             sx={{ mb: 2 }}
                           />
-                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mb: 2 }} />
+                          <DriverACP
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={false}
+                            sx={{ mb: 2 }}
+                          />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
@@ -357,10 +418,15 @@ const BulkingManualEntryWBIn = () => {
                             fullWidth
                             freeSolo
                             disableClearable
-                            options={dtTransport?.records.map((record) => record.plateNo)}
+                            options={dtTransport?.records.map(
+                              (record) => record.plateNo
+                            )}
                             onInputChange={(event, InputValue, reason) => {
                               if (reason !== "reset") {
-                                setFieldValue("transportVehiclePlateNo", InputValue.toUpperCase());
+                                setFieldValue(
+                                  "transportVehiclePlateNo",
+                                  InputValue.toUpperCase()
+                                );
                               }
                             }}
                             renderInput={(params) => (
@@ -382,15 +448,30 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             fullWidth
                             options={dtCompany?.records || []}
-                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
+                            getOptionLabel={(option) =>
+                              `[${option.code}] - ${option.name}`
+                            }
                             value={
-                              (values && dtCompany?.records?.find((item) => item.id === values.transporterCompanyId)) ||
+                              (values &&
+                                dtCompany?.records?.find(
+                                  (item) =>
+                                    item.id === values.transporterCompanyId
+                                )) ||
                               null
                             }
                             onChange={(event, newValue) => {
-                              setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
-                              setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
-                              setFieldValue("transporterCompanyCode", newValue ? newValue.code : "");
+                              setFieldValue(
+                                "transporterCompanyId",
+                                newValue ? newValue.id : ""
+                              );
+                              setFieldValue(
+                                "transporterCompanyName",
+                                newValue ? newValue.name : ""
+                              );
+                              setFieldValue(
+                                "transporterCompanyCode",
+                                newValue ? newValue.code : ""
+                              );
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI
@@ -408,15 +489,38 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             fullWidth
                             options={dtProduct?.records || []}
-                            getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                            value={(values && dtProduct?.records?.find((item) => item.id === values.productId)) || null}
+                            getOptionLabel={(option) =>
+                              `[${option.code}] - ${option.name}`
+                            }
+                            value={
+                              (values &&
+                                dtProduct?.records?.find(
+                                  (item) => item.id === values.productId
+                                )) ||
+                              null
+                            }
                             onChange={(event, newValue) => {
-                              setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
+                              setFieldValue(
+                                "transportVehicleProductName",
+                                newValue ? newValue.name : ""
+                              );
 
-                              setFieldValue("transportVehicleProductCode", newValue ? newValue.code : "");
-                              setFieldValue("productName", newValue ? newValue.name : "");
-                              setFieldValue("productId", newValue ? newValue.id : "");
-                              setFieldValue("productCode", newValue ? newValue.code : "");
+                              setFieldValue(
+                                "transportVehicleProductCode",
+                                newValue ? newValue.code : ""
+                              );
+                              setFieldValue(
+                                "productName",
+                                newValue ? newValue.name : ""
+                              );
+                              setFieldValue(
+                                "productId",
+                                newValue ? newValue.id : ""
+                              );
+                              setFieldValue(
+                                "productCode",
+                                newValue ? newValue.code : ""
+                              );
                             }}
                             renderInput={(params) => (
                               <TextFieldMUI
@@ -433,13 +537,17 @@ const BulkingManualEntryWBIn = () => {
                     </Grid>
                     {/* Dispatch */}
 
-                    {selectedOption === 1 && <Dispatch setFieldValue={setFieldValue} values={values} />}
+                    {selectedOption === 1 && (
+                      <Dispatch setFieldValue={setFieldValue} values={values} />
+                    )}
 
                     {/* TBS */}
                     {/* {selectedOption === "Tbs" && <TBS setFieldValue={setFieldValue} values={values} />}
 
                     {/* Others*/}
-                    {selectedOption === 4 && <OTHERS setFieldValue={setFieldValue} values={values} />}
+                    {selectedOption === 4 && (
+                      <OTHERS setFieldValue={setFieldValue} values={values} />
+                    )}
 
                     {/* KERNEL*/}
                     {/* {selectedOption === "Kernel" && <KERNEL setFieldValue={setFieldValue} values={values} />} */}

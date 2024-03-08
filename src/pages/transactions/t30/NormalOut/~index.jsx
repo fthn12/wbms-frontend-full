@@ -22,7 +22,13 @@ import { useForm } from "../../../../utils/useForm";
 import { TransactionAPI } from "../../../../apis";
 import * as eDispatchApi from "../../../../apis/eDispatchApi";
 
-import { useAuth, useConfig, useTransaction, useWeighbridge, useApp } from "../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useWeighbridge,
+  useApp,
+} from "../../../../hooks";
 import { useStorageTank } from "../../../../hooks";
 
 const TransactionT30WbOutNormal = (props) => {
@@ -42,12 +48,13 @@ const TransactionT30WbOutNormal = (props) => {
 
   const storageTankFilter = {
     where: {
-      OR: [{ siteId: T30Site.id }, { siteRefId: T30Site.id }],
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
       refType: 1,
     },
   };
 
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const { values, setValues, handleInputChange } = useForm({
     ...transactionAPI.InitialData,
@@ -71,7 +78,9 @@ const TransactionT30WbOutNormal = (props) => {
     let tempTrans = { ...values };
 
     try {
-      const selected = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selected = dtStorageTank.records.find(
+        (item) => item.id === values.originSourceStorageTankId
+      );
 
       if (selected) {
         tempTrans.originSourceStorageTankCode = selected.code || "";
@@ -111,9 +120,12 @@ const TransactionT30WbOutNormal = (props) => {
     try {
       let cancelReason = prompt("Alasan Cancel", "");
 
-      if (cancelReason.trim().length <= 10) return toast.warning("Alasan cancel harus melebihi 10 karakter");
+      if (cancelReason.trim().length <= 10)
+        return toast.warning("Alasan cancel harus melebihi 10 karakter");
 
-      const selected = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selected = dtStorageTank.records.find(
+        (item) => item.id === values.originSourceStorageTankId
+      );
 
       if (selected) {
         tempTrans.originSourceStorageTankCode = selected.code || "";
@@ -173,11 +185,16 @@ const TransactionT30WbOutNormal = (props) => {
   }, [wb.weight]);
 
   useEffect(() => {
-    if (values.originWeighInKg < WBMS.WB_MIN_WEIGHT || values.originWeighOutKg < WBMS.WB_MIN_WEIGHT) {
+    if (
+      values.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      values.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
       setOriginWeightNetto(0);
     } else {
       let total =
-        Math.abs(values.originWeighInKg - values.originWeighOutKg) - values.potonganWajib - values.potonganLain;
+        Math.abs(values.originWeighInKg - values.originWeighOutKg) -
+        values.potonganWajib -
+        values.potonganLain;
       setOriginWeightNetto(total);
     }
   }, [values]);
@@ -265,7 +282,9 @@ const TransactionT30WbOutNormal = (props) => {
         onChange={(e) => {
           handleInputChange(e);
 
-          let selected = dtStorageTank?.records?.find((item) => item.id === e.target.value);
+          let selected = dtStorageTank?.records?.find(
+            (item) => item.id === e.target.value
+          );
 
           if (selected) {
             setValues((prev) => {
@@ -292,7 +311,11 @@ const TransactionT30WbOutNormal = (props) => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        <Button variant="contained" disabled={!isSubmitted} onClick={handleClose}>
+        <Button
+          variant="contained"
+          disabled={!isSubmitted}
+          onClick={handleClose}
+        >
           TUTUP
         </Button>
       </Box>
@@ -360,7 +383,10 @@ const TransactionT30WbOutNormal = (props) => {
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               label="Nama Vendor"
               name="transporterCompanyName"
-              value={`${values?.transporterCompanyName} - ${values?.transporterCompanyCode}` || ""}
+              value={
+                `${values?.transporterCompanyName} - ${values?.transporterCompanyCode}` ||
+                ""
+              }
             />
 
             <Grid container columnSpacing={1}>
@@ -523,7 +549,9 @@ const TransactionT30WbOutNormal = (props) => {
                   fullWidth
                   sx={{ backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Berat Timbang Masuk"
                   name="originWeighInKg"
@@ -536,7 +564,9 @@ const TransactionT30WbOutNormal = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Berat Timbang Keluar"
                   name="originWeighOutKg"
@@ -553,7 +583,11 @@ const TransactionT30WbOutNormal = (props) => {
                   label="Waktu Timbang Masuk"
                   name="originWeighInTimestamp"
                   disabled
-                  value={moment(values?.originWeighInTimestamp).local().format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"}
+                  value={
+                    moment(values?.originWeighInTimestamp)
+                      .local()
+                      .format(`yyyy-MM-DD[T]HH:mm:ss`) || "-"
+                  }
                 />
                 <TextField
                   type="datetime-local"
@@ -577,7 +611,9 @@ const TransactionT30WbOutNormal = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Potongan Wajib Vendor"
                   name="potonganWajib"
@@ -592,7 +628,9 @@ const TransactionT30WbOutNormal = (props) => {
                   fullWidth
                   sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">kg</InputAdornment>
+                    ),
                   }}
                   label="Potongan Lainnya"
                   name="potonganLain"
@@ -607,7 +645,9 @@ const TransactionT30WbOutNormal = (props) => {
               fullWidth
               sx={{ mt: 2, backgroundColor: "whitesmoke" }}
               InputProps={{
-                endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">kg</InputAdornment>
+                ),
               }}
               label="TOTAL"
               name="weightNetto"

@@ -17,9 +17,18 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import CancelConfirmation from "components/CancelConfirmation";
+import ManualEntryConfirmation from "components/ManualEntryConfirmation";
 import Header from "../../../../../components/layout/signed/HeaderTransaction";
-import { CertificateSelect, StorageTankSelect } from "../../../../../components/FormikMUI";
-import { DriverACP, CompanyACP, ProductACP, TransportVehicleACP } from "../../../../../components/FormManualEntry";
+import {
+  CertificateSelect,
+  StorageTankSelect,
+} from "../../../../../components/FormikMUI";
+import {
+  DriverACP,
+  CompanyACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "../../../../../components/FormManualEntry";
 
 import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
@@ -44,8 +53,13 @@ const T30ManualEntryDispatchOut = () => {
   const { id } = useParams();
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { useGetSitesQuery } = useSite();
-  const { openedTransaction, clearWbTransaction, setOpenedTransaction, setWbTransaction, clearOpenedTransaction } =
-    useTransaction();
+  const {
+    openedTransaction,
+    clearWbTransaction,
+    setOpenedTransaction,
+    setWbTransaction,
+    clearOpenedTransaction,
+  } = useTransaction();
 
   const [selectedOption, setSelectedOption] = useState(0);
   const [isCancel, setIsCancel] = useState(false);
@@ -61,7 +75,8 @@ const T30ManualEntryDispatchOut = () => {
     },
   };
 
-  const { data: dtStorageTank } = useFindManyStorageTanksQuery(storageTankFilter);
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
 
   const { useFindManyProductQuery } = useProduct();
 
@@ -89,7 +104,6 @@ const T30ManualEntryDispatchOut = () => {
     originSourceStorageTankId: Yup.string().required("Wajib diisi"),
     loadedSeal1: Yup.string().required("Wajib diisi"),
     loadedSeal2: Yup.string().required("Wajib diisi"),
-    originWeighOutRemark: Yup.string().required("Wajib diisi"),
     deliveryOrderNo: Yup.string().required("Wajib diisi"),
   });
 
@@ -105,7 +119,9 @@ const T30ManualEntryDispatchOut = () => {
     setIsLoading(true);
 
     try {
-      const selectedStorageTank = dtStorageTank.records.find((item) => item.id === values.originSourceStorageTankId);
+      const selectedStorageTank = dtStorageTank.records.find(
+        (item) => item.id === values.originSourceStorageTankId
+      );
 
       if (selectedStorageTank) {
         tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
@@ -113,7 +129,9 @@ const T30ManualEntryDispatchOut = () => {
         tempTrans.originSiteCode = selectedStorageTank.code || "";
         tempTrans.originSiteName = selectedStorageTank.name || "";
       }
-      const selectedSite = dtSite.records.find((item) => item.id === WBMS.SITE.id);
+      const selectedSite = dtSite.records.find(
+        (item) => item.id === WBMS.SITE.id
+      );
 
       if (selectedSite) {
         tempTrans.originSiteId = selectedSite.id || "";
@@ -121,7 +139,7 @@ const T30ManualEntryDispatchOut = () => {
         tempTrans.originSiteName = selectedSite.name || "";
       }
 
-      if (WBMS.USE_WB === true) {
+      if (WBMS.WB_STATUS === true) {
         tempTrans.returnWeighInKg = wb.weight;
       }
 
@@ -130,6 +148,14 @@ const T30ManualEntryDispatchOut = () => {
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
 
       if (isCancel) {
+        if (WBMS.WB_STATUS === true) {
+          tempTrans.returnWeighInKg = wb.weight;
+        } else if (WBMS.WB_STATUS === false) {
+          tempTrans.returnWeighInKg = tempTrans.originWeighOutKg;
+        }
+
+        tempTrans.originWeighOutKg = 0;
+
         tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
         tempTrans.returnWeighInTimestamp = moment().toDate();
         tempTrans.progressStatus = 6;
@@ -153,11 +179,15 @@ const T30ManualEntryDispatchOut = () => {
 
         // redirect ke form view
         const id = response?.data?.transaction?.id;
-        navigate(`/wb/transactions/t30/manual-entry-dispatch-cancel-in-view/${id}`);
+        navigate(
+          `/wb/transactions/t30/manual-entry-dispatch-cancel-in-view/${id}`
+        );
 
         return;
       } else {
-        const selectedDestinationSite = dtSite.records.find((item) => item.id === WBMS.SITE_DESTINATION.id);
+        const selectedDestinationSite = dtSite.records.find(
+          (item) => item.id === WBMS.DESTINATION_SITE.id
+        );
 
         if (selectedDestinationSite) {
           tempTrans.destinationSiteId = selectedDestinationSite.id || "";
@@ -165,9 +195,16 @@ const T30ManualEntryDispatchOut = () => {
           tempTrans.destinationSiteName = selectedDestinationSite.name || "";
         }
 
-        if (WBMS.USE_WB === true) {
+        if (WBMS.WB_STATUS === true) {
           tempTrans.originWeighOutKg = wb.weight;
+        }else if (WBMS.WB_STATUS === false) {
+          tempTrans.isManualTonase = 1;
         }
+
+        tempTrans.deliveryStatus = 20;
+        tempTrans.isManualEntry = 1;
+        tempTrans.typeTransaction = 5;
+        tempTrans.deliveryDate = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
         tempTrans.progressStatus = 21;
@@ -247,14 +284,19 @@ const T30ManualEntryDispatchOut = () => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
 
   return (
     <Box>
-      <Header title="Transaksi T30" subtitle="Transaksi Manual Entry WB-OUT" />
+      <Header
+        title="Transaksi T30"
+        subtitle="Transaksi Manual Entry Timbang WB-OUT"
+      />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -269,7 +311,14 @@ const T30ManualEntryDispatchOut = () => {
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, dirty, setFieldValue, submitForm, handleChange } = props;
+            const {
+              values,
+              isValid,
+              dirty,
+              setFieldValue,
+              submitForm,
+              handleChange,
+            } = props;
             // console.log("Formik props:", props);
 
             const handleSubmit = () => {
@@ -278,7 +327,9 @@ const T30ManualEntryDispatchOut = () => {
 
             const handleCancel = (cancelReason) => {
               if (cancelReason.trim().length <= 10)
-                return toast.error("Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter.");
+                return toast.error(
+                  "Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter."
+                );
 
               setFieldValue("returnWeighInRemark", cancelReason);
               setIsCancel(true);
@@ -289,50 +340,63 @@ const T30ManualEntryDispatchOut = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {selectedOption === 1 && WBMS.USE_WB === true && (
+                {WBMS.WB_STATUS === true && (
                     <CancelConfirmation
                       title="Alasan CANCEL (PEMBATALAN)"
                       caption="SIMPAN CANCEL (IN)"
                       content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
-                      isDisabled={!(isValid && wb?.isStable && wb?.weight > WBMS.WB_MIN_WEIGHT)}
-                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ marginRight: "auto", backgroundColor: "darkred" }}
                     />
                   )}
-                  {selectedOption === 1 && WBMS.USE_WB === false && (
+                  {WBMS.WB_STATUS === false && (
                     <CancelConfirmation
                       title="Alasan CANCEL (PEMBATALAN)"
                       caption="SIMPAN CANCEL (IN)"
                       content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
-                      isDisabled={!(isValid && dirty && values.originWeighOutKg > WBMS.WB_MIN_WEIGHT)}
-                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ marginRight: "auto", backgroundColor: "darkred" }}
                     />
                   )}
-
-                  {selectedOption === 1 && WBMS.USE_WB === true && (
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      sx={{ mr: 1 }}
+                  {WBMS.WB_STATUS === true && (
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN (WB-OUT)"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleSubmit}
                       disabled={
                         !(
                           isValid &&
                           wb?.isStable &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                          dirty &&
+                     
                           values.progressStatus === 1
                         )
                       }
-                    >
-                      SIMPAN
-                    </Button>
-                  )}
-                  {selectedOption === 1 && WBMS.USE_WB === false && (
-                    <Button
-                      type="submit"
-                      variant="contained"
                       sx={{ mr: 1 }}
+                      variant="contained"
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <ManualEntryConfirmation
+                      title="Alasan (MANUAL ENTRY)"
+                      caption="SIMPAN (WB-OUT)"
+                      content="Anda yakin melakukan (MANUAL ENTRY) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleSubmit}
                       disabled={
                         !(
                           isValid &&
@@ -341,9 +405,9 @@ const T30ManualEntryDispatchOut = () => {
                           values.progressStatus === 1
                         )
                       }
-                    >
-                      SIMPAN
-                    </Button>
+                      sx={{ mr: 1 }}
+                      variant="contained"
+                    />
                   )}
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
                   <Button variant="contained" onClick={handleClose}>
@@ -377,7 +441,7 @@ const T30ManualEntryDispatchOut = () => {
                       />
                       <Field
                         name="productType"
-                        label="Tipe Produk"
+                        label="Tipe Transaksi"
                         component={Select}
                         size="small"
                         inputProps={{ readOnly: true }}
@@ -389,7 +453,9 @@ const T30ManualEntryDispatchOut = () => {
                         sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         onChange={(event, newValue) => {
                           handleChange(event);
-                          const selectedProductType = dtTypeProduct.find((item) => item.id === event.target.value);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
                           setSelectedOption(selectedProductType.id);
                         }}
                       >
@@ -420,7 +486,12 @@ const T30ManualEntryDispatchOut = () => {
                             isReadOnly={false}
                             sx={{ mb: 2 }}
                           />
-                          <DriverACP name="driverName" label="Nama Supir" isReadOnly={false} sx={{ mb: 2 }} />
+                          <DriverACP
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={false}
+                            sx={{ mb: 2 }}
+                          />
                           <CompanyACP
                             name="transporterCompanyName"
                             label="Nama Vendor"
@@ -479,7 +550,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.rspoCertificateNumber ? values.rspoCertificateNumber : "-"}
+                                value={
+                                  values?.rspoCertificateNumber
+                                    ? values.rspoCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -504,7 +579,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.isccCertificateNumber ? values.isccCertificateNumber : "-"}
+                                value={
+                                  values?.isccCertificateNumber
+                                    ? values.isccCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -529,7 +608,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.ispoCertificateNumber ? values.ispoCertificateNumber : "-"}
+                                value={
+                                  values?.ispoCertificateNumber
+                                    ? values.ispoCertificateNumber
+                                    : "-"
+                                }
                               />
                             </Grid>
 
@@ -567,7 +650,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal1 ? values.currentSeal1 : "-"}
+                                value={
+                                  values?.currentSeal1
+                                    ? values.currentSeal1
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -581,7 +668,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal2 ? values.currentSeal2 : "-"}
+                                value={
+                                  values?.currentSeal2
+                                    ? values.currentSeal2
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -595,7 +686,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal3 ? values.currentSeal3 : "-"}
+                                value={
+                                  values?.currentSeal3
+                                    ? values.currentSeal3
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -609,7 +704,11 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 inputProps={{ readOnly: true }}
-                                value={values?.currentSeal4 ? values.currentSeal4 : "-"}
+                                value={
+                                  values?.currentSeal4
+                                    ? values.currentSeal4
+                                    : "-"
+                                }
                               />
                             </Grid>
                             <Grid item xs={12} sx={{ mt: 2 }}>
@@ -669,7 +768,7 @@ const T30ManualEntryDispatchOut = () => {
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
-                            
+
                             <Grid item xs={12}>
                               <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
                             </Grid>
@@ -684,9 +783,17 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 1 }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originFfaPercentage > 0 ? values.originFfaPercentage : "0"}
+                                value={
+                                  values?.originFfaPercentage > 0
+                                    ? values.originFfaPercentage
+                                    : "0"
+                                }
                               />
                             </Grid>
                             <Grid item xs={4}>
@@ -700,9 +807,17 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 1 }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originMoistPercentage > 0 ? values.originMoistPercentage : "0"}
+                                value={
+                                  values?.originMoistPercentage > 0
+                                    ? values.originMoistPercentage
+                                    : "0"
+                                }
                               />
                             </Grid>
                             <Grid item xs={4}>
@@ -716,9 +831,17 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 1 }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
                                 }}
-                                value={values?.originDirtPercentage > 0 ? values.originDirtPercentage : "0"}
+                                value={
+                                  values?.originDirtPercentage > 0
+                                    ? values.originDirtPercentage
+                                    : "0"
+                                }
                               />
                             </Grid>
                           </Grid>
@@ -754,7 +877,10 @@ const T30ManualEntryDispatchOut = () => {
                                 label="Operator WB-OUT"
                                 value={user.name}
                                 name="originWeighOutOperatorName"
-                                inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                                inputProps={{
+                                  readOnly: true,
+                                  style: { textTransform: "uppercase" },
+                                }}
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -770,7 +896,9 @@ const T30ManualEntryDispatchOut = () => {
                                 inputProps={{ readOnly: true }}
                                 value={
                                   values?.originWeighInTimestamp
-                                    ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                    ? moment(values.originWeighInTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
                                     : "-"
                                 }
                               />
@@ -798,15 +926,23 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="BERAT MASUK - IN"
                                 name="originWeighInKg"
-                                value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                                value={
+                                  values?.originWeighInKg > 0
+                                    ? values.originWeighInKg.toFixed(2)
+                                    : "0.00"
+                                }
                                 inputProps={{ readOnly: true }}
                               />
                             </Grid>
-                            {WBMS.USE_WB === true && (
+                            {WBMS.WB_STATUS === true && (
                               <Grid item xs={6}>
                                 <Field
                                   type="number"
@@ -814,18 +950,30 @@ const T30ManualEntryDispatchOut = () => {
                                   size="small"
                                   fullWidth
                                   component={TextField}
-                                  sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                                  sx={{
+                                    mt: 2,
+                                    mb: 1.5,
+                                    backgroundColor: "whitesmoke",
+                                  }}
                                   InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        kg
+                                      </InputAdornment>
+                                    ),
                                   }}
                                   label="BERAT KELUAR - OUT"
                                   name="originWeighOutKg"
-                                  value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                                  value={
+                                    wb?.weight > 0
+                                      ? wb.weight.toFixed(2)
+                                      : "0.00"
+                                  }
                                   inputProps={{ readOnly: true }}
                                 />
                               </Grid>
                             )}
-                            {WBMS.USE_WB === false && (
+                            {WBMS.WB_STATUS === false && (
                               <Grid item xs={6}>
                                 <Field
                                   type="number"
@@ -834,13 +982,25 @@ const T30ManualEntryDispatchOut = () => {
                                   size="small"
                                   fullWidth
                                   required={true}
-                                  sx={{ mt: 2, mb: 2 }}
+                                  sx={{
+                                    mt: 2,
+                                    mb: 2,
+                                    backgroundColor: "lightyellow",
+                                  }}
                                   InputProps={{
-                                    endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                    endAdornment: (
+                                      <InputAdornment position="end">
+                                        kg
+                                      </InputAdornment>
+                                    ),
                                   }}
                                   label="BERAT KELUAR - OUT"
                                   name="originWeighOutKg"
-                                  value={values?.originWeighOutKg > 0 ? values.originWeighOutKg : "0"}
+                                  value={
+                                    values?.originWeighOutKg > 0
+                                      ? values.originWeighOutKg
+                                      : "0"
+                                  }
                                 />
                               </Grid>
                             )}
@@ -856,38 +1016,22 @@ const T30ManualEntryDispatchOut = () => {
                                 fullWidth
                                 sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                                 InputProps={{
-                                  endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      kg
+                                    </InputAdornment>
+                                  ),
                                 }}
                                 label="TOTAL"
                                 name="weightNetto"
-                                value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                                value={
+                                  originWeighNetto > 0
+                                    ? originWeighNetto.toFixed(2)
+                                    : "0.00"
+                                }
                               />
                             </Grid>
-                            <Grid item xs={12} sx={{ mt: 2 }}>
-                              <Divider>Catatan</Divider>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Field
-                                name="originWeighInRemark"
-                                label="Alasan untuk Entri Manual"
-                                type="text"
-                                multiline
-                                rows={5}
-                                required={true}
-                                component={TextField}
-                                onChange={(e) => {
-                                  const { value } = e.target;
-                                  setFieldValue("originWeighInRemark", value);
-                                  setFieldValue("originWeighOutRemark", value);
-                                }}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
-                                // inputProps={{ readOnly: true }}
-                              />
-                            </Grid>
+                          
                           </Grid>
                         </Grid>
                       </>

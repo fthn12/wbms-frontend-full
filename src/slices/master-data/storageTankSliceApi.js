@@ -33,5 +33,8 @@ const storageTankApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useEDispatchStorageTankSyncMutation, useGetStorageTanksQuery, useFindManyStorageTanksQuery } =
-  storageTankApiSlice;
+export const {
+  useEDispatchStorageTankSyncMutation,
+  useGetStorageTanksQuery,
+  useFindManyStorageTanksQuery,
+} = storageTankApiSlice;
