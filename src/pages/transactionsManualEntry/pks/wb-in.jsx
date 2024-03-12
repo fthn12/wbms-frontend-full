@@ -98,6 +98,11 @@ const PksManualEntryWBIn = () => {
     navigate("/wb/transactions");
   };
 
+  const handleReject = () => {
+    clearOpenedTransaction();
+    navigate(`/wb/transactions/bulking/manual-entry-dispatch-reject-in`);
+  };
+
   const handleDispatchSubmit = async (values) => {
     let tempTrans = { ...values };
 
@@ -542,6 +547,18 @@ const PksManualEntryWBIn = () => {
                         sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         inputProps={{ readOnly: true }}
                       />
+
+                      {selectedOption === 1 && (
+                        <Button
+                          variant="contained"
+                          fullWidth
+                          sx={{ mb: 2, backgroundColor: "goldenrod" }}
+                          onClick={handleReject}
+                        >
+                          Reject Transaksi Bulking
+                        </Button>
+                      )}
+
                       <Field
                         name="productType"
                         label="Tipe Transaksi"

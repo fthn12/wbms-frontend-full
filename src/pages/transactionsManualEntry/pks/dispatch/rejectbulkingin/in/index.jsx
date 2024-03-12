@@ -54,7 +54,7 @@ const TransactionPksRejectBulkingIn = (props) => {
   const { user } = useAuth();
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { urlPrev, setUrlPrev, setSidebar } = useApp();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+  const { wbTransaction, setWbTransaction, clearWbTransaction } =
     useTransaction();
   const { wb } = useWeighbridge();
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
@@ -77,13 +77,13 @@ const TransactionPksRejectBulkingIn = (props) => {
 
   const productFilter = {
     where: {
-      productGroupId: selectedOption,
+      productGroupId: 1,
     },
   };
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
 
   const handleClose = () => {
-    clearOpenedTransaction();
+    clearWbTransaction();
 
     const url = urlPrev;
     setUrlPrev("");
@@ -113,7 +113,7 @@ const TransactionPksRejectBulkingIn = (props) => {
 
       if (!response.status) throw new Error(response?.message);
 
-      clearOpenedTransaction();
+      clearWbTransaction();
       setIsLoading(false);
 
       const id = response?.data?.transaction?.id;
@@ -139,58 +139,38 @@ const TransactionPksRejectBulkingIn = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!id) return handleClose();
-
-    transactionAPI
-      .getById(id)
-      .then((res) => {
-        setOpenedTransaction(res.data.transaction);
-        setSelectedOption(res.data.transaction.productType);
-      })
-      .catch((error) => {
-        toast.error(`${error.message}.`);
-
-        return handleClose();
-      });
-
-    return () => {
-      // console.clear();
-    };
-  }, []);
-
-  useEffect(() => {
     if (
-      openedTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
-      openedTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+      wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
     ) {
       setOriginWeighNetto(0);
     } else {
       let total = Math.abs(
-        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+        wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg
       );
       setOriginWeighNetto(total);
     }
     if (
-      openedTransaction?.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
-      openedTransaction?.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
+      wbTransaction?.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
     ) {
       setReturnWeighNetto(0);
     } else {
       let total = Math.abs(
-        openedTransaction?.returnWeighInKg - openedTransaction?.returnWeighOutKg
+        wbTransaction?.returnWeighInKg - wbTransaction?.returnWeighOutKg
       );
       setReturnWeighNetto(total);
     }
-  }, [openedTransaction]);
+  }, [wbTransaction]);
 
   return (
     <Box>
-      <Header title="TRANSAKSI BULKING" subtitle="TIMBANG REJECT WB-IN" />
-      {openedTransaction && (
+      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
+      {wbTransaction && (
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={openedTransaction}
+          initialValues={wbTransaction}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
@@ -264,13 +244,8 @@ const TransactionPksRejectBulkingIn = (props) => {
                         component={TextField}
                         inputProps={{ readOnly: true }}
                       />
-                      {/* <Grid item xs={6}>
-                          <ProgressStatus
-                            progressStatus={values?.progressStatus}
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                          />
-                        </Grid> */}
-                      <Field
+                
+                      {/* <Field
                         name="productType"
                         label="Tipe Transaksi"
                         component={Select}
@@ -288,12 +263,7 @@ const TransactionPksRejectBulkingIn = (props) => {
                             (item) => item.id === event.target.value
                           );
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
+                        
                         }}
                       >
                         {dtTypeProduct &&
@@ -302,7 +272,7 @@ const TransactionPksRejectBulkingIn = (props) => {
                               {data.value}
                             </MenuItem>
                           ))}
-                      </Field>
+                      </Field> */}
 
                       {/* <Field
                         name="deliveryOrderNo"
@@ -319,26 +289,26 @@ const TransactionPksRejectBulkingIn = (props) => {
                       <TransportVehicleACP
                         name="transportVehicleId"
                         label="Nomor Plat"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <DriverACP
                         name="driverName"
                         label="Nama Supir"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <CompanyACP
                         name="transporterCompanyName"
                         label="Nama Vendor"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <ProductACP
                         data={dtProduct}
                         name="productId"
                         label="Nama Product"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -734,7 +704,7 @@ const TransactionPksRejectBulkingIn = (props) => {
                           />
                         </Grid>
                         <Grid item xs={6}>
-                        <Field
+                          <Field
                             name="originWeighInTimestamp"
                             label="Waktu WB-IN"
                             type="text"
@@ -1058,7 +1028,7 @@ const TransactionPksRejectBulkingIn = (props) => {
           }}
         </Formik>
       )}
-      {!openedTransaction && (
+      {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{

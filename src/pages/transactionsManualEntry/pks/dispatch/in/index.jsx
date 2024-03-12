@@ -174,7 +174,7 @@ const PKSManualEntryDispatchIn = (props) => {
               isRequired={false}
               isReadOnly={false}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="lightyellow"
               siteId={WBMS.SITE.refId}
             />
           </Grid>
@@ -258,8 +258,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+              // inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -272,8 +272,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+              // inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -285,8 +285,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+              // inputProps={{ readOnly: true }}
             />
           </Grid>
           <Grid item xs={6}>
@@ -298,8 +298,8 @@ const PKSManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-              inputProps={{ readOnly: true }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+              // inputProps={{ readOnly: true }}
             />
           </Grid>
 

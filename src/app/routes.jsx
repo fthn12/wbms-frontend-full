@@ -71,20 +71,20 @@ const PksManualEntryDispatchCancelOutView = lazy(() =>
 );
 
 const PksRejectT300InManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/in/index")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/in")
 );
 const PksRejectT300InManualView = lazy(() =>
   import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/in/view")
 );
 const PksRejectT300OutManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out/index")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out")
 );
 const PksRejectT300OutManualView = lazy(() =>
   import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out/view")
 );
 const RejectBulkingInManual = lazy(() =>
   import(
-    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in/index"
+    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in"
   )
 );
 const RejectBulkingInManualView = lazy(() =>
@@ -435,7 +435,7 @@ const routes = () => {
             element={<PksRejectT300OutManualView />}
           />
           <Route
-            path="transactions/bulking/manual-entry-dispatch-reject-in/:id"
+            path="transactions/bulking/manual-entry-dispatch-reject-in"
             name="RejectBulkingInManual"
             element={<RejectBulkingInManual />}
           />
