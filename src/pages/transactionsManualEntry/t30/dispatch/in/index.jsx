@@ -174,7 +174,7 @@ const T30ManualEntryDispatchIn = (props) => {
               isRequired={true}
               isReadOnly={false}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="lightyellow"
               siteId={WBMS.SITE.refId}
             />
           </Grid>
@@ -255,7 +255,7 @@ const T30ManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -269,7 +269,7 @@ const T30ManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -282,7 +282,7 @@ const T30ManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -295,7 +295,7 @@ const T30ManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "tranparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
               // inputProps={{ readOnly: true }}
             />
           </Grid>

@@ -52,7 +52,7 @@ import {
   TransportVehicleACP,
 } from "components/FormManualEntry";
 
-const TransactionPKSCancelInView = (props) => {
+const TransactionPKSRejectOutView = (props) => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -177,7 +177,7 @@ const TransactionPKSCancelInView = (props) => {
 
   return (
     <Box>
-      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-OUT" />
+      <Header title="TRANSAKSI PKS" subtitle="DATA TIMBANG" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -1090,4 +1090,4 @@ const TransactionPKSCancelInView = (props) => {
   );
 };
 
-export default TransactionPKSCancelInView;
+export default TransactionPKSRejectOutView;

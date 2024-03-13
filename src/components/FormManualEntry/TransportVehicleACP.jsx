@@ -43,7 +43,7 @@ export const TransportVehicleACP = (props) => {
                 name={name}
                 required={true}
                 size="small"
-                sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "white" }}
+                sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
               />
             )}
           />

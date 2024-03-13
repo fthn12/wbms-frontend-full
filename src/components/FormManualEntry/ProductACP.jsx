@@ -31,7 +31,7 @@ export const ProductACP = (props) => {
               required: true,
               size: "small",
             }}
-            sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "white" }}
+            sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "lightyellow" }}
             inputProps={{ readOnly: isReadOnly }}
             component={Select}
             onChange={(event) => {

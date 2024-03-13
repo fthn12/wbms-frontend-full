@@ -172,7 +172,7 @@ const TransactionPksRejectBulkingInView = (props) => {
 
   return (
     <Box>
-      <Header title="TRANSAKSI BULKING" subtitle="TIMBANG REJECT WB-IN" />
+      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -447,13 +447,13 @@ const TransactionPksRejectBulkingInView = (props) => {
 
                         <Grid item xs={12}>
                           <StorageTankSelect
-                            name="destinationSinkStorageTankId"
+                            name="originSourceStorageTankId"
                             label="Tangki Tujuan"
                             isRequired={true}
                             isReadOnly={true}
                             sx={{ mt: 2 }}
                             backgroundColor="whitesmoke"
-                            siteId={WBMS.SITE_REFID}
+                            // siteId={WBMS.SITE_REFID}
                           />
                         </Grid>
                         <Grid item xs={12}>
@@ -611,7 +611,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="unloadedSeal1"
+                            name="loadedSeal1"
                             label="Segel ISI Mainhole 1"
                             type="text"
                             required={true}
@@ -625,7 +625,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="unloadedSeal2"
+                            name="loadedSeal2"
                             label="Segel Bongkar Valve 1"
                             type="text"
                             required={true}
@@ -639,7 +639,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="unloadedSeal3"
+                            name="loadedSeal3"
                             label="Segel Bongkar Mainhole 2"
                             type="text"
                             component={TextField}
@@ -652,7 +652,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="unloadedSeal4"
+                            name="loadedSeal4"
                             label="Segel Bongkar Valve 2"
                             type="text"
                             component={TextField}
@@ -728,6 +728,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.originWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -742,6 +743,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.originWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -909,6 +911,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.returnWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -923,6 +926,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.returnWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>

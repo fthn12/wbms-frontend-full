@@ -197,13 +197,13 @@ const T30ManualEntryDispatchOut = () => {
 
         if (WBMS.WB_STATUS === true) {
           tempTrans.originWeighOutKg = wb.weight;
-        }else if (WBMS.WB_STATUS === false) {
+        } else if (WBMS.WB_STATUS === false) {
           tempTrans.isManualTonase = 1;
         }
 
-        tempTrans.deliveryStatus = 20;
         tempTrans.isManualEntry = 1;
         tempTrans.typeTransaction = 5;
+        tempTrans.deliveryStatus = 20;
         tempTrans.deliveryDate = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
@@ -340,7 +340,7 @@ const T30ManualEntryDispatchOut = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                {WBMS.WB_STATUS === true && (
+                  {WBMS.WB_STATUS === true && (
                     <CancelConfirmation
                       title="Alasan CANCEL (PEMBATALAN)"
                       caption="SIMPAN CANCEL (IN)"
@@ -349,6 +349,7 @@ const T30ManualEntryDispatchOut = () => {
                       isDisabled={
                         !(
                           isValid &&
+                          dirty &&
                           wb?.isStable &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
@@ -381,9 +382,9 @@ const T30ManualEntryDispatchOut = () => {
                       disabled={
                         !(
                           isValid &&
+                          dirty &&
                           wb?.isStable &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                     
                           values.progressStatus === 1
                         )
                       }
@@ -478,7 +479,7 @@ const T30ManualEntryDispatchOut = () => {
                             required
                             size="small"
                             fullWidth
-                            sx={{ mb: 2, backgroundColor: "transparant" }}
+                            sx={{ mb: 2, backgroundColor: "lightyellow" }}
                           />
                           <TransportVehicleACP
                             name="transportVehicleId"
@@ -536,7 +537,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isRequired={true}
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="lightyellow"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -565,7 +566,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isRequired={true}
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="lightyellow"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -594,7 +595,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isRequired={true}
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
-                                // backgroundColor="lightyellow"
+                                backgroundColor="lightyellow"
                               />
                             </Grid>
                             <Grid item xs={6}>
@@ -627,7 +628,7 @@ const T30ManualEntryDispatchOut = () => {
                                 isRequired={true}
                                 isReadOnly={false}
                                 sx={{ mt: 2 }}
-                                backgroundColor="transparant"
+                                backgroundColor="lightyellow"
                                 siteId={WBMS.SITE.refId}
                               />
                             </Grid>
@@ -724,7 +725,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
+                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -738,7 +739,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
+                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -751,7 +752,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "transparant" }}
+                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -764,7 +765,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 2, backgroundColor: "tranparant" }}
+                                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                                 // inputProps={{ readOnly: true }}
                               />
                             </Grid>
@@ -781,7 +782,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "lightyellow" }}
                                 InputProps={{
                                   endAdornment: (
                                     <InputAdornment position="end">
@@ -805,7 +806,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "lightyellow" }}
                                 InputProps={{
                                   endAdornment: (
                                     <InputAdornment position="end">
@@ -829,7 +830,7 @@ const T30ManualEntryDispatchOut = () => {
                                 variant="outlined"
                                 size="small"
                                 fullWidth
-                                sx={{ mt: 1 }}
+                                sx={{ mt: 1, backgroundColor: "lightyellow" }}
                                 InputProps={{
                                   endAdornment: (
                                     <InputAdornment position="end">
@@ -1031,7 +1032,6 @@ const T30ManualEntryDispatchOut = () => {
                                 }
                               />
                             </Grid>
-                          
                           </Grid>
                         </Grid>
                       </>

@@ -76,6 +76,11 @@ const TransactionPksRejectBulkingInView = (props) => {
     url ? navigate(url) : navigate("/wb/transactions");
   };
 
+  const handleReject = () => {
+    clearOpenedTransaction();
+    navigate(`/wb/transactions/bulking/manual-entry-dispatch-reject-out/${id}`);
+  };
+
   const handleFormikSubmit = async (values) => {
     let tempTrans = { ...values };
 
@@ -176,6 +181,13 @@ const TransactionPksRejectBulkingInView = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                <Button
+                    variant="contained"
+                    sx={{ backgroundColor: "goldenrod", marginRight: "auto" }}
+                    onClick={() => handleReject(values)}
+                  >
+                    Manual (REJECT OUT)
+                  </Button>
                   <Button
                     variant="contained"
                     disabled={isReadOnly ? false : !(isValid && dirty)}

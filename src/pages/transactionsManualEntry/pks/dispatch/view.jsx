@@ -299,7 +299,6 @@ const PKSManualEntryDispatchView = () => {
                       </Button>
                       <Button
                         variant="contained"
-                      
                         onClick={() => handleReject(values)}
                         sx={{ ml: 1, backgroundColor: "goldenrod" }}
                       >
@@ -544,85 +543,6 @@ const PKSManualEntryDispatchView = () => {
                             // siteId={WBMS.SITE.refId }
                           />
                         </Grid>
-
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originFfaPercentage"
-                            label="FFA"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originFfaPercentage > 0
-                                ? values.originFfaPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originMoistPercentage"
-                            label="Moist"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originMoistPercentage > 0
-                                ? values.originMoistPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originDirtPercentage"
-                            label="Dirt"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originDirtPercentage > 0
-                                ? values.originDirtPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
                       </Grid>
                     </Grid>
 
@@ -753,27 +673,81 @@ const PKSManualEntryDispatchView = () => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Catatan</Divider>
-                        </Grid>
                         <Grid item xs={12}>
+                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
+                        </Grid>
+                        <Grid item xs={4}>
                           <Field
-                            name="originWeighInRemark"
-                            label="Alasan untuk Entri Manual"
-                            type="text"
-                            multiline
-                            rows={5.4}
-                            required={true}
+                            name="originFfaPercentage"
+                            label="FFA"
+                            type="number"
                             component={TextField}
-                            onChange={(e) => {
-                              const { value } = e.target;
-                              setFieldValue("originWeighInRemark", value);
-                              setFieldValue("originWeighOutRemark", value);
-                            }}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
+                            }}
+                            value={
+                              values?.originFfaPercentage > 0
+                                ? values.originFfaPercentage
+                                : "0"
+                            }
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            name="originMoistPercentage"
+                            label="Moist"
+                            type="number"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
+                            }}
+                            value={
+                              values?.originMoistPercentage > 0
+                                ? values.originMoistPercentage
+                                : "0"
+                            }
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            name="originDirtPercentage"
+                            label="Dirt"
+                            type="number"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
+                            }}
+                            value={
+                              values?.originDirtPercentage > 0
+                                ? values.originDirtPercentage
+                                : "0"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -782,274 +756,6 @@ const PKSManualEntryDispatchView = () => {
 
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
-                        {isReadOnly === false && (
-                          <>
-                            <Grid item xs={12}>
-                              <Divider>DATA DARI T300</Divider>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                component={TextField}
-                                size="small"
-                                fullWidth
-                                required={true}
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      kg
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                label="BERAT ASAL MASUK - IN"
-                                name="destinationWeighInKg"
-                                value={
-                                  values?.destinationWeighInKg > 0
-                                    ? values.destinationWeighInKg
-                                    : "0"
-                                }
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                type="datetime-local"
-                                variant="outlined"
-                                component={TextField}
-                                size="small"
-                                fullWidth
-                                required={true}
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                label="WAKTU ASAL MASUK - IN"
-                                name="destinationWeighInTimestamp"
-                                value={moment(
-                                  values?.destinationWeighInTimestamp
-                                ).format("YYYY-MM-DDTHH:mm")}
-                                InputLabelProps={{
-                                  shrink: true,
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                type="number"
-                                variant="outlined"
-                                component={TextField}
-                                size="small"
-                                fullWidth
-                                required={true}
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                InputProps={{
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      kg
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                label="BERAT ASAL KELUAR - OUT"
-                                name="destinationWeighOutKg"
-                                value={
-                                  values?.destinationWeighOutKg > 0
-                                    ? values.destinationWeighOutKg
-                                    : "0"
-                                }
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                type="datetime-local"
-                                variant="outlined"
-                                component={TextField}
-                                size="small"
-                                fullWidth
-                                required={true}
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                label="WAKTU ASAL KELUAR - OUT"
-                                name="destinationWeighOutTimestamp"
-                                value={moment(
-                                  values?.destinationWeighOutTimestamp
-                                ).format("YYYY-MM-DDTHH:mm")}
-                                InputLabelProps={{
-                                  shrink: true,
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                name="unloadingOperatorName"
-                                label="OPERATOR UNLOADING"
-                                type="text"
-                                required={true}
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{
-                                  mt: 2,
-
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                inputProps={{
-                                  style: { textTransform: "uppercase" },
-                                  readOnly: isReadOnly,
-                                }}
-                              />
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Field
-                                type="datetime-local"
-                                variant="outlined"
-                                component={TextField}
-                                size="small"
-                                fullWidth
-                                required={true}
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                label="WAKTU BONGKAR"
-                                name="unloadingTimestamp"
-                                value={moment(
-                                  values?.unloadingTimestamp
-                                ).format("YYYY-MM-DDTHH:mm")}
-                                InputLabelProps={{
-                                  shrink: true,
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-                            <Grid item xs={12} sx={{ mt: 2 }}>
-                              <Divider>Segel Tangki Bongkar T300</Divider>
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                name="unloadedSeal1"
-                                label="Segel BONGKAR Mainhole 1"
-                                type="text"
-                                required={true}
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={6}>
-                              <Field
-                                name="unloadedSeal2"
-                                label="Segel BONGKAR Valve 1"
-                                type="text"
-                                required={true}
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Field
-                                name="unloadedSeal3"
-                                label="Segel BONGKAR Mainhole 2"
-                                type="text"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{
-                                  mt: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-                            <Grid item xs={6}>
-                              <Field
-                                name="unloadedSeal4"
-                                label="Segel BONGKAR Valve 2"
-                                type="text"
-                                component={TextField}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{
-                                  mt: 2,
-                                  mb: 2,
-                                  backgroundColor: isReadOnly
-                                    ? "whitesmoke"
-                                    : "lightyellow",
-                                }}
-                                inputProps={{ readOnly: isReadOnly }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <Divider sx={{ mt: 1 }}>Tangki Tujuan</Divider>
-                            </Grid>
-
-                            <Grid item xs={12}>
-                              <StorageTankSelect
-                                name="destinationSinkStorageTankId"
-                                label="Tangki Tujuan"
-                                isRequired={isReadOnly}
-                                isReadOnly={isReadOnly}
-                                sx={{ mt: 1, mb: 2 }}
-                                backgroundColor="lightyellow"
-                                siteId={WBMS.DESTINATION_SITE.refId}
-                              />
-                            </Grid>
-                          </>
-                        )}
-
                         <Grid item xs={12}>
                           <Divider>DATA TIMBANG KENDARAAN</Divider>
                         </Grid>
@@ -1202,6 +908,31 @@ const PKSManualEntryDispatchView = () => {
                                 ? originWeighNetto.toFixed(2)
                                 : "0.00"
                             }
+                          />
+                        </Grid>
+
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Catatan</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            name="originWeighInRemark"
+                            label="Alasan untuk Entri Manual"
+                            type="text"
+                            multiline
+                            rows={5.4}
+                            required={true}
+                            component={TextField}
+                            onChange={(e) => {
+                              const { value } = e.target;
+                              setFieldValue("originWeighInRemark", value);
+                              setFieldValue("originWeighOutRemark", value);
+                            }}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>

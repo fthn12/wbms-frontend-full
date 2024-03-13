@@ -21,6 +21,7 @@ import {
   CertificateSelect,
   StorageTankSelect,
 } from "../../../../../components/FormikMUI";
+import CancelConfirmation from "components/CancelConfirmation";
 import {
   DriverACP,
   CompanyACP,
@@ -88,6 +89,8 @@ const LBNManualEntryDispatchOut = () => {
   const [originWeightNetto, setOriginWeightNetto] = useState(0);
   const [destinationWeightNetto, setDestinationWeightNetto] = useState(0);
 
+  const [isReject, setIsReject] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [dtTrx, setDtTrx] = useState(null);
 
@@ -106,11 +109,6 @@ const LBNManualEntryDispatchOut = () => {
     clearOpenedTransaction();
 
     navigate("/wb/transactions");
-  };
-
-  const handleReject = () => {
-    clearOpenedTransaction();
-    navigate(`/wb/transactions/bulking/manual-entry-dispatch-reject-in/${id}`);
   };
 
   const handleFormikSubmit = async (values) => {
@@ -142,32 +140,63 @@ const LBNManualEntryDispatchOut = () => {
 
       if (WBMS.WB_STATUS === true) {
         tempTrans.destinationWeighOutKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        tempTrans.isManualTonase = 1;
       }
+      tempTrans.isManualEntry = 1;
 
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.progressStatus = 21;
-      tempTrans.destinationWeighOutTimestamp = moment().toDate();
-      tempTrans.destinationWeighOutOperatorName = user.name.toUpperCase();
-      tempTrans.dtTransaction = moment()
-        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
-        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
-        .format();
+      if (isReject) {
+        tempTrans.productType = parseInt(tempTrans.productType);
+        tempTrans.progressStatus = 31;
+        tempTrans.deliveryStatus = 26;
+        tempTrans.deliveryDate = moment().toDate();
+        tempTrans.destinationWeighOutTimestamp = moment().toDate();
+        tempTrans.destinationWeighOutOperatorName = user.name.toUpperCase();
+        tempTrans.dtTransaction = moment()
+          .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+          .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+          .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, {
-        ...tempTrans,
-      });
+        const response = await transactionAPI.updateById(tempTrans.id, {
+          ...tempTrans,
+        });
 
-      if (!response.status) throw new Error(response?.message);
+        if (!response.status) throw new Error(response?.message);
 
-      clearWbTransaction();
-      setIsLoading(false);
+        clearWbTransaction();
+        setIsLoading(false);
 
-      toast.success(`Transaksi WB-OUT telah tersimpan.`);
-      // redirect ke form view
-      const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/bulking/manual-entry-dispatch-view/${id}`);
+        toast.success(`Transaksi WB-OUT Reject telah tersimpan.`);
+        // redirect ke form view
+        const id = response?.data?.transaction?.id;
+        navigate(`/wb/transactions/bulking/manual-entry-dispatch-view/${id}`);
+      } else {
+        tempTrans.productType = parseInt(tempTrans.productType);
+        tempTrans.progressStatus = 21;
+        tempTrans.deliveryStatus = 38;
+        tempTrans.deliveryDate = moment().toDate();
+        tempTrans.destinationWeighOutTimestamp = moment().toDate();
+        tempTrans.destinationWeighOutOperatorName = user.name.toUpperCase();
+        tempTrans.dtTransaction = moment()
+          .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+          .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+          .format();
 
-      return;
+        const response = await transactionAPI.updateById(tempTrans.id, {
+          ...tempTrans,
+        });
+
+        if (!response.status) throw new Error(response?.message);
+
+        clearWbTransaction();
+        setIsLoading(false);
+
+        toast.success(`Transaksi WB-OUT telah tersimpan.`);
+        // redirect ke form view
+        const id = response?.data?.transaction?.id;
+        navigate(`/wb/transactions/bulking/manual-entry-dispatch-view/${id}`);
+        return;
+      }
     } catch (error) {
       setIsLoading(false);
       toast.error(`${error.message}.`);
@@ -204,32 +233,41 @@ const LBNManualEntryDispatchOut = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (
-  //     openedTransaction.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
-  //     openedTransaction.originWeighOutKg < WBMS.WB_MIN_WEIGHT
-  //   ) {
-  //     setOriginWeightNetto(0);
-  //   } else {
-  //     let total = Math.abs(openedTransaction.originWeighInKg - openedTransaction.originWeighOutKg);
-  //     setOriginWeightNetto(total);
-  //   }
+  useEffect(() => {
+    if (!openedTransaction) {
+      return;
+    }
 
-  //   if (
-  //     openedTransaction.destinationWeighInKg < WBMS.WB_MIN_WEIGHT ||
-  //     openedTransaction.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT
-  //   ) {
-  //     setDestinationWeightNetto(0);
-  //   } else {
-  //     let total = Math.abs(openedTransaction.destinationWeighInKg - openedTransaction.destinationWeighOutKg);
-  //     setDestinationWeightNetto(total);
-  //   }
-  // }, [openedTransaction]);
+    if (
+      openedTransaction.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      openedTransaction.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
+      setOriginWeightNetto(0);
+    } else {
+      let total = Math.abs(
+        openedTransaction.originWeighInKg - openedTransaction.originWeighOutKg
+      );
+      setOriginWeightNetto(total);
+    }
+
+    if (
+      openedTransaction.destinationWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      openedTransaction.destinationWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
+      setDestinationWeightNetto(0);
+    } else {
+      let total = Math.abs(
+        openedTransaction.destinationWeighInKg -
+          openedTransaction.destinationWeighOutKg
+      );
+      setDestinationWeightNetto(total);
+    }
+  }, [openedTransaction]);
 
   return (
     <Box>
       <Header
-        title="Transaksi BULKING"
+        title="TRANSAKSI BULKING"
         subtitle="Transaksi Manual Entry Timbang WB-OUT"
       />
       {openedTransaction && (
@@ -241,20 +279,65 @@ const LBNManualEntryDispatchOut = () => {
           isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, dirty, setFieldValue, handleChange } =
-              props;
+            const {
+              values,
+              isValid,
+              dirty,
+              setFieldValue,
+              submitForm,
+              handleChange,
+            } = props;
             // console.log("Formik props:", props);
+
+            const handleReject = (rejectReason) => {
+              if (rejectReason.trim().length <= 10)
+                return toast.error(
+                  "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter."
+                );
+
+              setFieldValue("destinationWeighOutRemark", rejectReason);
+              setIsReject(true);
+
+              submitForm();
+            };
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleReject(values)}
-                    sx={{ mr: 1 }}
-                  >
-                    Reject Transaksi
-                  </Button>
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN REJECT (PENGEMBALIAN)"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ marginRight: "auto", backgroundColor: "goldenrod" }}
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN REJECT (PENGEMBALIAN)"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 2
+                        )
+                      }
+                      sx={{ marginRight: "auto", backgroundColor: "goldenrod" }}
+                    />
+                  )}
+
                   {WBMS.WB_STATUS === true && (
                     <Button
                       type="submit"
@@ -269,7 +352,7 @@ const LBNManualEntryDispatchOut = () => {
                         )
                       }
                     >
-                      SIMPAN
+                      SIMPAN (WB-OUT)
                     </Button>
                   )}
                   {WBMS.WB_STATUS === false && (
@@ -286,7 +369,7 @@ const LBNManualEntryDispatchOut = () => {
                         )
                       }
                     >
-                      SIMPAN
+                      SIMPAN (WB-OUT)
                     </Button>
                   )}
                   {/* <BonTripPrint dtTrans={{ ...values }} isDisable={!isSubmitted} sx={{ mx: 1 }} /> */}
@@ -458,7 +541,7 @@ const LBNManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -472,7 +555,7 @@ const LBNManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -485,7 +568,7 @@ const LBNManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -498,7 +581,7 @@ const LBNManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "tranparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -513,8 +596,8 @@ const LBNManualEntryDispatchOut = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="transparant"
-                            siteId={WBMS.SITE.refid}
+                            backgroundColor="lightyellow"
+                            siteId={WBMS.SITE.refId}
                           />
                         </Grid>
                       </Grid>

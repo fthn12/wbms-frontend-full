@@ -83,13 +83,19 @@ const PksRejectT300OutManualView = lazy(() =>
   import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out/view")
 );
 const RejectBulkingInManual = lazy(() =>
-  import(
-    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in"
-  )
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in")
 );
 const RejectBulkingInManualView = lazy(() =>
   import(
     "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in/view"
+  )
+);
+const RejectBulkingOutManual = lazy(() =>
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/out")
+);
+const RejectBulkingOutManualView = lazy(() =>
+  import(
+    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/out/view"
   )
 );
 
@@ -200,8 +206,12 @@ const BulkingManualEntryOthersView = lazy(() =>
 
 const BulkingIn = lazy(() => import("../pages/transactions/bulking/In"));
 const BulkingOut = lazy(() => import("../pages/transactions/bulking/Out"));
-const BulkingViewIn = lazy(() => import("../pages/transactions/bulking/In/view"));
-const BulkingViewOut = lazy(() => import("../pages/transactions/bulking/Out/view"));
+const BulkingViewIn = lazy(() =>
+  import("../pages/transactions/bulking/In/view")
+);
+const BulkingViewOut = lazy(() =>
+  import("../pages/transactions/bulking/Out/view")
+);
 
 const ReportTransactionDaily = lazy(() =>
   import("../pages/reports/transactions-daily")
@@ -276,9 +286,7 @@ const routes = () => {
             path="dashboard/labanan"
             element={<div>Dashboard Labanan</div>}
           />
-
           <Route path="transactions" element={<Transactions />} />
-
           <Route
             path="transactions/pks-edispatch-normal-in"
             element={<PksNormalIn />}
@@ -307,7 +315,6 @@ const routes = () => {
             path="transactions/pks-edispatch-reject-out"
             element={<PksRejectOut />}
           />
-
           <Route
             path="transactions/pks-edispatch-normal-in/:id"
             element={<PksNormalInView />}
@@ -336,21 +343,17 @@ const routes = () => {
             path="transactions/pks-edispatch-reject-out/:id"
             element={<PksRejectOutView />}
           />
-
           <Route path="transactions/pks-new" element={<PksEDispatchNew />} />
-
           <Route
             path="transactions/pks/manual-entry-in"
             name="PksManualEntryWbIn"
             element={<PksManualEntryIn />}
           />
-
           <Route
             path="transactions/pks/finalize-t300/:id"
             name="PksManualEntryFinalizeT300"
             element={<PksManualEntryFinalizeT300 />}
           />
-
           <Route
             path="transactions/pks/manual-entry-others-out/:id"
             name="PksManualEntryOutOthers"
@@ -371,7 +374,6 @@ const routes = () => {
             name="PksManualEntryOutDispatch"
             element={<PksManualEntryOutDispatch />}
           />
-
           <Route
             path="transactions/pks/manual-entry-other-view/:id"
             name="PksManualEntryOthersView"
@@ -392,7 +394,6 @@ const routes = () => {
             name="PksManualEntryDispatchView"
             element={<PksManualEntryDispatchView />}
           />
-
           <Route
             path="transactions/pks/manual-entry-dispatch-cancel-in/:id"
             name="PksManualEntryDispatchCancelIn"
@@ -413,7 +414,6 @@ const routes = () => {
             name="PksManualEntryDispatchCancelOutView"
             element={<PksManualEntryDispatchCancelOutView />}
           />
-
           <Route
             path="transactions/pks/manual-entry-dispatch-reject-in/:id"
             name="PksRejectT300InManual"
@@ -444,13 +444,21 @@ const routes = () => {
             name="RejectBulkingInManualView"
             element={<RejectBulkingInManualView />}
           />
-
+          <Route
+            path="transactions/bulking/manual-entry-dispatch-reject-out/:id"
+            name="RejectBulkingOutManual"
+            element={<RejectBulkingOutManual />}
+          />
+          <Route
+            path="transactions/bulking/manual-entry-dispatch-reject-out-view/:id"
+            name="RejectBulkingOutManualView"
+            element={<RejectBulkingOutManualView />}
+          />
           <Route
             path="transactions/t30/manual-entry-in"
             name="T30ManualEntryWbIn"
             element={<T30ManualEntryIn />}
           />
-
           <Route
             path="transactions/t30/manual-entry-dispatch-out/:id"
             name="T30ManualEntryOutDispatch"
@@ -461,7 +469,6 @@ const routes = () => {
             name="T30ManualEntryDispatchView"
             element={<T30ManualEntryDispatchView />}
           />
-
           <Route
             path="transactions/t30/manual-entry-others-out/:id"
             name="T30ManualEntryOutOthers"
@@ -472,7 +479,6 @@ const routes = () => {
             name="T30ManualEntryOthersView"
             element={<T30ManualEntryOthersView />}
           />
-
           <Route
             path="transactions/t30/manual-entry-dispatch-cancel-in/:id"
             name="T30ManualEntryDispatchCancelIn"
@@ -493,7 +499,6 @@ const routes = () => {
             name="T30ManualEntryDispatchCancelOutView"
             element={<T30ManualEntryDispatchCancelOutView />}
           />
-
           <Route
             path="transactions/t30-edispatch-normal-in"
             element={<T30NormalIn />}
@@ -510,7 +515,6 @@ const routes = () => {
             path="transactions/t30-edispatch-cancel-out"
             element={<T30CancelOut />}
           />
-
           <Route
             path="transactions/t30-edispatch-normal-in/:id"
             element={<T30NormalInView />}
@@ -531,13 +535,11 @@ const routes = () => {
             path="transactions/t30-edispatch-deleted/:id"
             element={<T30DeletedView />}
           />
-
           <Route
             path="transactions/bulking/manual-entry-in"
             name="BulkingManualEntryWbIn"
             element={<BulkingManualEntryIn />}
           />
-
           <Route
             path="transactions/bulking/manual-entry-dispatch-out/:id"
             name="BulkingManualEntryDispatchOut"
@@ -548,7 +550,6 @@ const routes = () => {
             name="BulkingManualEntryOutOthers"
             element={<BulkingManualEntryOutOthers />}
           />
-
           <Route
             path="transactions/bulking/manual-entry-dispatch-view/:id"
             name="BulkingManualEntryDispatchView"
@@ -559,7 +560,6 @@ const routes = () => {
             name="BulkingManualEntryOthersView"
             element={<BulkingManualEntryOthersView />}
           />
-
           <Route
             path="transactions/bulking-edispatch-in"
             element={<BulkingIn />}
@@ -568,7 +568,7 @@ const routes = () => {
             path="transactions/bulking-edispatch-out"
             element={<BulkingOut />}
           />
-            <Route
+          <Route
             path="transactions/bulking-edispatch-in/:id"
             element={<BulkingViewIn />}
           />
@@ -576,7 +576,6 @@ const routes = () => {
             path="transactions/bulking-edispatch-out/:id"
             element={<BulkingViewOut />}
           />
-
           <Route
             path="reports/transactions-daily"
             element={<ReportTransactionDaily />}
@@ -585,7 +584,6 @@ const routes = () => {
             path="reports/transactions-pending"
             element={<ReportTransactionPending />}
           />
-
           <Route
             path="transactions-manual-pending"
             element={<TransactionOnGoing />}
@@ -594,7 +592,6 @@ const routes = () => {
             path="transactions-manual-complete"
             element={<TransactionComplete />}
           />
-
           <Route
             path="approve/transactions-manual-pending"
             element={<TransactionPendingApproved />}
@@ -603,7 +600,6 @@ const routes = () => {
             path="approve/transactions-manual-complete"
             element={<TransactionCompleteApproved />}
           />
-
           {/* <Route path="md/provinces" element={<MDProvince />} />
           <Route path="md/cities" element={<MDCity />} /> */}
           <Route path="md/products" element={<MDProduct />} />
@@ -615,12 +611,9 @@ const routes = () => {
           />
           <Route path="md/companies" element={<MDCompany />} />
           <Route path="md/drivers" element={<MDDriver />} />
-
           <Route path="kualitas/cpo" element={<KualitasCpo />} />
           <Route path="kualitas/kernel" element={<KualitasKernel />} />
-
           <Route path="administration/configs/:id" element={<Config />} />
-
           <Route path="administration/users" element={<AdmUser />} />
           <Route path="administration/users/add" element={<AdmUserCreate />} />
           <Route path="administration/users/:id" element={<AdmUserView />} />

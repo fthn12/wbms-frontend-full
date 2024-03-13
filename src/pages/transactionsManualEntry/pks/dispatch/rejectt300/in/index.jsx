@@ -110,6 +110,8 @@ const TransactionPksCancelIn = (props) => {
 
       tempTrans.isManualEntry = 1;
       tempTrans.typeTransaction = 5;
+      // tempTrans.deliveryStatus = 26;
+      // tempTrans.deliveryDate = moment().toDate();
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.progressStatus = 11;
@@ -240,7 +242,7 @@ const TransactionPksCancelIn = (props) => {
                           wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ mr: 1, backgroundColor: "goldenrod" }}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
                     />
                   )}
                   {WBMS.WB_STATUS === false && (
@@ -254,7 +256,7 @@ const TransactionPksCancelIn = (props) => {
                           isValid && values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ mr: 1, backgroundColor: "goldenrod" }}
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
                     />
                   )}
                   <Button

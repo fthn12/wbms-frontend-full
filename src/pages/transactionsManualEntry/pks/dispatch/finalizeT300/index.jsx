@@ -50,17 +50,10 @@ const UserCreate = () => {
   const [dtRoles] = useState(ROLES);
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    openedTransaction,
-    clearWbTransaction,
-    setOpenedTransaction,
-    setWbTransaction,
-    clearOpenedTransaction,
-  } = useTransaction();
+  const { openedTransaction, clearWbTransaction, clearOpenedTransaction } =
+    useTransaction();
 
-  const [isCancel, setIsCancel] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(0);
-  const [isReadOnly, setIsReadOnly] = useState(true);
+  const [originWeighNetto, setOriginWeighNetto] = useState(0);
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const { useGetSitesQuery } = useSite();
@@ -110,10 +103,11 @@ const UserCreate = () => {
         tempTrans.destinationSiteName = selectedDestinationSite.name || "";
       }
 
-      tempTrans.typeTransaction = 5;
       tempTrans.isManualEntry = 1;
-      tempTrans.deliveryStatus = 38;
+      tempTrans.typeTransaction = 5;
       tempTrans.progressStatus = 21;
+      tempTrans.deliveryStatus = 38;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.unloadingOperatorName =
         tempTrans.unloadingOperatorName.toUpperCase();
       tempTrans.destinationWeighInTimestamp = moment(
@@ -146,6 +140,20 @@ const UserCreate = () => {
       return;
     }
   };
+
+  useEffect(() => {
+    if (
+      openedTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      openedTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
+      setOriginWeighNetto(0);
+    } else {
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
+      setOriginWeighNetto(total);
+    }
+  }, [openedTransaction]);
 
   return (
     <Box mt={1}>
@@ -184,107 +192,164 @@ const UserCreate = () => {
 
               <Paper sx={{ mt: 4, minHeight: "71.5vh" }}>
                 <Grid container justifyContent="center" spacing={3}>
-                  <Grid item xs={12} sm={5}>
+                  <Grid item xs={12} sm={6} lg={4}>
+                    <Grid container columnSpacing={1}>
+                      <Grid item xs={12}>
+                        <Divider>DATA TIMBANG KENDARAAN PKS</Divider>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="text"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          label="Operator WB-IN"
+                          name="originWeighInOperatorName"
+                          value={values?.originWeighInOperatorName || "-"}
+                          inputProps={{
+                            readOnly: true,
+                            style: { textTransform: "uppercase" },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="text"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          label="Operator WB-OUT"
+                          value={values?.originWeighOutOperatorName || "-"}
+                          name="originWeighOutOperatorName"
+                          inputProps={{
+                            readOnly: true,
+                            style: { textTransform: "uppercase" },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="text"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          label="Waktu WB-IN"
+                          name="originWeighInTimestamp"
+                          inputProps={{ readOnly: true }}
+                          value={
+                            values?.originWeighInTimestamp
+                              ? moment(values.originWeighInTimestamp)
+                                  .local()
+                                  .format(`DD/MM/YYYY - HH:mm:ss`)
+                              : "-"
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="text"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          label="Waktu WB-Out"
+                          name="originWeighOutTimestamp"
+                          inputProps={{ readOnly: true }}
+                          value={
+                            values?.originWeighOutTimestamp
+                              ? moment(values.originWeighOutTimestamp)
+                                  .local()
+                                  .format(`DD/MM/YYYY - HH:mm:ss`)
+                              : "-"
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="number"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
+                            ),
+                          }}
+                          label="BERAT MASUK - IN"
+                          name="originWeighInKg"
+                          value={
+                            values?.originWeighInKg > 0
+                              ? values.originWeighInKg.toFixed(2)
+                              : "0.00"
+                          }
+                          inputProps={{ readOnly: true }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="number"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
+                            ),
+                          }}
+                          value={
+                            values?.originWeighOutKg > 0
+                              ? values.originWeighOutKg.toFixed(2)
+                              : "0.00"
+                          }
+                          label="BERAT KELUAR - OUT"
+                          name="originWeighOutKg"
+                          inputProps={{ readOnly: true }}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Divider>TOTAL</Divider>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Field
+                          type="number"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
+                            ),
+                          }}
+                          label="TOTAL"
+                          name="weightNetto"
+                          value={
+                            originWeighNetto > 0
+                              ? originWeighNetto.toFixed(2)
+                              : "0.00"
+                          }
+                        />
+                      </Grid>
+                    </Grid>
+                  </Grid>
+
+                  <Grid item xs={12} sm={4}>
                     <Grid container justifyContent="center" spacing={2}>
-                      <Grid item xs={12} >
-                        <Divider>DATA DARI T300</Divider>
+                      <Grid item xs={12}>
+                        <Divider>DATA TIMBANG KENDARAAN T300</Divider>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Field
-                          type="number"
-                          variant="outlined"
-                          component={TextField}
-                          size="small"
-                          fullWidth
-                          required={true}
-                          sx={{
-                            backgroundColor: "transparant",
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">kg</InputAdornment>
-                            ),
-                          }}
-                          label="BERAT ASAL MASUK - IN"
-                          name="destinationWeighInKg"
-                          value={
-                            values?.destinationWeighInKg > 0
-                              ? values.destinationWeighInKg
-                              : "0"
-                          }
-                        />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <Field
-                          type="datetime-local"
-                          variant="outlined"
-                          component={TextField}
-                          size="small"
-                          fullWidth
-                          required={true}
-                          sx={{
-                            backgroundColor: "transparant",
-                          }}
-                          label="WAKTU ASAL MASUK - IN"
-                          name="destinationWeighInTimestamp"
-                          value={moment(
-                            values?.destinationWeighInTimestamp
-                          ).format("YYYY-MM-DDTHH:mm")}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <Field
-                          type="number"
-                          variant="outlined"
-                          component={TextField}
-                          size="small"
-                          fullWidth
-                          required={true}
-                          sx={{
-                            backgroundColor: "transparant",
-                          }}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">kg</InputAdornment>
-                            ),
-                          }}
-                          label="BERAT ASAL KELUAR - OUT"
-                          name="destinationWeighOutKg"
-                          value={
-                            values?.destinationWeighOutKg > 0
-                              ? values.destinationWeighOutKg
-                              : "0"
-                          }
-                        />
-                      </Grid>
-
-                      <Grid item xs={6}>
-                        <Field
-                          type="datetime-local"
-                          variant="outlined"
-                          component={TextField}
-                          size="small"
-                          fullWidth
-                          required={true}
-                          sx={{
-                            backgroundColor: "transparant",
-                          }}
-                          label="WAKTU ASAL KELUAR - OUT"
-                          name="destinationWeighOutTimestamp"
-                          value={moment(
-                            values?.destinationWeighOutTimestamp
-                          ).format("YYYY-MM-DDTHH:mm")}
-                          InputLabelProps={{
-                            shrink: true,
-                          }}
-                        />
-                      </Grid>
-
                       <Grid item xs={6}>
                         <Field
                           name="unloadingOperatorName"
@@ -296,7 +361,7 @@ const UserCreate = () => {
                           size="small"
                           fullWidth
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                           inputProps={{
                             style: { textTransform: "uppercase" },
@@ -312,7 +377,7 @@ const UserCreate = () => {
                           fullWidth
                           required={true}
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                           label="WAKTU BONGKAR"
                           name="unloadingTimestamp"
@@ -324,10 +389,101 @@ const UserCreate = () => {
                           }}
                         />
                       </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="number"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          required={true}
+                          sx={{
+                            backgroundColor: "lightyellow",
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
+                            ),
+                          }}
+                          label="BERAT ASAL MASUK - IN"
+                          name="destinationWeighInKg"
+                          value={
+                            values?.destinationWeighInKg > 0
+                              ? values.destinationWeighInKg
+                              : "0"
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="datetime-local"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          required={true}
+                          sx={{
+                            backgroundColor: "lightyellow",
+                          }}
+                          label="WAKTU ASAL MASUK - IN"
+                          name="destinationWeighInTimestamp"
+                          value={moment(
+                            values?.destinationWeighInTimestamp
+                          ).format("YYYY-MM-DDTHH:mm")}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="number"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          required={true}
+                          sx={{
+                            backgroundColor: "lightyellow",
+                          }}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">kg</InputAdornment>
+                            ),
+                          }}
+                          label="BERAT ASAL KELUAR - OUT"
+                          name="destinationWeighOutKg"
+                          value={
+                            values?.destinationWeighOutKg > 0
+                              ? values.destinationWeighOutKg
+                              : "0"
+                          }
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Field
+                          type="datetime-local"
+                          variant="outlined"
+                          component={TextField}
+                          size="small"
+                          fullWidth
+                          required={true}
+                          sx={{
+                            backgroundColor: "lightyellow",
+                          }}
+                          label="WAKTU ASAL KELUAR - OUT"
+                          name="destinationWeighOutTimestamp"
+                          value={moment(
+                            values?.destinationWeighOutTimestamp
+                          ).format("YYYY-MM-DDTHH:mm")}
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                        />
+                      </Grid>
                       <Grid item xs={12}>
                         <Divider>Segel Tangki Bongkar T300</Divider>
                       </Grid>
-
                       <Grid item xs={6}>
                         <Field
                           name="unloadedSeal1"
@@ -339,11 +495,10 @@ const UserCreate = () => {
                           size="small"
                           fullWidth
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                         />
                       </Grid>
-
                       <Grid item xs={6}>
                         <Field
                           name="unloadedSeal2"
@@ -355,7 +510,7 @@ const UserCreate = () => {
                           size="small"
                           fullWidth
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                         />
                       </Grid>
@@ -369,7 +524,7 @@ const UserCreate = () => {
                           size="small"
                           fullWidth
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                         />
                       </Grid>
@@ -383,22 +538,20 @@ const UserCreate = () => {
                           size="small"
                           fullWidth
                           sx={{
-                            backgroundColor: "transparant",
+                            backgroundColor: "lightyellow",
                           }}
                         />
                       </Grid>
-
                       <Grid item xs={12}>
                         <Divider>Tangki Tujuan</Divider>
                       </Grid>
-
                       <Grid item xs={12}>
                         <StorageTankSelect
                           name="destinationSinkStorageTankId"
                           label="Tangki Tujuan"
                           isRequired={true}
                           isReadOnly={false}
-                          backgroundColor="transparant"
+                          backgroundColor="lightyellow"
                           siteId={WBMS.DESTINATION_SITE.refId}
                         />
                       </Grid>

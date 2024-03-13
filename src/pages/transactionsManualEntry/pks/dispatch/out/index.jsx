@@ -198,14 +198,14 @@ const PKSManualEntryDispatchOut = () => {
           tempTrans.isManualTonase = 1;
         }
 
-        tempTrans.deliveryStatus = 20;
         tempTrans.isManualEntry = 1;
         tempTrans.typeTransaction = 5;
+        tempTrans.progressStatus = 20;
+        tempTrans.deliveryStatus = 20;
         tempTrans.deliveryDate = moment().toDate();
         tempTrans.returnWeighInTimestamp = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
-        tempTrans.progressStatus = 20;
         tempTrans.dtTransaction = moment()
           .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
           .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
@@ -524,7 +524,7 @@ const PKSManualEntryDispatchOut = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            // backgroundColor="lightyellow"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -553,7 +553,7 @@ const PKSManualEntryDispatchOut = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            // backgroundColor="lightyellow"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -582,7 +582,7 @@ const PKSManualEntryDispatchOut = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            // backgroundColor="lightyellow"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -615,7 +615,7 @@ const PKSManualEntryDispatchOut = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="transparant"
+                            backgroundColor="lightyellow"
                             siteId={WBMS.SITE.refId}
                           />
                         </Grid>
@@ -707,7 +707,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -721,7 +721,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -734,7 +734,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -747,7 +747,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "tranparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -764,7 +764,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -788,7 +788,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -812,7 +812,7 @@ const PKSManualEntryDispatchOut = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">

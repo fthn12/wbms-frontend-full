@@ -117,9 +117,9 @@ const TransactionPksNormalIn = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ originWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (

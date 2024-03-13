@@ -81,7 +81,14 @@ const TransactionPksCancelIn = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrans.returnWeighInKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.returnWeighInKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        tempTrans.isManualTonase = 1;
+      }
+
+      tempTrans.isManualEntry = 1;
+      tempTrans.typeTransaction = 5;
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()

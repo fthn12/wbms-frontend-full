@@ -121,7 +121,14 @@ const TransactionManualPksCancelOut = (props) => {
       );
       if (WBMS.WB_STATUS === true) {
         tempTrans.returnWeighOutKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        tempTrans.isManualTonase = 1;
       }
+
+      tempTrans.isManualEntry = 1;
+      tempTrans.typeTransaction = 5;
+      tempTrans.deliveryStatus = 32;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.returnWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighOutTimestamp = moment().toDate();
       tempTrans.progressStatus = 26;
