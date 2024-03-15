@@ -108,7 +108,14 @@ const TransactionT30NormaOut = (props) => {
       wbTransaction.ispoSccModel = parseInt(wbTransaction.ispoSccModel);
 
       if (isCancel) {
-        wbTransaction.returnWeighInKg = wb.weight;
+        if (WBMS.WB_STATUS === true) {
+          wbTransaction.returnWeighInKg = wb.weight;
+        } else if (WBMS.WB_STATUS === false) {
+          wbTransaction.returnWeighInKg = wbTransaction.originWeighOutKg;
+        }
+        wbTransaction.originWeighOutKg = 0;
+
+        // wbTransaction.returnWeighInKg = wb.weight;
         wbTransaction.returnWeighInOperatorName = user.name.toUpperCase();
         wbTransaction.returnWeighInTimestamp = moment().toDate();
         wbTransaction.dtTransaction = moment()
@@ -133,7 +140,11 @@ const TransactionT30NormaOut = (props) => {
 
         return;
       } else {
-        wbTransaction.originWeighOutKg = wb.weight;
+        if (WBMS.WB_STATUS === true) {
+          wbTransaction.originWeighOutKg = wb.weight;
+        }
+
+        // wbTransaction.originWeighOutKg = wb.weight;
         wbTransaction.originWeighOutOperatorName = user.name.toUpperCase();
         wbTransaction.originWeighOutTimestamp = moment().toDate();
         wbTransaction.dtTransaction = moment()
@@ -175,9 +186,9 @@ const TransactionT30NormaOut = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -227,7 +238,7 @@ const TransactionT30NormaOut = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     variant="contained"
                     onClick={() => handleSubmit()}
                     disabled={
@@ -253,7 +264,67 @@ const TransactionT30NormaOut = (props) => {
                       )
                     }
                     sx={{ ml: 1, backgroundColor: "darkred" }}
-                  />
+                  /> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      variant="contained"
+                      onClick={() => handleSubmit()}
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN (WB-OUT)
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      variant="contained"
+                      onClick={() => handleSubmit()}
+                      disabled={
+                        !(
+                          isValid &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN (WB-OUT)
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (WB-IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN CANCEL (WB-IN)"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}

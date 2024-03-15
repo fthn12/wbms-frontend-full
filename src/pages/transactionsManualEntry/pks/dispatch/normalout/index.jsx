@@ -141,6 +141,7 @@ const PKSManualEntryDispatchOut = () => {
       tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
       tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
       tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
+
       if (isCancel) {
         if (WBMS.WB_STATUS === true) {
           tempTrans.returnWeighInKg = wb.weight;
@@ -200,8 +201,8 @@ const PKSManualEntryDispatchOut = () => {
 
         tempTrans.isManualEntry = 1;
         tempTrans.typeTransaction = 5;
-        tempTrans.progressStatus = 20;
         tempTrans.deliveryStatus = 20;
+        tempTrans.progressStatus = 20;
         tempTrans.deliveryDate = moment().toDate();
         tempTrans.returnWeighInTimestamp = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();

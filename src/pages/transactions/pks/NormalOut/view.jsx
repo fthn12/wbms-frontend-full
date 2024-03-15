@@ -66,7 +66,7 @@ const TransactionT30NormalOutView = (props) => {
 
   const handleReject = () => {
     clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/manual-entry-dispatch-reject-in/${id}`);
+    navigate(`/wb/transactions/pks/dispatch-reject-t300-in/${id}`);
   };
 
   const handleFinalizeT300 = () => {

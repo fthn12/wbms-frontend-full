@@ -155,9 +155,7 @@ const TransactionManualPksCancelOut = (props) => {
       setIsLoading(false);
 
       const id = response?.data?.transaction?.id;
-      navigate(
-        `/wb/transactions/pks/manual-entry-dispatch-reject-out-view/${id}`
-      );
+      navigate(`/wb/transactions/pks/dispatch-reject-t300-out-view/${id}`);
 
       setIsLoading(false);
       toast.success("Transaksi REJECT WB-OUT telah tersimpan.");

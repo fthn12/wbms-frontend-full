@@ -41,7 +41,7 @@ const PksManualEntryOutTbs = lazy(() =>
   import("../pages/transactionsManualEntry/pks/tbs/out")
 );
 const PksManualEntryOutDispatch = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/out")
+  import("../pages/transactionsManualEntry/pks/dispatch/normalout")
 );
 
 const PksManualEntryOthersView = lazy(() =>
@@ -54,7 +54,7 @@ const PksManualEntryKernelView = lazy(() =>
   import("../pages/transactionsManualEntry/pks/kernel/view")
 );
 const PksManualEntryDispatchView = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/view")
+  import("../pages/transactionsManualEntry/pks/dispatch/normalout/view")
 );
 
 const PksManualEntryDispatchCancelIn = lazy(() =>
@@ -71,32 +71,28 @@ const PksManualEntryDispatchCancelOutView = lazy(() =>
 );
 
 const PksRejectT300InManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/in")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectT300/in")
 );
 const PksRejectT300InManualView = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/in/view")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectT300/in/view")
 );
 const PksRejectT300OutManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectT300/out")
 );
 const PksRejectT300OutManualView = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectt300/out/view")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectT300/out/view")
 );
 const RejectBulkingInManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectBulking/in")
 );
 const RejectBulkingInManualView = lazy(() =>
-  import(
-    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/in/view"
-  )
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectBulking/in/view")
 );
 const RejectBulkingOutManual = lazy(() =>
-  import("../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/out")
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectBulking/out")
 );
 const RejectBulkingOutManualView = lazy(() =>
-  import(
-    "../pages/transactionsManualEntry/pks/dispatch/rejectbulkingin/out/view"
-  )
+  import("../pages/transactionsManualEntry/pks/dispatch/rejectBulking/out/view")
 );
 
 const PksNormalIn = lazy(() => import("../pages/transactions/pks/NormalIn"));
@@ -139,7 +135,7 @@ const T30ManualEntryIn = lazy(() =>
 );
 
 const T30ManualEntryOutDispatch = lazy(() =>
-  import("../pages/transactionsManualEntry/t30/dispatch/out")
+  import("../pages/transactionsManualEntry/t30/dispatch/normalout")
 );
 const T30ManualEntryOutOthers = lazy(() =>
   import("../pages/transactionsManualEntry/t30/others/out")
@@ -189,7 +185,9 @@ const T30DeletedView = lazy(() =>
 const BulkingManualEntryIn = lazy(() =>
   import("../pages/transactionsManualEntry/bulking/wb-in")
 );
-
+const BulkingManualEntryInQR = lazy(() =>
+  import("../pages/transactionsManualEntry/bulking/dispatch/in/in-qr")
+);
 const BulkingManualEntryDispatchOut = lazy(() =>
   import("../pages/transactionsManualEntry/bulking/dispatch/out")
 );
@@ -415,42 +413,42 @@ const routes = () => {
             element={<PksManualEntryDispatchCancelOutView />}
           />
           <Route
-            path="transactions/pks/manual-entry-dispatch-reject-in/:id"
+            path="transactions/pks/dispatch-reject-t300-in/:id"
             name="PksRejectT300InManual"
             element={<PksRejectT300InManual />}
           />
           <Route
-            path="transactions/pks/manual-entry-dispatch-reject-in-view/:id"
+            path="transactions/pks/dispatch-reject-t300-in-view/:id"
             name="PksRejectT300InManualView"
             element={<PksRejectT300InManualView />}
           />
           <Route
-            path="transactions/pks/manual-entry-dispatch-reject-out/:id"
+            path="transactions/pks/dispatch-reject-t300-out/:id"
             name="PksRejectT300OutManual"
             element={<PksRejectT300OutManual />}
           />
           <Route
-            path="transactions/pks/manual-entry-dispatch-reject-out-view/:id"
+            path="transactions/pks/dispatch-reject-t300-out-view/:id"
             name="PksRejectT300OutManualView"
             element={<PksRejectT300OutManualView />}
           />
           <Route
-            path="transactions/bulking/manual-entry-dispatch-reject-in"
+            path="transactions/pks/dispatch-reject-bulking-in"
             name="RejectBulkingInManual"
             element={<RejectBulkingInManual />}
           />
           <Route
-            path="transactions/bulking/manual-entry-dispatch-reject-in-view/:id"
+            path="transactions/pks/dispatch-reject-bulking-in-view/:id"
             name="RejectBulkingInManualView"
             element={<RejectBulkingInManualView />}
           />
           <Route
-            path="transactions/bulking/manual-entry-dispatch-reject-out/:id"
+            path="transactions/pks/dispatch-reject-bulking-out/:id"
             name="RejectBulkingOutManual"
             element={<RejectBulkingOutManual />}
           />
           <Route
-            path="transactions/bulking/manual-entry-dispatch-reject-out-view/:id"
+            path="transactions/pks/dispatch-reject-bulking-out-view/:id"
             name="RejectBulkingOutManualView"
             element={<RejectBulkingOutManualView />}
           />
@@ -537,8 +535,11 @@ const routes = () => {
           />
           <Route
             path="transactions/bulking/manual-entry-in"
-            name="BulkingManualEntryWbIn"
             element={<BulkingManualEntryIn />}
+          />
+          <Route
+            path="transactions/bulking/manual-entry-in-qr"
+            element={<BulkingManualEntryInQR />}
           />
           <Route
             path="transactions/bulking/manual-entry-dispatch-out/:id"

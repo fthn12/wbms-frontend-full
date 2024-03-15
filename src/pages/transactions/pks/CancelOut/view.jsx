@@ -732,7 +732,7 @@ const TransactionT30CancelInView = (props) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sx={{ mt: 3 }}>
+                        <Grid item xs={12} sx={{ mt: 2 }}>
                           <Divider>Catatan</Divider>
                         </Grid>
                         <Grid item xs={12}>

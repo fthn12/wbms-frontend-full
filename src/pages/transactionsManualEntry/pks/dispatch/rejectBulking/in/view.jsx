@@ -10,15 +10,15 @@ import {
 } from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
-import { TextField } from "formik-mui";
+import { TextField, Select } from "formik-mui";
 import * as yup from "yup";
 
 import moment from "moment";
 import numeral from "numeral";
 
-import Header from "../../../../components/layout/signed/HeaderTransaction";
-import ProgressStatus from "../../../../components/ProgressStatus";
-import QRCodeViewer from "../../../../components/QRCodeViewer";
+import Header from "../../../../../../components/layout/signed/HeaderTransaction";
+import ProgressStatus from "../../../../../../components/ProgressStatus";
+import QRCodeViewer from "../../../../../../components/QRCodeViewer";
 
 import {
   TransportVehicleAC,
@@ -27,13 +27,26 @@ import {
   SiteSelect,
   CertificateSelect,
   StorageTankSelect,
-} from "../../../../components/FormikMUI";
+} from "../../../../../../components/FormikMUI";
 
-import { TransactionAPI } from "../../../../apis";
+import { TransactionAPI } from "../../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useApp } from "../../../../hooks";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useApp,
+  useProduct,
+} from "../../../../../../hooks";
+import { MenuItem } from "react-pro-sidebar";
+import {
+  CompanyACP,
+  DriverACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "components/FormManualEntry";
 
-const TransactionT30CancelInView = (props) => {
+const TransactionPksRejectBulkingInView = (props) => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -41,11 +54,12 @@ const TransactionT30CancelInView = (props) => {
   const transactionAPI = TransactionAPI();
 
   const { user } = useAuth();
-  const { WBMS, SCC_MODEL } = useConfig();
+  const { WBMS, PRODUCT_TYPES } = useConfig();
   const { urlPrev, setUrlPrev } = useApp();
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
     useTransaction();
-
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
+  const [selectedOption, setSelectedOption] = useState(0);
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [returnWeighNetto, setReturnWeighNetto] = useState(0);
 
@@ -57,7 +71,24 @@ const TransactionT30CancelInView = (props) => {
     // originSourceStorageTankId: yup.string().required("Wajib diisi."),
     // loadedSeal1: yup.string().required("Wajib diisi."),
     // loadedSeal2: yup.string().required("Wajib diisi."),
+    returnWeighInRemark: yup
+      .string()
+      .required("Wajib diisi.")
+      .min(11, "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter.")
+      .max(
+        500,
+        "Alasan REJECT (PENGEMBALIAN) tidak boleh melebihi 500 karakter."
+      ),
   });
+
+  const { useFindManyProductQuery } = useProduct();
+  const productFilter = {
+    where: {
+      productGroupId: selectedOption,
+    },
+  };
+
+  const { data: dtProduct } = useFindManyProductQuery(productFilter);
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -83,7 +114,7 @@ const TransactionT30CancelInView = (props) => {
       clearOpenedTransaction();
       setIsLoading(false);
 
-      toast.success(`Update Transaksi CANCEL WB-IN telah tersimpan.`);
+      toast.success(`Update Transaksi REJECT WB-IN telah tersimpan.`);
 
       return handleClose();
     } catch (error) {
@@ -101,6 +132,7 @@ const TransactionT30CancelInView = (props) => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
+        setSelectedOption(res.data.transaction.productType);
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -140,7 +172,7 @@ const TransactionT30CancelInView = (props) => {
 
   return (
     <Box>
-      <Header title="TRANSAKSI T30" subtitle="DATA TIMBANG CANCEL" />
+      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -149,7 +181,14 @@ const TransactionT30CancelInView = (props) => {
           validationSchema={validationSchema}
         >
           {(props) => {
-            const { values, submitForm, resetForm } = props;
+            const {
+              values,
+              submitForm,
+              resetForm,
+              isValid,
+              dirty,
+              handleChange,
+            } = props;
             // console.log("Formik props:", props)
 
             const handleSubmit = async () => {
@@ -168,22 +207,21 @@ const TransactionT30CancelInView = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {/* <Button
+                  <Button
                     variant="contained"
-                    sx={{ mr: 1 }}
                     disabled={isReadOnly ? false : !(isValid && dirty)}
                     onClick={handleSubmit}
                   >
-                    {isReadOnly ? "PERUBAHAN DATA" : "SIMPAN PERUBAHAN"}
-                  </Button> */}
-                  <QRCodeViewer
+                    {isReadOnly ? "EDIT" : "SIMPAN"}
+                  </Button>
+                  {/* <QRCodeViewer
                     progressStatus={values.progressStatus}
                     deliveryOrderId={values.deliveryOrderId}
                     type="form"
                     disabled={!isReadOnly}
                   >
                     TAMPILKAN QR
-                  </QRCodeViewer>
+                  </QRCodeViewer> */}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}
@@ -205,342 +243,104 @@ const TransactionT30CancelInView = (props) => {
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12} sx={{ mb: 1 }}>
-                          <Divider>DATA KENDARAAN</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="bonTripNo"
-                            label="NO BONTRIP"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <ProgressStatus
-                            progressStatus={values?.progressStatus}
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <TransportVehicleAC
-                            name="transportVehiclePlateNo"
-                            label="Nomor Plat Kendaraan"
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <DriverAC
-                            name="driverName"
-                            label="Nama Supir"
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="transportVehicleProduct"
-                            label="Produk Kendaraan"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={`${values.transportVehicleProductCode} - ${values.transportVehicleProductName}`}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="transportVehicleSccModel"
-                            label="Sertifikasi Kendaraan"
-                            isRequired={false}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <CompanyAC
-                            name="transporterCompanyName"
-                            label="Nama Vendor"
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                          />
-                        </Grid>
-
-                        {/* <Grid item xs={6}>
-                          <SiteSelect
-                            name="originSiteId"
-                            label="Site Asal"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <SiteSelect
-                            name="destinationSiteId"
-                            label="Site Tujuan"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid> */}
+                      <Grid item xs={12}>
+                        <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
                       </Grid>
+                      <Field
+                        variant="outlined"
+                        fullWidth
+                        sx={{ backgroundColor: "whitesmoke", mb: 2 }}
+                        size="small"
+                        label="NO BONTRIP"
+                        name="bonTripNo"
+                        component={TextField}
+                        inputProps={{ readOnly: true }}
+                      />
+                        {/* <Field
+                        name="productType"
+                        label="Tipe Transaksi"
+                        component={Select}
+                        size="small"
+                        formControl={{
+                          fullWidth: true,
+                          required: true,
+                          size: "small",
+                        }}
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        onChange={(event, newValue) => {
+                          handleChange(event);
+                          const selectedProductType = dtTypeProduct.find(
+                            (item) => item.id === event.target.value
+                          );
+                          setSelectedOption(selectedProductType.id);
+                        
+                        }}
+                      >
+                        {dtTypeProduct &&
+                          dtTypeProduct.map((data, index) => (
+                            <MenuItem key={index} value={data.id}>
+                              {data.value}
+                            </MenuItem>
+                          ))}
+                      </Field> */}
+                      <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                      />
+
+                      <Field
+                        name="deliveryOrderNo"
+                        label="NO DO"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                      />
+                      <TransportVehicleACP
+                        name="transportVehicleId"
+                        label="Nomor Plat"
+                        isReadOnly={true}
+                        sx={{ mb: 2 }}
+                      />
+                      <DriverACP
+                        name="driverName"
+                        label="Nama Supir"
+                        isReadOnly={true}
+                        sx={{ mb: 2 }}
+                      />
+                      <CompanyACP
+                        name="transporterCompanyName"
+                        label="Nama Vendor"
+                        isReadOnly={true}
+                        sx={{ mb: 2 }}
+                      />
+                      <ProductACP
+                        data={dtProduct}
+                        name="productId"
+                        label="Nama Product"
+                        isReadOnly={true}
+                        sx={{ mb: 2 }}
+                      />
                     </Grid>
 
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
-                        <Grid item xs={12} sx={{ mb: 1 }}>
-                          <Divider>DATA PRODUK</Divider>
-                        </Grid>
-
                         <Grid item xs={12}>
-                          <Field
-                            name="product"
-                            label="Produk"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={`${values.productCode} - ${values.productName}`}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="rspoSccModel"
-                            label="Sertifikasi RSPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="rspoCertificateNumber"
-                            label="Nomor Sertifikasi RSPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="isccSccModel"
-                            label="Sertifikasi ISCC"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="isccCertificateNumber"
-                            label="Nomor Sertifikasi ISCC"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="ispoSccModel"
-                            label="Sertifikasi ISPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="ispoCertificateNumber"
-                            label="Nomor Sertifikasi ISPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <TextFieldMUI
-                            label=""
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: "transparent",
-                              input: {
-                                cursor: "default",
-                                borderColor: "transparent",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&:hover fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "transparent",
-                                },
-                              },
-                            }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Divider sx={{ mb: 1 }}>Tangki</Divider>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <StorageTankSelect
-                            name="originSourceStorageTankId"
-                            label="Tangki Asal"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 1 }}
-                            backgroundColor={"whitesmoke"}
-                            siteId=""
-                          />
-                        </Grid>
-                        {/* <Grid item xs={12}>
-                          <StorageTankSelect
-                            name="destinationSinkStorageTankId"
-                            label="Tangki Tujuan"
-                            isRequired={true}
-                            isReadOnly={false}
-                            sx={{ mt: 1 }}
-                            backgroundColor="white"
-                            siteId={WBMS.SITE.refId}
-                          />
-                        </Grid> */}
-
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
-                        </Grid>
-
-                        <Grid item xs={4}>
-                          <Field
-                            name="originFfaPercentage"
-                            label="FFA"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originFfaPercentage > 0
-                                ? values.originFfaPercentage.toFixed(2)
-                                : "0.00"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originMoistPercentage"
-                            label="Moist"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originMoistPercentage > 0
-                                ? values.originMoistPercentage.toFixed(2)
-                                : "0.00"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originDirtPercentage"
-                            label="Dirt"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originDirtPercentage > 0
-                                ? values.originDirtPercentage.toFixed(2)
-                                : "0.00"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                      </Grid>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12} sx={{ mb: 1 }}>
                           <Divider>Segel Saat ini</Divider>
                         </Grid>
-
                         <Grid item xs={6}>
                           <Field
                             name="currentSeal1"
@@ -550,8 +350,11 @@ const TransactionT30CancelInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={
+                              values?.currentSeal1 ? values.currentSeal1 : "-"
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -563,8 +366,11 @@ const TransactionT30CancelInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={
+                              values?.currentSeal2 ? values.currentSeal2 : "-"
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -578,6 +384,9 @@ const TransactionT30CancelInView = (props) => {
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={
+                              values?.currentSeal3 ? values.currentSeal3 : "-"
+                            }
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -591,167 +400,66 @@ const TransactionT30CancelInView = (props) => {
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={
+                              values?.currentSeal4 ? values.currentSeal4 : "-"
+                            }
                           />
                         </Grid>
-
-                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Tangki Kosong</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal1"
-                            label="Segel KOSONG Mainhole 1"
-                            type="text"
-                            required
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal2"
-                            label="Segel KOSONG Valve 1"
-                            type="text"
-                            required
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal3"
-                            label="Segel KOSONG Mainhole 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="unloadedSeal4"
-                            label="Segel KOSONG Valve 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid> */}
-
-                        <Grid item xs={12} sx={{ mt: 2, mb: 1 }}>
-                          <Divider>Segel Tangki Isi</Divider>
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal1"
-                            label="Segel ISI Mainhole 1"
-                            type="text"
-                            required
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 1,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal2"
-                            label="Segel ISI Valve 1"
-                            type="text"
-                            required
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 1,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal3"
-                            label="Segel ISI Mainhole 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal4"
-                            label="Segel ISI Valve 2"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Catatan</Divider>
+                          <Divider>Segel Tangki Bongkar</Divider>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                           <Field
-                            name="returnWeighInRemark"
-                            label="Alasan CANCEL (PEMBATALAN)"
+                            name="returnUnloadedSeal1"
+                            label="Segel BONGKAR Mainhole 1"
+                            type="text"
+                            // required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnUnloadedSeal2"
+                            label="Segel BONGKAR Valve 1"
+                            type="text"
+                            // required={true}
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnUnloadedSeal3"
+                            label="Segel BONGKAR Mainhole 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            required
-                            multiline
-                            rows={5.4}
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            sx={{
-                              mt: 2,
-                              backgroundColor: "whitesmoke",
-                            }}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnUnloadedSeal4"
+                            label="Segel BONGKAR Valve 2"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>
@@ -760,7 +468,7 @@ const TransactionT30CancelInView = (props) => {
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider>DATA TIMBANG KENDARAAN</Divider>
+                          <Divider>DATA TIMBANG ASAL</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -774,6 +482,7 @@ const TransactionT30CancelInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.originWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -788,7 +497,7 @@ const TransactionT30CancelInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            // value={user.name.toUpperCase()}
+                            value={values.originWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -824,7 +533,6 @@ const TransactionT30CancelInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            // value={moment().format(`DD/MM/YYYY - HH:mm:ss`)}
                             value={
                               values?.originWeighOutTimestamp
                                 ? moment(values.originWeighOutTimestamp)
@@ -851,12 +559,12 @@ const TransactionT30CancelInView = (props) => {
                                 </InputAdornment>
                               ),
                             }}
-                            inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInKg > 0
                                 ? values.originWeighInKg.toFixed(2)
                                 : "0.00"
                             }
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -876,19 +584,19 @@ const TransactionT30CancelInView = (props) => {
                                 </InputAdornment>
                               ),
                             }}
-                            inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutKg > 0
                                 ? values.originWeighOutKg.toFixed(2)
                                 : "0.00"
                             }
-                            // value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
 
                         <Grid item xs={12} sx={{ mt: 2 }}>
                           <Divider>TOTAL</Divider>
                         </Grid>
+
                         <Grid item xs={12}>
                           <Field
                             name="originWeighNetto"
@@ -906,47 +614,21 @@ const TransactionT30CancelInView = (props) => {
                                 </InputAdornment>
                               ),
                             }}
-                            inputProps={{ readOnly: true }}
                             value={
                               originWeighNetto > 0
                                 ? originWeighNetto.toFixed(2)
                                 : "0.00"
                             }
-                          />
-                        </Grid>
-
-                        {/* <Grid item xs={12}>
-                          <TextFieldMUI
-                            label=""
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: "transparent",
-                              input: {
-                                cursor: "default",
-                                borderColor: "transparent",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&:hover fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "transparent",
-                                },
-                              },
-                            }}
                             inputProps={{ readOnly: true }}
                           />
-                        </Grid> */}
+                        </Grid>
+                      </Grid>
+                    </Grid>
 
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 2 }}>DATA TIMBANG CANCEL</Divider>
+                          <Divider>DATA TIMBANG REJECT</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -960,7 +642,7 @@ const TransactionT30CancelInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            // value={user.name.toUpperCase()}
+                            value={values.returnWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -975,7 +657,7 @@ const TransactionT30CancelInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            // value={user.name.toUpperCase()}
+                            value={values.returnWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -997,9 +679,9 @@ const TransactionT30CancelInView = (props) => {
                                     .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
-                            // value={moment().format(`DD/MM/YYYY - HH:mm:ss`)}
                           />
                         </Grid>
+
                         <Grid item xs={6}>
                           <Field
                             name="returnWeighOutTimestamp"
@@ -1046,7 +728,6 @@ const TransactionT30CancelInView = (props) => {
                             }
                           />
                         </Grid>
-
                         <Grid item xs={6}>
                           <Field
                             name="returnWeighOutKg"
@@ -1074,12 +755,12 @@ const TransactionT30CancelInView = (props) => {
                         </Grid>
 
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>TOTAL CANCEL</Divider>
+                          <Divider>TOTAL REJECT</Divider>
                         </Grid>
                         <Grid item xs={12}>
                           <Field
                             name="returnWeighNetto"
-                            label="TOTAL CANCEL"
+                            label="NETTO"
                             type="number"
                             component={TextField}
                             variant="outlined"
@@ -1099,6 +780,30 @@ const TransactionT30CancelInView = (props) => {
                                 ? returnWeighNetto.toFixed(2)
                                 : "0.00"
                             }
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Catatan</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            name="returnWeighInRemark"
+                            label="Alasan REJECT (PENGEMBALIAN)"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            multiline
+                            rows={5.4}
+                            sx={{
+                              mt: 2,
+                              backgroundColor: isReadOnly
+                                ? "whitesmoke"
+                                : "lightyellow",
+                            }}
+                            inputProps={{ readOnly: isReadOnly }}
                           />
                         </Grid>
                       </Grid>
@@ -1139,4 +844,4 @@ const TransactionT30CancelInView = (props) => {
   );
 };
 
-export default TransactionT30CancelInView;
+export default TransactionPksRejectBulkingInView;

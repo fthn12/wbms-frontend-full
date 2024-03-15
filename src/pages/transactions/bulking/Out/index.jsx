@@ -109,8 +109,12 @@ const TransactionBulkingNormalRejectOut = (props) => {
         wbTransaction.destinationSinkStorageTankName = selected.name || "";
       }
 
-      if (isReject) {
+      if (WBMS.WB_STATUS === true) {
         wbTransaction.destinationWeighOutKg = wb.weight;
+      }
+
+      if (isReject) {
+        // wbTransaction.destinationWeighOutKg = wb.weight;
         wbTransaction.destinationWeighOutOperatorName = user.name.toUpperCase();
         wbTransaction.destinationWeighOutTimestamp = moment().toDate();
         wbTransaction.dtTransaction = moment()
@@ -135,8 +139,7 @@ const TransactionBulkingNormalRejectOut = (props) => {
         const id = response?.data?.transaction?.id;
         navigate(`/wb/transactions/bulking-edispatch-out/${id}`);
       } else {
-        
-        wbTransaction.destinationWeighOutKg = wb.weight;
+        // wbTransaction.destinationWeighOutKg = wb.weight;
         wbTransaction.destinationWeighOutOperatorName = user.name.toUpperCase();
         wbTransaction.destinationWeighOutTimestamp = moment().toDate();
         wbTransaction.dtTransaction = moment()
@@ -179,9 +182,9 @@ const TransactionBulkingNormalRejectOut = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ destinationWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ destinationWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (!wbTransaction) {
@@ -246,7 +249,7 @@ const TransactionBulkingNormalRejectOut = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     variant="contained"
                     onClick={() => handleSubmit()}
                     disabled={
@@ -272,7 +275,68 @@ const TransactionBulkingNormalRejectOut = (props) => {
                       )
                     }
                     sx={{ ml: 1, backgroundColor: "darkred" }}
-                  />
+                  /> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN (WB-OUT)
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN (WB-OUT)
+                    </Button>
+                  )}
+
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN REJECT (PENGEMBALIAN)"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN REJECT (PENGEMBALIAN)"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      disabled={
+                        !(
+                          isValid &&
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}

@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Typography, CircularProgress, IconButton } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  CircularProgress,
+  IconButton,
+} from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 
@@ -18,7 +29,8 @@ const QRCodeScanner = (props) => {
 
   const { WBMS } = useConfig();
   const { wb } = useWeighbridge();
-  const { wbTransaction, setWbTransaction, clearOpenedTransaction } = useTransaction();
+  const { wbTransaction, setWbTransaction, clearOpenedTransaction } =
+    useTransaction();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,29 +51,54 @@ const QRCodeScanner = (props) => {
       if (codeContent?.trim().length > 10) {
         const data = { content: codeContent.trim() };
 
+        console.log("qrContent:", codeContent.trim());
+
         setIsLoading(true);
 
-        transactionAPI
-          .eDispatchFindOrCreateByQrcode(data)
-          .then((response) => {
-            console.log("Decode QR response:", response);
+        if (data.content.substring(0, 5) === "ARMIN") {
+          // console.log("ARMIN QR Code");
+          // console.log(JSON.parse(data.content.substring(5)));
+          const qrData = JSON.parse(data.content.substring(5));
 
-            if (!response?.status) {
-              throw new Error(response?.message);
-            }
+          if (qrData?.siteType && qrData.siteType === 3) {
+            setWbTransaction(qrData);
 
-            console.log("vStatus:", response.data.draftTransaction.vehicleStatus);
-            console.log("dStatus:", response.data.draftTransaction.deliveryStatus);
-
-            setWbTransaction(response.data.draftTransaction);
             setIsLoading(false);
 
-            return navigate(response.data.urlPath);
-          })
-          .catch((error) => {
-            setIsLoading(false);
-            toast.error(`${error?.message}..!!`);
-          });
+            return navigate("/wb/transactions/bulking/manual-entry-in-qr");
+          } else if (qrData?.siteType && qrData.siteType === 1) {
+            console.log("Ini data dari Labanan");
+          }
+          
+        } else {
+          transactionAPI
+            .eDispatchFindOrCreateByQrcode(data)
+            .then((response) => {
+              console.log("Decode QR response:", response);
+
+              if (!response?.status) {
+                throw new Error(response?.message);
+              }
+
+              console.log(
+                "vStatus:",
+                response.data.draftTransaction.vehicleStatus
+              );
+              console.log(
+                "dStatus:",
+                response.data.draftTransaction.deliveryStatus
+              );
+
+              setWbTransaction(response.data.draftTransaction);
+              setIsLoading(false);
+
+              return navigate(response.data.urlPath);
+            })
+            .catch((error) => {
+              setIsLoading(false);
+              toast.error(`${error?.message}..!!`);
+            });
+        }
       } else {
         toast.error("Tidak dapat membaca QR Code atau QR Code tidak valid..!!");
       }
@@ -95,7 +132,11 @@ const QRCodeScanner = (props) => {
         variant="contained"
         sx={{ height: "67.5px", width: "100px" }}
         fullWidth
-        disabled={WBMS.NODE_ENV === "production" ? !wb?.canStartScalling || !!wbTransaction : false}
+        disabled={
+          WBMS.NODE_ENV === "production"
+            ? !wb?.canStartScalling || !!wbTransaction
+            : false
+        }
         onClick={() => {
           setIsOpen(true);
         }}
@@ -188,7 +229,11 @@ const QRCodeScanner = (props) => {
         </DialogContent>
         <DialogActions>
           {/* <Box flex={1} /> */}
-          <Button fullWidth variant="contained" onClick={() => setIsOpen(false)}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setIsOpen(false)}
+          >
             Tutup
           </Button>
         </DialogActions>

@@ -79,7 +79,11 @@ const TransactionPksRejectBulkingIn = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrans.returnWeighInKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.returnWeighInKg = wb.weight;
+      }
+
+      // tempTrans.returnWeighInKg = wb.weight;
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
@@ -120,9 +124,9 @@ const TransactionPksRejectBulkingIn = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ returnWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ returnWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -181,7 +185,7 @@ const TransactionPksRejectBulkingIn = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <CancelConfirmation
+                  {/* <CancelConfirmation
                     title="Alasan REJECT (PENGEMBALIAN)"
                     caption="SIMPAN"
                     content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
@@ -194,7 +198,37 @@ const TransactionPksRejectBulkingIn = (props) => {
                       )
                     }
                     sx={{ ml: 1, backgroundColor: "darkred" }}
-                  />
+                  /> */}
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                    caption="SIMPAN"
+                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                    caption="SIMPAN"
+                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid && values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}

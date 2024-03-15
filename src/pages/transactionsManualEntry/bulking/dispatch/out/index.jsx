@@ -317,7 +317,7 @@ const LBNManualEntryDispatchOut = () => {
                           wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ marginRight: "auto", backgroundColor: "goldenrod" }}
+                      sx={{ marginRight: "auto", backgroundColor: "darkred" }}
                     />
                   )}
                   {WBMS.WB_STATUS === false && (
@@ -330,11 +330,10 @@ const LBNManualEntryDispatchOut = () => {
                         !(
                           isValid &&
                           dirty &&
-                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT &&
-                          values.progressStatus === 2
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ marginRight: "auto", backgroundColor: "goldenrod" }}
+                      sx={{ marginRight: "auto", backgroundColor: "darkred" }}
                     />
                   )}
 
@@ -347,8 +346,7 @@ const LBNManualEntryDispatchOut = () => {
                         !(
                           isValid &&
                           wb?.isStable &&
-                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                          values.progressStatus === 2
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
                     >
@@ -364,8 +362,7 @@ const LBNManualEntryDispatchOut = () => {
                         !(
                           isValid &&
                           dirty &&
-                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT &&
-                          values.progressStatus === 2
+                          values.destinationWeighOutKg > WBMS.WB_MIN_WEIGHT
                         )
                       }
                     >

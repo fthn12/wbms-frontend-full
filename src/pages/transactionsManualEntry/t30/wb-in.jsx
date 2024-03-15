@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import moment from "moment";
 import * as Yup from "yup";
 import OTHERS from "./others/in";
-import Dispatch from "./dispatch/in";
+import Dispatch from "./dispatch/normalin";
 import Header from "../../../components/layout/signed/HeaderTransaction";
 import ManualEntryConfirmation from "components/ManualEntryConfirmation";
 
@@ -140,6 +140,7 @@ const T30ManualEntryWBIn = () => {
 
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 1;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()

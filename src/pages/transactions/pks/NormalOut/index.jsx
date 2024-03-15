@@ -79,7 +79,11 @@ const TransactionPksNormaOut = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrx.originWeighOutKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrx.originWeighOutKg = wb.weight;
+      }
+
+      // tempTrx.originWeighOutKg = wb.weight;
       tempTrx.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrx.originWeighOutTimestamp = moment().toDate();
       tempTrx.dtTransaction = moment()
@@ -120,9 +124,9 @@ const TransactionPksNormaOut = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ originWeighOutKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ originWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -156,7 +160,7 @@ const TransactionPksNormaOut = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     type="submit"
                     variant="contained"
                     disabled={
@@ -168,7 +172,36 @@ const TransactionPksNormaOut = (props) => {
                     }
                   >
                     SIMPAN
-                  </Button>
+                  </Button> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}

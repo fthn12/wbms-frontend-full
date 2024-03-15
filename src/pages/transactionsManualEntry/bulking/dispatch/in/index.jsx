@@ -331,7 +331,7 @@ const LBNManualEntryDispatchIn = (props) => {
             />
           </Grid>
           <Grid item xs={12}>
-            <Divider>TOTAL ASAL</Divider>
+            <Divider>TOTAL</Divider>
           </Grid>
           <Grid item xs={12}>
             <Field

@@ -124,10 +124,16 @@ const BulkingManualEntryWBIn = () => {
 
       if (WBMS.WB_STATUS === true) {
         tempTrans.destinationWeighInKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        tempTrans.isManualTonase = 1;
       }
 
+      tempTrans.isManualEntry = 1;
+      tempTrans.typeTransaction = 5;
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 2;
+      tempTrans.deliveryStatus = 22;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.destinationWeighInTimestamp = moment().toDate();
       tempTrans.destinationWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()

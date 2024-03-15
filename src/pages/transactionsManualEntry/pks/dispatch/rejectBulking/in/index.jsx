@@ -3,17 +3,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
-import { Button, TextField as TextFieldMUI, InputAdornment } from "@mui/material";
+import {
+  Button,
+  TextField as TextFieldMUI,
+  InputAdornment,
+} from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
 import { TextField, Select } from "formik-mui";
-import * as yup from "yup";
+import * as Yup from "yup";
 
 import moment from "moment";
 import numeral from "numeral";
 
-import Header from "../../../../../components/layout/signed/HeaderTransaction";
-import ProgressStatus from "../../../../../components/ProgressStatus";
+import Header from "../../../../../../components/layout/signed/HeaderTransaction";
+import ProgressStatus from "../../../../../../components/ProgressStatus";
 import CancelConfirmation from "components/CancelConfirmation";
 
 import {
@@ -22,25 +26,35 @@ import {
   CompanyAC,
   CertificateSelect,
   StorageTankSelect,
-} from "../../../../../components/FormikMUI";
+} from "../../../../../../components/FormikMUI";
 
-import { TransactionAPI } from "../../../../../apis";
+import { TransactionAPI } from "../../../../../../apis";
 
-import { useAuth, useConfig, useTransaction, useWeighbridge, useApp, useProduct } from "../../../../../hooks";
-import { MenuItem } from "react-pro-sidebar";
-import { CompanyACP, DriverACP, ProductACP, TransportVehicleACP } from "components/FormManualEntry";
+import {
+  useAuth,
+  useConfig,
+  useTransaction,
+  useWeighbridge,
+  useApp,
+  useProduct,
+} from "../../../../../../hooks";
+import {
+  CompanyACP,
+  DriverACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "components/FormManualEntry";
 
-const TransactionPksCancelIn = (props) => {
+const TransactionPksRejectBulkingIn = (props) => {
   const navigate = useNavigate();
   const { id } = useParams();
-
   const transactionAPI = TransactionAPI();
-
+  const { wb } = useWeighbridge();
   const { user } = useAuth();
   const { WBMS, PRODUCT_TYPES } = useConfig();
   const { urlPrev, setUrlPrev, setSidebar } = useApp();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
-  const { wb } = useWeighbridge();
+  const { wbTransaction, setWbTransaction, clearWbTransaction } =
+    useTransaction();
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
   const [selectedOption, setSelectedOption] = useState(0);
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
@@ -49,25 +63,26 @@ const TransactionPksCancelIn = (props) => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const validationSchema = yup.object().shape({
-    // tidak bisa dari sini, karena ada pengaruh dari external form
-    // originWeighOutKg: yup.number().required("Wajib diisi.").min(WBMS.WB_MIN_WEIGHT),
-    // originSourceStorageTankId: yup.string().required("Wajib diisi."),
-    // loadedSeal1: yup.string().required("Wajib diisi."),
-    // loadedSeal2: yup.string().required("Wajib diisi."),
+  const validationSchema = Yup.object().shape({
+    transportVehicleId: Yup.string().required("Wajib diisi"),
+    transporterCompanyId: Yup.string().required("Wajib diisi"),
+    productId: Yup.string().required("Wajib diisi"),
+    driverId: Yup.string().required("Wajib diisi"),
+    bonTripRef: Yup.string().required("Wajib diisi"),
+    deliveryOrderNo: Yup.string().required("Wajib diisi"),
   });
 
   const { useFindManyProductQuery } = useProduct();
-  
+
   const productFilter = {
     where: {
-      productGroupId: selectedOption,
+      productGroupId: 1,
     },
   };
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
 
   const handleClose = () => {
-    clearOpenedTransaction();
+    clearWbTransaction();
 
     const url = urlPrev;
     setUrlPrev("");
@@ -76,71 +91,53 @@ const TransactionPksCancelIn = (props) => {
   };
 
   const handleFormikSubmit = async (values) => {
-    let tempTrans = { ...values };
+    let wbTransaction = { ...values };
 
     setIsLoading(true);
 
     try {
       if (WBMS.WB_STATUS === true) {
-        tempTrans.returnWeighInKg = wb.weight;
+        wbTransaction.returnWeighInKg = wb.weight;
       } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
+        wbTransaction.isManualTonase = 1;
       }
 
-      tempTrans.isManualEntry = 1;
-      tempTrans.typeTransaction = 5;
-      tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
-      tempTrans.returnWeighInTimestamp = moment().toDate();
-      tempTrans.dtTransaction = moment()
+      wbTransaction.isManualEntry = 1;
+      wbTransaction.typeTransaction = 5;
+      wbTransaction.deliveryStatus = 26;
+      wbTransaction.deliveryDate = moment().toDate();
+      wbTransaction.returnWeighInTimestamp = moment().toDate();
+      wbTransaction.returnWeighInOperatorName = user.name.toUpperCase();
+      wbTransaction.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const data = { wbTransaction: { ...tempTrans } };
+      const data = { wbTransaction: { ...wbTransaction } };
 
-      const response = await transactionAPI.eDispatchPksCancelInAfter(data);
+      const response = await transactionAPI.eDispatchPksRejectBulkingInAfter(
+        data
+      );
 
       if (!response.status) throw new Error(response?.message);
 
-      clearOpenedTransaction();
+      clearWbTransaction();
       setIsLoading(false);
 
-      toast.success(`Transaksi CANCEL WB-IN telah tersimpan.`);
-
-      // redirect ke form view
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/t30/manual-entry-dispatch-cancel-in-view/${id}`);
+      navigate(`/wb/transactions/pks/dispatch-reject-bulking-in-view/${id}`);
+
+      setIsLoading(false);
+      toast.success("Transaksi REJECT WB-IN telah tersimpan.");
     } catch (error) {
       setIsLoading(false);
       toast.error(`${error.message}.`);
-
-      return;
     }
   };
 
   useEffect(() => {
     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
-    setSidebar({ selected: "Transaksi WB T30" });
-
-    return () => {
-      // console.clear();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!id) return handleClose();
-
-    transactionAPI
-      .getById(id)
-      .then((res) => {
-        setOpenedTransaction(res.data.transaction);
-        setSelectedOption(res.data.transaction.productType);
-      })
-      .catch((error) => {
-        toast.error(`${error.message}.`);
-
-        return handleClose();
-      });
+    setSidebar({ selected: "Transaksi WB LBN" });
 
     return () => {
       // console.clear();
@@ -149,49 +146,54 @@ const TransactionPksCancelIn = (props) => {
 
   useEffect(() => {
     if (
-      openedTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
-      openedTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+      wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
     ) {
       setOriginWeighNetto(0);
     } else {
       let total = Math.abs(
-        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+        wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg
       );
       setOriginWeighNetto(total);
     }
     if (
-      openedTransaction?.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
-      openedTransaction?.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
+      wbTransaction?.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
     ) {
       setReturnWeighNetto(0);
     } else {
       let total = Math.abs(
-        openedTransaction?.returnWeighInKg - openedTransaction?.returnWeighOutKg
+        wbTransaction?.returnWeighInKg - wbTransaction?.returnWeighOutKg
       );
       setReturnWeighNetto(total);
     }
-  }, [openedTransaction]);
+  }, [wbTransaction]);
 
   return (
     <Box>
-      <Header title="TRANSAKSI T30" subtitle="TIMBANG CANCEL WB-IN" />
-      {openedTransaction && (
+      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
+      {wbTransaction && (
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={openedTransaction}
+          initialValues={wbTransaction}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
-            const { values, isValid, submitForm, setFieldValue, handleChange } = props;
+            const { values, isValid, submitForm, setFieldValue, dirty } = props;
             // console.log("Formik props:", props);
 
-            const handleCancel = (cancelReason) => {
-              if (cancelReason.trim().length <= 10 || cancelReason.trim().length > 500)
-                return toast.error("Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter, dan maksimal 500 karakter.");
+            const handleReject = (rejectReason) => {
+              if (
+                rejectReason.trim().length <= 10 ||
+                rejectReason.trim().length > 500
+              )
+                return toast.error(
+                  "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter, dan maksimal 500 karakter."
+                );
 
-              setFieldValue("returnWeighInRemark", cancelReason);
+              setFieldValue("returnWeighInRemark", rejectReason);
 
               submitForm();
             };
@@ -199,37 +201,44 @@ const TransactionPksCancelIn = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                {WBMS.WB_STATUS === true && (
+                  {WBMS.WB_STATUS === true && (
                     <CancelConfirmation
-                    title="Alasan CANCEL (PEMBATALAN)"
-                    caption="SIMPAN"
-                    content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
-                    onClose={handleCancel}
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
                       isDisabled={
                         !(
                           isValid &&
                           wb?.isStable &&
+                          dirty &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
                     />
                   )}
                   {WBMS.WB_STATUS === false && (
                     <CancelConfirmation
-                    title="Alasan CANCEL (PEMBATALAN)"
-                    caption="SIMPAN"
-                    content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
-                    onClose={handleCancel}
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
                       isDisabled={
                         !(
-                          isValid && values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
+                          isValid &&
+                          dirty &&
+                          values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
                         )
                       }
-                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
                     />
                   )}
-                  <Button variant="contained" sx={{ ml: 1 }} onClick={handleClose}>
+                  <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={handleClose}
+                  >
                     TUTUP
                   </Button>
                   {/* <Button
@@ -259,13 +268,8 @@ const TransactionPksCancelIn = (props) => {
                         component={TextField}
                         inputProps={{ readOnly: true }}
                       />
-                      {/* <Grid item xs={6}>
-                          <ProgressStatus
-                            progressStatus={values?.progressStatus}
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                          />
-                        </Grid> */}
-                      <Field
+
+                      {/* <Field
                         name="productType"
                         label="Tipe Transaksi"
                         component={Select}
@@ -283,12 +287,7 @@ const TransactionPksCancelIn = (props) => {
                             (item) => item.id === event.target.value
                           );
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
+                        
                         }}
                       >
                         {dtTypeProduct &&
@@ -297,8 +296,19 @@ const TransactionPksCancelIn = (props) => {
                               {data.value}
                             </MenuItem>
                           ))}
-                      </Field>
-
+                      </Field> */}
+                      <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                      />
                       <Field
                         name="deliveryOrderNo"
                         label="NO DO"
@@ -308,158 +318,34 @@ const TransactionPksCancelIn = (props) => {
                         required
                         size="small"
                         fullWidth
-                        inputProps={{ readOnly: true }}
-                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
                       />
                       <TransportVehicleACP
                         name="transportVehicleId"
                         label="Nomor Plat"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <DriverACP
                         name="driverName"
                         label="Nama Supir"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <CompanyACP
                         name="transporterCompanyName"
                         label="Nama Vendor"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <ProductACP
                         data={dtProduct}
                         name="productId"
                         label="Nama Product"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
-                          <Divider>DATA PRODUK</Divider>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            name="product"
-                            label="Produk"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={`${values?.productCode} - ${values?.productName}`}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="rspoSccModel"
-                            label="Sertifikasi RSPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="rspoCertificateNumber"
-                            label="Nomor Sertifikasi RSPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.rspoCertificateNumber
-                                ? values.rspoCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="isccSccModel"
-                            label="Sertifikasi ISCC"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="isccCertificateNumber"
-                            label="Nomor Sertifikasi ISCC"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.isccCertificateNumber
-                                ? values.isccCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="ispoSccModel"
-                            label="Sertifikasi ISPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="ispoCertificateNumber"
-                            label="Nomor Sertifikasi ISPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.ispoCertificateNumber
-                                ? values.ispoCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <StorageTankSelect
-                            name="originSourceStorageTankId"
-                            label="Tangki Asal"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                            siteId={WBMS.SITE_REFID}
-                          />
-                        </Grid>
-                      </Grid>
                     </Grid>
 
                     <Grid item xs={12} sm={6} lg={3}>
@@ -532,158 +418,60 @@ const TransactionPksCancelIn = (props) => {
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Tangki Isi</Divider>
+                          <Divider>Segel Tangki Bongkar</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal1"
-                            label="Segel ISI Mainhole 1"
+                            name="returnUnloadedSeal1"
+                            label="Segel BONGKAR Mainhole 1"
                             type="text"
-                            required={true}
+                            // required={true}
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="loadedSeal2"
-                            label="Segel ISI Valve 1"
-                            type="text"
-                            required={true}
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal3"
-                            label="Segel ISI Mainhole 2"
+                            name="returnUnloadedSeal2"
+                            label="Segel BONGKAR Valve 1"
                             type="text"
+                            // required={true}
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal4"
-                            label="Segel ISI Valve 2"
+                            name="returnUnloadedSeal3"
+                            label="Segel BONGKAR Mainhole 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Catatan</Divider>
-                        </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighInRemark"
-                            label="Alasan untuk Entri Manual"
+                            name="returnUnloadedSeal4"
+                            label="Segel BONGKAR Valve 2"
                             type="text"
-                            multiline
-                            rows={5.4}
-                            required={true}
-                            component={TextField}
-                           
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid> */}
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originFfaPercentage"
-                            label="FFA"
-                            type="number"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originFfaPercentage > 0
-                                ? values.originFfaPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originMoistPercentage"
-                            label="Moist"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originMoistPercentage > 0
-                                ? values.originMoistPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originDirtPercentage"
-                            label="Dirt"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originDirtPercentage > 0
-                                ? values.originDirtPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>
@@ -692,7 +480,7 @@ const TransactionPksCancelIn = (props) => {
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider>DATA TIMBANG KENDARAAN</Divider>
+                          <Divider>DATA TIMBANG ASAL</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -730,14 +518,15 @@ const TransactionPksCancelIn = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
+                            name="originWeighInTimestamp"
+                            label="Waktu WB-IN"
                             type="text"
-                            variant="outlined"
                             component={TextField}
+                            variant="outlined"
                             size="small"
                             fullWidth
+                            required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-IN"
-                            name="originWeighInTimestamp"
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
@@ -849,8 +638,13 @@ const TransactionPksCancelIn = (props) => {
                             }
                           />
                         </Grid>
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 2 }}>DATA TIMBANG CANCEL</Divider>
+                          <Divider>DATA TIMBANG REJECT</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -1003,12 +797,12 @@ const TransactionPksCancelIn = (props) => {
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>TOTAL CANCEL</Divider>
+                          <Divider>TOTAL</Divider>
                         </Grid>
                         <Grid item xs={12}>
                           <Field
                             name="returnWeighNetto"
-                            label="TOTAL CANCEL"
+                            label="TOTAL"
                             type="number"
                             component={TextField}
                             variant="outlined"
@@ -1052,7 +846,7 @@ const TransactionPksCancelIn = (props) => {
           }}
         </Formik>
       )}
-      {!openedTransaction && (
+      {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{
@@ -1068,4 +862,4 @@ const TransactionPksCancelIn = (props) => {
   );
 };
 
-export default TransactionPksCancelIn;
+export default TransactionPksRejectBulkingIn;

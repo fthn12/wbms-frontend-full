@@ -1,72 +1,68 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Box,
-  Button,
-  MenuItem,
-  CircularProgress,
-  Grid,
-  InputAdornment,
-  Divider,
-  Paper,
-  TextField as TextFieldMUI,
-} from "@mui/material";
-import { Formik, Form, Field } from "formik";
-import { TextField, Autocomplete, Select } from "formik-mui";
-import * as Yup from "yup";
 import { toast } from "react-toastify";
-import moment from "moment";
-import Header from "../../../../components/layout/signed/HeaderTransaction";
+
+import { Paper, Box, Grid, CircularProgress, Divider } from "@mui/material";
 import {
+  Button,
+  TextField as TextFieldMUI,
+  InputAdornment,
+} from "@mui/material";
+
+import { Formik, Form, Field } from "formik";
+import { TextField, Select } from "formik-mui";
+import * as Yup from "yup";
+
+import moment from "moment";
+import numeral from "numeral";
+
+import Header from "../../../../../../components/layout/signed/HeaderTransaction";
+import ProgressStatus from "../../../../../../components/ProgressStatus";
+import CancelConfirmation from "components/CancelConfirmation";
+
+import {
+  TransportVehicleAC,
+  DriverAC,
+  CompanyAC,
   CertificateSelect,
   StorageTankSelect,
-} from "../../../../components/FormikMUI";
-import {
-  DriverACP,
-  CompanyACP,
-  ProductACP,
-  TransportVehicleACP,
-} from "../../../../components/FormManualEntry";
-import BonTripPrintT30 from "../../../../components/BonTripPrint";
+} from "../../../../../../components/FormikMUI";
 
-import * as eDispatchApi from "../../../../apis/eDispatchApi";
-import CancelConfirmation from "components/CancelConfirmation";
-import { TransactionAPI } from "../../../../apis";
+import { TransactionAPI } from "../../../../../../apis";
 
 import {
   useAuth,
   useConfig,
   useTransaction,
-  useProduct,
   useWeighbridge,
+  useApp,
+  useProduct,
   useStorageTank,
-  useSite,
-} from "../../../../hooks";
+} from "../../../../../../hooks";
+import { MenuItem } from "react-pro-sidebar";
+import {
+  CompanyACP,
+  DriverACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "components/FormManualEntry";
 
-const PKSManualEntryDispatchView = () => {
+const TransactionPksRejectBulkingIn = (props) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { id } = useParams();
   const transactionAPI = TransactionAPI();
   const { wb } = useWeighbridge();
-  const { id } = useParams();
-  const { WBMS, PRODUCT_TYPES, PROGRESS_STATUS } = useConfig();
-  const { useGetSitesQuery } = useSite();
-  const { data: dtSite } = useGetSitesQuery();
-  const {
-    openedTransaction,
-    clearWbTransaction,
-    setOpenedTransaction,
-    setWbTransaction,
-    clearOpenedTransaction,
-  } = useTransaction();
-
-  const [isCancel, setIsCancel] = useState(false);
+  const { user } = useAuth();
+  const { WBMS, PRODUCT_TYPES } = useConfig();
+  const { urlPrev, setUrlPrev, setSidebar } = useApp();
+  const { wbTransaction, setWbTransaction, clearWbTransaction } =
+    useTransaction();
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
   const [selectedOption, setSelectedOption] = useState(0);
-  const [isReadOnly, setIsReadOnly] = useState(true);
-
+  const [originWeighNetto, setOriginWeighNetto] = useState(0);
+  const [returnWeighNetto, setReturnWeighNetto] = useState(0);
+  const [dtTrx, setDtTrx] = useState(null);
   const { useFindManyStorageTanksQuery } = useStorageTank();
-  const T30Site = eDispatchApi.getT30Site();
-
   const storageTankFilter = {
     where: {
       OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
@@ -77,148 +73,101 @@ const PKSManualEntryDispatchView = () => {
   const { data: dtStorageTank } =
     useFindManyStorageTanksQuery(storageTankFilter);
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validationSchema = Yup.object().shape({
+    transportVehicleId: Yup.string().required("Wajib diisi"),
+    transporterCompanyId: Yup.string().required("Wajib diisi"),
+    productId: Yup.string().required("Wajib diisi"),
+    driverId: Yup.string().required("Wajib diisi"),
+    originSourceStorageTankId: Yup.string().required("Wajib diisi"),
+    returnUnloadedSeal1: Yup.string().required("Wajib diisi"),
+    returnUnloadedSeal2: Yup.string().required("Wajib diisi"),
+    deliveryOrderNo: Yup.string().required("Wajib diisi"),
+  });
+
   const { useFindManyProductQuery } = useProduct();
 
   const productFilter = {
     where: {
-      productGroupId: selectedOption,
+      productGroupId: 1,
     },
   };
-
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
 
-  const [dtTypeProduct] = useState(PRODUCT_TYPES);
-
-  const [originWeighNetto, setOriginWeighNetto] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [dtTrx, setDtTrx] = useState(null);
-
-  const validationSchema = Yup.object().shape({
-    destinationWeighInKg: Yup.number().required("Wajib diisi"),
-    destinationWeighOutKg: Yup.number().required("Wajib diisi"),
-    destinationWeighInTimestamp: Yup.date().required("Wajib diisi"),
-    unloadingTimestamp: Yup.date().required("Wajib diisi"),
-    destinationWeighOutTimestamp: Yup.date().required("Wajib diisi"),
-    unloadingOperatorName: Yup.string().required("Wajib diisi"),
-    unloadedSeal1: Yup.string().required("Wajib diisi"),
-    unloadedSeal2: Yup.string().required("Wajib diisi"),
-  });
-
   const handleClose = () => {
-    clearOpenedTransaction();
+    clearWbTransaction();
 
-    navigate("/wb/transactions");
-  };
+    const url = urlPrev;
+    setUrlPrev("");
 
-  const handleFinalizeT300 = () => {
-    // clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/finalize-t300/${id}`);
-  };
-
-  const handleCancel = () => {
-    clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/manual-entry-dispatch-cancel-in/${id}`);
-  };
-
-  const handleReject = () => {
-    clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/manual-entry-dispatch-reject-in/${id}`);
+    url ? navigate(url) : navigate("/wb/transactions");
   };
 
   const handleFormikSubmit = async (values) => {
-    let tempTrans = { ...values };
+    let wbTransaction = { ...values };
 
     setIsLoading(true);
 
     try {
       const selected = dtStorageTank.records.find(
-        (item) => item.id === values.destinationSinkStorageTankId
+        (item) => item.id === values.originSourceStorageTankId
       );
 
       if (selected) {
-        tempTrans.destinationSinkStorageTankCode = selected.code || "";
-        tempTrans.destinationSinkStorageTankName = selected.name || "";
+        wbTransaction.originSourceStorageTankCode = selected.code || "";
+        wbTransaction.originSourceStorageTankName = selected.name || "";
       }
 
-      const selectedDestinationSite = dtSite.records.find(
-        (item) => item.id === WBMS.DESTINATION_SITE.id
+      if (WBMS.WB_STATUS === true) {
+        wbTransaction.returnWeighInKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        wbTransaction.isManualTonase = 1;
+      }
+
+      if (wbTransaction.rspoSccModel) {
+        wbTransaction.rspoSccModel = parseInt(wbTransaction.rspoSccModel);
+      } else if (wbTransaction.isccSccModel) {
+        wbTransaction.isccSccModel = parseInt(wbTransaction.isccSccModel);
+      } else if (wbTransaction.ispoSccModel) {
+        wbTransaction.ispoSccModel = parseInt(wbTransaction.ispoSccModel);
+      }
+
+      wbTransaction.isManualEntry = 1;
+      wbTransaction.typeTransaction = 5;
+      // wbTransaction.deliveryDate = moment().toDate();
+      wbTransaction.returnWeighInTimestamp = moment().toDate();
+      wbTransaction.returnWeighInOperatorName = user.name.toUpperCase();
+      wbTransaction.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+
+      const data = { wbTransaction: { ...wbTransaction } };
+
+      const response = await transactionAPI.eDispatchPksRejectBulkingInAfter(
+        data
       );
-
-      if (selectedDestinationSite) {
-        tempTrans.destinationSiteId = selectedDestinationSite.id || "";
-        tempTrans.destinationSiteCode = selectedDestinationSite.code || "";
-        tempTrans.destinationSiteName = selectedDestinationSite.name || "";
-      }
-
-      tempTrans.typeTransaction = 5;
-      tempTrans.isManualEntry = 1;
-      tempTrans.deliveryStatus = 38;
-      tempTrans.progressStatus = 21;
-      tempTrans.unloadingOperatorName =
-        tempTrans.unloadingOperatorName.toUpperCase();
-      tempTrans.destinationWeighInTimestamp = moment(
-        tempTrans.destinationWeighInTimestamp
-      ).toISOString();
-      tempTrans.destinationWeighOutTimestamp = moment(
-        tempTrans.destinationWeighOutTimestamp
-      ).toISOString();
-
-      tempTrans.unloadingTimestamp = moment(
-        tempTrans.unloadingTimestamp
-      ).toISOString();
-
-      const response = await transactionAPI.updateById(tempTrans.id, {
-        ...tempTrans,
-      });
 
       if (!response.status) throw new Error(response?.message);
 
       clearWbTransaction();
       setIsLoading(false);
 
-      toast.success(`Transaksi dari T300 telah tersimpan.`);
-      handleClose();
-      return;
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/pks/dispatch-reject-bulking-in-view/${id}`);
+
+      setIsLoading(false);
+      toast.success("Transaksi REJECT WB-IN telah tersimpan.");
     } catch (error) {
       setIsLoading(false);
       toast.error(`${error.message}.`);
-
-      return;
     }
   };
 
   useEffect(() => {
     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
-
-    return () => {
-      // console.clear();
-    };
-  }, []);
-
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
-
-  //weight wb
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighOutKg: wb.weight });
-  // }, [wb.weight]);
-
-  useEffect(() => {
-    if (!id) return handleClose();
-
-    transactionAPI
-      .getById(id)
-      .then((res) => {
-        setOpenedTransaction(res.data.transaction);
-        setSelectedOption(res.data.transaction.productType);
-      })
-      .catch((error) => {
-        toast.error(`${error.message}.`);
-
-        return handleClose();
-      });
+    setSidebar({ selected: "Transaksi WB LBN" });
 
     return () => {
       // console.clear();
@@ -227,111 +176,110 @@ const PKSManualEntryDispatchView = () => {
 
   useEffect(() => {
     if (
-      openedTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
-      openedTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
+      wbTransaction?.originWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.originWeighOutKg < WBMS.WB_MIN_WEIGHT
     ) {
       setOriginWeighNetto(0);
     } else {
       let total = Math.abs(
-        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+        wbTransaction?.originWeighInKg - wbTransaction?.originWeighOutKg
       );
       setOriginWeighNetto(total);
     }
-  }, [openedTransaction]);
+    if (
+      wbTransaction?.returnWeighInKg < WBMS.WB_MIN_WEIGHT ||
+      wbTransaction?.returnWeighOutKg < WBMS.WB_MIN_WEIGHT
+    ) {
+      setReturnWeighNetto(0);
+    } else {
+      let total = Math.abs(
+        wbTransaction?.returnWeighInKg - wbTransaction?.returnWeighOutKg
+      );
+      setReturnWeighNetto(total);
+    }
+  }, [wbTransaction]);
 
   return (
     <Box>
-      <Header title="Transaksi PKS" subtitle="Data Timbangan Manual Entry" />
-      {openedTransaction && (
+      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
+      {wbTransaction && (
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={openedTransaction}
+          initialValues={wbTransaction}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
           {(props) => {
-            const {
-              values,
-              isValid,
-              dirty,
-              setFieldValue,
-              submitForm,
-              resetForm,
-              handleChange,
-            } = props;
+            const { values, isValid, submitForm, setFieldValue, dirty } = props;
             // console.log("Formik props:", props);
 
-            // const handleCancel = (cancelReason) => {
-            //   if (cancelReason.trim().length <= 10)
-            //     return toast.error("Alasan CANCEL (PEMBATALAN) harus melebihi 10 karakter.");
+            const handleReject = (rejectReason) => {
+              if (
+                rejectReason.trim().length <= 10 ||
+                rejectReason.trim().length > 500
+              )
+                return toast.error(
+                  "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter, dan maksimal 500 karakter."
+                );
 
-            //   setFieldValue("returnWeighInRemark", cancelReason);
-            //   setIsCancel(true);
+              setFieldValue("returnWeighInRemark", rejectReason);
 
-            //   submitForm();
-            // };
-
-            const handleSubmit = async () => {
-              if (isReadOnly) setIsReadOnly(false);
-              else submitForm();
-            };
-
-            const handleReset = async () => {
-              if (isReadOnly) handleClose();
-              else {
-                resetForm();
-                setIsReadOnly(true);
-              }
+              submitForm();
             };
 
             return (
               <Form>
-                <Box sx={{ display: "flex", mt: 3 }}>
-                  {values.progressStatus === 20 && (
-                    <>
-                      <Button
-                        variant="contained"
-                        sx={{ backgroundColor: "darkred" }}
-                        onClick={() => handleCancel(values)}
-                      >
-                        Cancel Transaksi
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={() => handleReject(values)}
-                        sx={{ ml: 1, backgroundColor: "goldenrod" }}
-                      >
-                        Reject Transaksi
-                      </Button>
-                      <Button
-                        variant="contained"
-                        disabled={isReadOnly ? false : !(isValid && dirty)}
-                        // onClick={handleSubmit}
-                        onClick={() => handleFinalizeT300(values)}
-                        sx={{ ml: 1, backgroundColor: "darkorange " }}
-                      >
-                        {/* {isReadOnly ? "SELESAIKAN TRANSAKSI T300" : "SIMPAN"} */}
-                        SELESAIKAN TRANSAKSI T300
-                      </Button>
-                    </>
+                <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          dirty &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ ml: 1, backgroundColor: "darkred" }}
+                    />
                   )}
-
-                  <BonTripPrintT30
-                    dtTrans={{ ...values }}
-                    sx={{ mr: 1, marginLeft: "auto" }}
-                  />
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleReject}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ marginRight: "auto", backgroundColor: "darkred" }}
+                    />
+                  )}
                   <Button
                     variant="contained"
-                    sx={{ backgroundColor: "dimgrey " }}
-                    onClick={handleReset}
+                    sx={{ ml: 1 }}
+                    onClick={handleClose}
                   >
-                    {/* {isReadOnly ? "TUTUP" : "BATAL"} */}
                     TUTUP
                   </Button>
-                  {/* <Button variant="contained" onClick={handleClose}>
-                      TUTUP
-                    </Button> */}
+                  {/* <Button
+                    variant="contained"
+                    sx={{ ml: 1 }}
+                    onClick={() => {
+                      console.log("Form:", props);
+                    }}
+                  >
+                    DEBUG
+                  </Button> */}
                 </Box>
 
                 <Paper sx={{ mt: 1, p: 2, minHeight: "71.5vh" }}>
@@ -342,15 +290,16 @@ const PKSManualEntryDispatchView = () => {
                       </Grid>
                       <Field
                         variant="outlined"
-                        size="small"
                         fullWidth
                         sx={{ backgroundColor: "whitesmoke", mb: 2 }}
+                        size="small"
                         label="NO BONTRIP"
                         name="bonTripNo"
                         component={TextField}
                         inputProps={{ readOnly: true }}
                       />
-                      <Field
+
+                      {/* <Field
                         name="productType"
                         label="Tipe Transaksi"
                         component={Select}
@@ -368,12 +317,7 @@ const PKSManualEntryDispatchView = () => {
                             (item) => item.id === event.target.value
                           );
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
+                        
                         }}
                       >
                         {dtTypeProduct &&
@@ -382,7 +326,7 @@ const PKSManualEntryDispatchView = () => {
                               {data.value}
                             </MenuItem>
                           ))}
-                      </Field>
+                      </Field> */}
 
                       <Field
                         name="deliveryOrderNo"
@@ -393,35 +337,36 @@ const PKSManualEntryDispatchView = () => {
                         required
                         size="small"
                         fullWidth
-                        inputProps={{ readOnly: true }}
-                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
                       />
                       <TransportVehicleACP
                         name="transportVehicleId"
                         label="Nomor Plat"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <DriverACP
                         name="driverName"
                         label="Nama Supir"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <CompanyACP
                         name="transporterCompanyName"
                         label="Nama Vendor"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <ProductACP
                         data={dtProduct}
                         name="productId"
                         label="Nama Product"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                     </Grid>
+
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
@@ -446,9 +391,9 @@ const PKSManualEntryDispatchView = () => {
                             name="rspoSccModel"
                             label="Sertifikasi RSPO"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -475,9 +420,9 @@ const PKSManualEntryDispatchView = () => {
                             name="isccSccModel"
                             label="Sertifikasi ISCC"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -504,9 +449,9 @@ const PKSManualEntryDispatchView = () => {
                             name="ispoSccModel"
                             label="Sertifikasi ISPO"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -537,10 +482,10 @@ const PKSManualEntryDispatchView = () => {
                             name="originSourceStorageTankId"
                             label="Tangki Asal"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                            // siteId={WBMS.SITE.refId }
+                            backgroundColor="lightyellow"
+                            siteId={WBMS.DESTINATION_SITE.refId}
                           />
                         </Grid>
                       </Grid>
@@ -620,7 +565,7 @@ const PKSManualEntryDispatchView = () => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal1"
+                            name="returnUnloadedSeal1"
                             label="Segel ISI Mainhole 1"
                             type="text"
                             required={true}
@@ -628,13 +573,13 @@ const PKSManualEntryDispatchView = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal2"
+                            name="returnUnloadedSeal2"
                             label="Segel ISI Valve 1"
                             type="text"
                             required={true}
@@ -642,37 +587,56 @@ const PKSManualEntryDispatchView = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal3"
+                            name="returnUnloadedSeal3"
                             label="Segel ISI Mainhole 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal4"
+                            name="returnUnloadedSeal4"
                             label="Segel ISI Valve 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
+                          />
+                        </Grid>
+                        {/* <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Catatan</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            name="originWeighInRemark"
+                            label="Alasan untuk Entri Manual"
+                            type="text"
+                            multiline
+                            rows={5.4}
+                            required={true}
+                            component={TextField}
+                           
+                            variant="outlined"
+                            size="small"
+                            fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
                           />
-                        </Grid>
-
+                        </Grid> */}
                         <Grid item xs={12}>
                           <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
                         </Grid>
@@ -685,7 +649,7 @@ const PKSManualEntryDispatchView = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -698,7 +662,7 @@ const PKSManualEntryDispatchView = () => {
                                 ? values.originFfaPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -710,7 +674,7 @@ const PKSManualEntryDispatchView = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -723,7 +687,7 @@ const PKSManualEntryDispatchView = () => {
                                 ? values.originMoistPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -735,7 +699,7 @@ const PKSManualEntryDispatchView = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -748,7 +712,7 @@ const PKSManualEntryDispatchView = () => {
                                 ? values.originDirtPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>
@@ -795,14 +759,15 @@ const PKSManualEntryDispatchView = () => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
+                            name="originWeighInTimestamp"
+                            label="Waktu WB-IN"
                             type="text"
-                            variant="outlined"
                             component={TextField}
+                            variant="outlined"
                             size="small"
                             fullWidth
+                            required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label="Waktu WB-IN"
-                            name="originWeighInTimestamp"
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
@@ -865,7 +830,11 @@ const PKSManualEntryDispatchView = () => {
                             component={TextField}
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, mb: 2, backgroundColor: "whitesmoke" }}
+                            sx={{
+                              mt: 2,
+                              mb: 2,
+                              backgroundColor: "whitesmoke",
+                            }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -910,35 +879,192 @@ const PKSManualEntryDispatchView = () => {
                             }
                           />
                         </Grid>
-
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Catatan</Divider>
-                        </Grid>
                         <Grid item xs={12}>
+                          <Divider sx={{ mt: 2 }}>DATA TIMBANG REJECT</Divider>
+                        </Grid>
+                        <Grid item xs={6}>
                           <Field
-                            name="originWeighInRemark"
-                            label="Alasan untuk Entri Manual"
+                            name="returnWeighInOperatorName"
+                            label="Operator WB-IN"
                             type="text"
-                            multiline
-                            rows={5.4}
-                            required={true}
                             component={TextField}
-                            onChange={(e) => {
-                              const { value } = e.target;
-                              setFieldValue("originWeighInRemark", value);
-                              setFieldValue("originWeighOutRemark", value);
-                            }}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={user.name.toUpperCase()}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnWeighOutOperatorName"
+                            label="Operator WB-OUT"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={values.returnWeighOutOperatorName || "-"}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnWeighInTimestamp"
+                            label="Waktu WB-IN"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            // value={
+                            //   values?.returnWeighInTimestamp
+                            //     ? moment(values.returnWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                            //     : "-"
+                            // }
+                            value={dtTrx || "-"}
+                          />
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnWeighOutTimestamp"
+                            label="Waktu WB-OUT"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              values?.returnWeighOutTimestamp
+                                ? moment(values.returnWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
+                                : "-"
+                            }
+                            // value={moment().format(`DD/MM/YYYY - HH:mm:ss`)}
+                          />
+                        </Grid>{" "}
+                        {WBMS.WB_STATUS === true && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighInKg"
+                              label="Berat WB-IN"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              inputProps={{ readOnly: true }}
+                              // value={values?.returnWeighInKg > 0 ? values.returnWeighInKg.toFixed(2) : "0.00"}
+                              value={
+                                wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"
+                              }
+                            />
+                          </Grid>
+                        )}
+                        {WBMS.WB_STATUS === false && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighInKg"
+                              label="Berat WB-IN"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              value={
+                                values?.returnWeighInKg > 0
+                                  ? values.returnWeighInKg
+                                  : "0"
+                              }
+                            />
+                          </Grid>
+                        )}
+                        <Grid item xs={6}>
+                          <Field
+                            name="returnWeighOutKg"
+                            label="Berat WB-OUT"
+                            type="number"
+                            component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
                             inputProps={{ readOnly: true }}
+                            value={
+                              values?.returnWeighOutKg > 0
+                                ? values.returnWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
+                            // value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>TOTAL</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            name="returnWeighNetto"
+                            label="TOTAL"
+                            type="number"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            inputProps={{ readOnly: true }}
+                            value={
+                              returnWeighNetto > 0
+                                ? returnWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                           />
                         </Grid>
                       </Grid>
                     </Grid>
                   </Grid>
                 </Paper>
+
                 {isLoading && (
                   <CircularProgress
                     size={50}
@@ -956,7 +1082,7 @@ const PKSManualEntryDispatchView = () => {
           }}
         </Formik>
       )}
-      {!openedTransaction && (
+      {!wbTransaction && (
         <CircularProgress
           size={50}
           sx={{
@@ -972,4 +1098,4 @@ const PKSManualEntryDispatchView = () => {
   );
 };
 
-export default PKSManualEntryDispatchView;
+export default TransactionPksRejectBulkingIn;

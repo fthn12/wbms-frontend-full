@@ -79,7 +79,11 @@ const TransactionT30CancelIn = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrans.returnWeighInKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.returnWeighInKg = wb.weight;
+      }
+
+      // tempTrans.returnWeighInKg = wb.weight;
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
@@ -118,9 +122,9 @@ const TransactionT30CancelIn = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ returnWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ returnWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -179,7 +183,7 @@ const TransactionT30CancelIn = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <CancelConfirmation
+                  {/* <CancelConfirmation
                     title="Alasan CANCEL (PEMBATALAN)"
                     caption="SIMPAN"
                     content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
@@ -192,7 +196,37 @@ const TransactionT30CancelIn = (props) => {
                       )
                     }
                     sx={{ ml: 1, backgroundColor: "darkred" }}
-                  />
+                  /> */}
+                  {WBMS.WB_STATUS === true && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <CancelConfirmation
+                      title="Alasan CANCEL (PEMBATALAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan CANCEL (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      onClose={handleCancel}
+                      isDisabled={
+                        !(
+                          isValid && values.returnWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ mr: 1, backgroundColor: "darkred" }}
+                    />
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}
@@ -642,7 +676,7 @@ const TransactionT30CancelIn = (props) => {
                         </Grid>
 
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 3, mb: 1 }}>Kualitas</Divider>
+                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
                         </Grid>
 
                         <Grid item xs={4}>

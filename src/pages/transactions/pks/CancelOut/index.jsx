@@ -87,7 +87,11 @@ const TransactionPksCancelOut = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrans.returnWeighOutKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.returnWeighOutKg = wb.weight;
+      }
+
+      // tempTrans.returnWeighOutKg = wb.weight;
       tempTrans.returnWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighOutTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
@@ -126,9 +130,9 @@ const TransactionPksCancelOut = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ returnWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ returnWeighInKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -173,7 +177,7 @@ const TransactionPksCancelOut = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     type="submit"
                     variant="contained"
                     disabled={
@@ -185,7 +189,38 @@ const TransactionPksCancelOut = (props) => {
                     }
                   >
                     SIMPAN
-                  </Button>
+                  </Button> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ backgroundColor: "darkred" }}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          values.returnWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ backgroundColor: "darkred" }}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}

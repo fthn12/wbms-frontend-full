@@ -169,8 +169,10 @@ const TransactionGrid = (props) => {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-out";
         } else if (progressStatus === 6) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out";
+        } else if (progressStatus === 11 && bonTripRef) {
+          urlPath = "/wb/transactions/pks/dispatch-reject-bulking-out";
         } else if (progressStatus === 11) {
-          urlPath = "/wb/transactions/bulking/manual-entry-dispatch-reject-out";
+          urlPath = "/wb/transactions/pks/dispatch-reject-t300-out";
         } else if (progressStatus === 20) {
           urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
         } else if (progressStatus === 21) {
@@ -178,9 +180,10 @@ const TransactionGrid = (props) => {
         } else if (progressStatus === 26) {
           urlPath =
             "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
+        } else if (progressStatus === 31 && bonTripRef) {
+          urlPath = "/wb/transactions/pks/dispatch-reject-bulking-out-view";
         } else if (progressStatus === 31) {
-          urlPath =
-            "/wb/transactions/pks/manual-entry-dispatch-reject-out-view";
+          urlPath = "/wb/transactions/pks/dispatch-reject-t300-out-view";
         } else if (progressStatus === 35) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-out";
         } else if (progressStatus === 36) {
@@ -254,23 +257,22 @@ const TransactionGrid = (props) => {
               deliveryOrderId={params.data.deliveryOrderId}
               type="grid"
             />
-            {params.data.isManualEntry === 0 &&
-              params.data.isManualTonase === 0 && (
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    handleViewClick(
-                      params.data.id,
-                      params.data.progressStatus,
-                      params.data.bonTripRef
-                    )
-                  }
-                >
-                  <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
-                </IconButton>
-              )}
+            {params.data.isManualEntry === 0 && (
+              <IconButton
+                size="small"
+                onClick={() =>
+                  handleViewClick(
+                    params.data.id,
+                    params.data.progressStatus,
+                    params.data.bonTripRef
+                  )
+                }
+              >
+                <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            )}
             {(params.data.isManualEntry === 1 ||
-              params.data.isManualTonase === 1) && (
+              params.data.typeTransaction === 5) && (
               <IconButton
                 size="small"
                 onClick={() =>

@@ -78,7 +78,11 @@ const TransactionPksNormalIn = (props) => {
     setIsLoading(true);
 
     try {
-      tempTrans.originWeighInKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.originWeighInKg = wb.weight;
+      }
+
+      // tempTrans.originWeighInKg = wb.weight;
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
@@ -156,19 +160,48 @@ const TransactionPksNormalIn = (props) => {
                   display="flex"
                   sx={{ display: "flex", mt: 3, justifyContent: "end" }}
                 >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={
-                      !(
-                        isValid &&
-                        wb?.isStable &&
-                        wb?.weight > WBMS.WB_MIN_WEIGHT
-                      )
-                    }
-                  >
-                    SIMPAN
-                  </Button>
+                  {/*   <Button 
+                 type="submit"
+                 variant="contained"
+                 disabled={
+                   !(
+                     isValid &&
+                     wb?.isStable &&
+                     wb?.weight > WBMS.WB_MIN_WEIGHT
+                   )
+                 }
+               >
+                 SIMPAN
+               </Button>*/}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                   {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          values.originWeighInKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}
@@ -389,7 +422,10 @@ const TransactionPksNormalIn = (props) => {
                             sx={{
                               mt: 2,
                               backgroundColor: "transparent",
-                              input: { cursor: "default", borderColor: "transparent" },
+                              input: {
+                                cursor: "default",
+                                borderColor: "transparent",
+                              },
                               "& .MuiOutlinedInput-root": {
                                 "& fieldset": {
                                   borderColor: "transparent",
@@ -406,7 +442,7 @@ const TransactionPksNormalIn = (props) => {
                           />
                         </Grid>
                         <Grid item xs={12}>
-                          <Divider >Tangki</Divider>
+                          <Divider>Tangki</Divider>
                         </Grid>
 
                         <Grid item xs={12}>
@@ -415,7 +451,7 @@ const TransactionPksNormalIn = (props) => {
                             label="Tangki Asal"
                             isRequired={false}
                             isReadOnly={true}
-                            sx={{ mt: 2}}
+                            sx={{ mt: 2 }}
                             backgroundColor="whitesmoke"
                             siteId={null}
                           />
@@ -461,8 +497,6 @@ const TransactionPksNormalIn = (props) => {
                             inputProps={{ readOnly: true }}
                           />
                         </Grid> */}
-
-                      
                       </Grid>
                     </Grid>
 
@@ -588,7 +622,7 @@ const TransactionPksNormalIn = (props) => {
                           />
                         </Grid> */}
 
-                        <Grid item xs={12} sx={{ mt: 2,mb:1 }}>
+                        <Grid item xs={12} sx={{ mt: 2, mb: 1 }}>
                           <Divider>Segel Tangki Isi</Divider>
                         </Grid>
 

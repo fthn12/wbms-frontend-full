@@ -69,7 +69,7 @@ const TransactionPksRejectBulkingInView = (props) => {
 
   const handleReject = () => {
     clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/manual-entry-dispatch-reject-out/${id}`);
+    navigate(`/wb/transactions/pks/dispatch-reject-t300-out/${id}`);
   };
 
   const handleClose = () => {

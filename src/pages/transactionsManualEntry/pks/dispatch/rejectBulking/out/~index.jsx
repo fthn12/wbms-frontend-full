@@ -10,24 +10,28 @@ import {
 } from "@mui/material";
 
 import { Formik, Form, Field } from "formik";
-import { TextField, Select } from "formik-mui";
+import { TextField } from "formik-mui";
 import * as yup from "yup";
 
 import moment from "moment";
 import numeral from "numeral";
 
-import Header from "../../../../../../components/layout/signed/HeaderTransaction";
-import ProgressStatus from "../../../../../../components/ProgressStatus";
-import QRCodeViewer from "../../../../../../components/QRCodeViewer";
-
+import Header from "components/layout/signed/HeaderTransaction";
+import ProgressStatus from "components/ProgressStatus";
+import CancelConfirmation from "components/CancelConfirmation";
+import {
+  CompanyACP,
+  DriverACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "components/FormManualEntry";
 import {
   TransportVehicleAC,
   DriverAC,
   CompanyAC,
-  SiteSelect,
   CertificateSelect,
   StorageTankSelect,
-} from "../../../../../../components/FormikMUI";
+} from "components/FormikMUI";
 
 import { TransactionAPI } from "../../../../../../apis";
 
@@ -35,60 +39,57 @@ import {
   useAuth,
   useConfig,
   useTransaction,
+  useWeighbridge,
   useApp,
   useProduct,
+  useStorageTank,
 } from "../../../../../../hooks";
-import { MenuItem } from "react-pro-sidebar";
-import {
-  CompanyACP,
-  DriverACP,
-  ProductACP,
-  TransportVehicleACP,
-} from "components/FormManualEntry";
 
-const TransactionPksRejectBulkingInView = (props) => {
+const TransactionPksRejectBulkingIn = (props) => {
   const navigate = useNavigate();
-
   const { id } = useParams();
-
   const transactionAPI = TransactionAPI();
 
   const { user } = useAuth();
-  const { WBMS, PRODUCT_TYPES } = useConfig();
-  const { urlPrev, setUrlPrev } = useApp();
+  const { WBMS } = useConfig();
+  const { urlPrev, setUrlPrev, setSidebar } = useApp();
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
     useTransaction();
-  const [dtTypeProduct] = useState(PRODUCT_TYPES);
-  const [selectedOption, setSelectedOption] = useState(0);
+  const { wb } = useWeighbridge();
+
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [returnWeighNetto, setReturnWeighNetto] = useState(0);
+  const [dtTrx, setDtTrx] = useState(null);
 
-  const [isReadOnly, setIsReadOnly] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const validationSchema = yup.object().shape({
-    // originWeighInKg: yup.number().required("Wajib diisi.").min(WBMS.WB_MIN_WEIGHT),
-    // originSourceStorageTankId: yup.string().required("Wajib diisi."),
-    // loadedSeal1: yup.string().required("Wajib diisi."),
-    // loadedSeal2: yup.string().required("Wajib diisi."),
-    returnWeighInRemark: yup
-      .string()
-      .required("Wajib diisi.")
-      .min(11, "Alasan REJECT (PENGEMBALIAN) harus melebihi 10 karakter.")
-      .max(
-        500,
-        "Alasan REJECT (PENGEMBALIAN) tidak boleh melebihi 500 karakter."
-      ),
-  });
-
-  const { useFindManyProductQuery } = useProduct();
-  const productFilter = {
+  const { useFindManyStorageTanksQuery } = useStorageTank();
+  const storageTankFilter = {
     where: {
-      productGroupId: selectedOption,
+      OR: [{ siteId: WBMS.SITE.refId }, { siteRefId: WBMS.SITE.refId }],
+      refType: 1,
     },
   };
 
+  const { data: dtStorageTank } =
+    useFindManyStorageTanksQuery(storageTankFilter);
+
+  const { useFindManyProductQuery } = useProduct();
+
+  const productFilter = {
+    where: {
+      productGroupId: 1,
+    },
+  };
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
+
+  const validationSchema = yup.object().shape({
+    // tidak bisa dari sini, karena ada pengaruh dari external form
+    // originWeighOutKg: yup.number().required("Wajib diisi.").min(WBMS.WB_MIN_WEIGHT),
+    // originSourceStorageTankId: yup.string().required("Wajib diisi."),
+    // loadedSeal1: yup.string().required("Wajib diisi."),
+    // loadedSeal2: yup.string().required("Wajib diisi."),
+  });
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -105,6 +106,39 @@ const TransactionPksRejectBulkingInView = (props) => {
     setIsLoading(true);
 
     try {
+      const selected = dtStorageTank.records.find(
+        (item) => item.id === values.originSourceStorageTankId
+      );
+
+      if (selected) {
+        tempTrans.originSourceStorageTankCode = selected.code || "";
+        tempTrans.originSourceStorageTankName = selected.name || "";
+      }
+
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.returnWeighOutKg = wb.weight;
+      } else if (WBMS.WB_STATUS === false) {
+        tempTrans.isManualTonase = 1;
+      }
+
+      tempTrans.rspoSccModel = parseInt(tempTrans.rspoSccModel);
+      tempTrans.isccSccModel = parseInt(tempTrans.isccSccModel);
+      tempTrans.ispoSccModel = parseInt(tempTrans.ispoSccModel);
+
+      tempTrans.isManualEntry = 1;
+      tempTrans.typeTransaction = 5;
+      tempTrans.progressStatus = 31;
+      tempTrans.deliveryStatus = 36;
+      tempTrans.deliveryDate = moment().toDate();
+      tempTrans.returnWeighOutOperatorName = user.name.toUpperCase();
+      tempTrans.returnWeighOutTimestamp = moment().toDate();
+      tempTrans.dtTransaction = moment()
+        .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
+        .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
+        .format();
+
+      const data = { tempTrans };
+
       const response = await transactionAPI.updateById(tempTrans.id, {
         ...tempTrans,
       });
@@ -114,16 +148,25 @@ const TransactionPksRejectBulkingInView = (props) => {
       clearOpenedTransaction();
       setIsLoading(false);
 
-      toast.success(`Update Transaksi REJECT WB-IN telah tersimpan.`);
+      const id = response?.data?.transaction?.id;
+      navigate(`/wb/transactions/pks/dispatch-reject-bulking-out-view/${id}`);
 
-      return handleClose();
+      setIsLoading(false);
+      toast.success("Transaksi REJECT WB-OUT telah tersimpan.");
     } catch (error) {
       setIsLoading(false);
       toast.error(`${error.message}.`);
-
-      return;
     }
   };
+
+  useEffect(() => {
+    setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
+    setSidebar({ selected: "Transaksi WB LBN" });
+
+    return () => {
+      // console.clear();
+    };
+  }, []);
 
   useEffect(() => {
     if (!id) return handleClose();
@@ -132,7 +175,6 @@ const TransactionPksRejectBulkingInView = (props) => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
-        setSelectedOption(res.data.transaction.productType);
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -172,62 +214,60 @@ const TransactionPksRejectBulkingInView = (props) => {
 
   return (
     <Box>
-      <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
+      <Header title="TRANSAKSI BULKING" subtitle="TIMBANG REJECT WB-OUT" />
       {openedTransaction && (
         <Formik
           // enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
+          // isInitialValid={false}
         >
           {(props) => {
-            const {
-              values,
-              submitForm,
-              resetForm,
-              isValid,
-              dirty,
-              handleChange,
-            } = props;
-            // console.log("Formik props:", props)
-
-            const handleSubmit = async () => {
-              if (isReadOnly) setIsReadOnly(false);
-              else submitForm();
-            };
-
-            const handleReset = async () => {
-              if (isReadOnly) handleClose();
-              else {
-                resetForm();
-                setIsReadOnly(true);
-              }
-            };
+            const { values, isValid, submitForm, dirty, setFieldValue } = props;
+            // console.log("Formik props:", props);
 
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
-                    variant="contained"
-                    disabled={isReadOnly ? false : !(isValid && dirty)}
-                    onClick={handleSubmit}
-                  >
-                    {isReadOnly ? "EDIT" : "SIMPAN"}
-                  </Button>
-                  {/* <QRCodeViewer
-                    progressStatus={values.progressStatus}
-                    deliveryOrderId={values.deliveryOrderId}
-                    type="form"
-                    disabled={!isReadOnly}
-                  >
-                    TAMPILKAN QR
-                  </QRCodeViewer> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ backgroundColor: "darkred" }}
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{ backgroundColor: "darkred" }}
+                      disabled={
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.returnWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}
-                    onClick={handleReset}
+                    onClick={handleClose}
                   >
-                    {isReadOnly ? "TUTUP" : "BATAL PERUBAHAN"}
+                    TUTUP
                   </Button>
                   {/* <Button
                     variant="contained"
@@ -256,13 +296,8 @@ const TransactionPksRejectBulkingInView = (props) => {
                         component={TextField}
                         inputProps={{ readOnly: true }}
                       />
-                      {/* <Grid item xs={6}>
-                          <ProgressStatus
-                            progressStatus={values?.progressStatus}
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                          />
-                        </Grid> */}
-                      <Field
+
+                      {/* <Field
                         name="productType"
                         label="Tipe Transaksi"
                         component={Select}
@@ -280,12 +315,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             (item) => item.id === event.target.value
                           );
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
+                        
                         }}
                       >
                         {dtTypeProduct &&
@@ -294,9 +324,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                               {data.value}
                             </MenuItem>
                           ))}
-                      </Field>
+                      </Field> */}
 
-                      {/* <Field
+                      <Field
                         name="deliveryOrderNo"
                         label="NO DO"
                         type="text"
@@ -305,32 +335,32 @@ const TransactionPksRejectBulkingInView = (props) => {
                         required
                         size="small"
                         fullWidth
-                        inputProps={{ readOnly: true }}
-                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
-                      /> */}
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                      />
                       <TransportVehicleACP
                         name="transportVehicleId"
                         label="Nomor Plat"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <DriverACP
                         name="driverName"
                         label="Nama Supir"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <CompanyACP
                         name="transporterCompanyName"
                         label="Nama Vendor"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                       <ProductACP
                         data={dtProduct}
                         name="productId"
                         label="Nama Product"
-                        isReadOnly={true}
+                        isReadOnly={false}
                         sx={{ mb: 2 }}
                       />
                     </Grid>
@@ -359,9 +389,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             name="rspoSccModel"
                             label="Sertifikasi RSPO"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -388,9 +418,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             name="isccSccModel"
                             label="Sertifikasi ISCC"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -417,9 +447,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                             name="ispoSccModel"
                             label="Sertifikasi ISPO"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
+                            backgroundColor="lightyellow"
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -448,12 +478,12 @@ const TransactionPksRejectBulkingInView = (props) => {
                         <Grid item xs={12}>
                           <StorageTankSelect
                             name="originSourceStorageTankId"
-                            label="Tangki Tujuan"
+                            label="Tangki Asal"
                             isRequired={true}
-                            isReadOnly={true}
+                            isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                            // siteId={WBMS.SITE_REFID}
+                            backgroundColor="lightyellow"
+                            siteId={WBMS.DESTINATION_SITE.refId}
                           />
                         </Grid>
                         <Grid item xs={12}>
@@ -468,7 +498,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -481,7 +511,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 ? values.originFfaPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -493,7 +523,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -506,7 +536,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 ? values.originMoistPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={4}>
@@ -518,7 +548,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
+                            sx={{ mt: 1, backgroundColor: "lightyellow" }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -531,7 +561,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 ? values.originDirtPercentage
                                 : "0"
                             }
-                            inputProps={{ readOnly: true }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                       </Grid>
@@ -619,48 +649,48 @@ const TransactionPksRejectBulkingInView = (props) => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
                             name="loadedSeal2"
-                            label="Segel Bongkar Valve 1"
+                            label="Segel ISI Valve 1"
                             type="text"
                             required={true}
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
                             name="loadedSeal3"
-                            label="Segel Bongkar Mainhole 2"
+                            label="Segel ISI Mainhole 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
                             name="loadedSeal4"
-                            label="Segel Bongkar Valve 2"
+                            label="Segel ISI Valve 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            // inputProps={{ readOnly: true }}
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ mt: 2 }}>
@@ -678,36 +708,10 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             multiline
                             rows={5.4}
-                            sx={{
-                              mt: 2,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                            inputProps={{ readOnly: false }}
                           />
                         </Grid>
-                        {/* <Grid item xs={12}>
-                              <Field
-                                name="originWeighInRemark"
-                                label="Alasan untuk Entri Manual"
-                                type="text"
-                                multiline
-                                rows={5.4}
-                                required={true}
-                                component={TextField}
-                                onChange={(e) => {
-                                  const { value } = e.target;
-                                  setFieldValue("originWeighInRemark", value);
-                                  setFieldValue("originWeighOutRemark", value);
-                                }}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid> */}
                       </Grid>
                     </Grid>
 
@@ -718,32 +722,36 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="originWeighInOperatorName"
-                            label="Operator WB-IN"
                             type="text"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={values.originWeighInOperatorName || "-"}
+                            label="Operator WB-IN"
+                            name="originWeighInOperatorName"
+                            value={values?.originWeighInOperatorName || "-"}
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="originWeighOutOperatorName"
-                            label="Operator WB-OUT"
                             type="text"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={values.originWeighOutOperatorName || "-"}
+                            label="Operator WB-OUT"
+                            value={values?.originWeighOutOperatorName || "-"}
+                            name="originWeighOutOperatorName"
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -769,15 +777,14 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="originWeighOutTimestamp"
-                            label="Waktu WB-OUT"
                             type="text"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            label="Waktu WB-Out"
+                            name="originWeighOutTimestamp"
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutTimestamp
@@ -790,11 +797,9 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="originWeighInKg"
-                            label="Berat WB-IN"
                             type="number"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
@@ -805,6 +810,8 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 </InputAdornment>
                               ),
                             }}
+                            label="BERAT MASUK - IN"
+                            name="originWeighInKg"
                             value={
                               values?.originWeighInKg > 0
                                 ? values.originWeighInKg.toFixed(2)
@@ -815,14 +822,16 @@ const TransactionPksRejectBulkingInView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="originWeighOutKg"
-                            label="Berat WB-OUT"
                             type="number"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                            sx={{
+                              mt: 2,
+                              mb: 2,
+                              backgroundColor: "whitesmoke",
+                            }}
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -835,20 +844,19 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 ? values.originWeighOutKg.toFixed(2)
                                 : "0.00"
                             }
+                            label="BERAT KELUAR - OUT"
+                            name="originWeighOutKg"
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
-
-                        <Grid item xs={12} sx={{ mt: 2 }}>
+                        <Grid item xs={12}>
                           <Divider>TOTAL</Divider>
                         </Grid>
                         <Grid item xs={12}>
                           <Field
-                            name="originWeighNetto"
-                            label="TOTAL"
                             type="number"
-                            component={TextField}
                             variant="outlined"
+                            component={TextField}
                             size="small"
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
@@ -859,43 +867,15 @@ const TransactionPksRejectBulkingInView = (props) => {
                                 </InputAdornment>
                               ),
                             }}
+                            label="TOTAL"
+                            name="weightNetto"
                             value={
                               originWeighNetto > 0
                                 ? originWeighNetto.toFixed(2)
                                 : "0.00"
                             }
-                            inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        {/* <Grid item xs={12}>
-                          <TextFieldMUI
-                            label=""
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: "transparent",
-                              input: {
-                                cursor: "default",
-                                borderColor: "transparent",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&:hover fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "transparent",
-                                },
-                              },
-                            }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid> */}
                         <Grid item xs={12}>
                           <Divider sx={{ mt: 2 }}>DATA TIMBANG REJECT</Divider>
                         </Grid>
@@ -926,7 +906,7 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            value={values.returnWeighOutOperatorName || "-"}
+                            value={user.name.toUpperCase()}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -950,7 +930,6 @@ const TransactionPksRejectBulkingInView = (props) => {
                             }
                           />
                         </Grid>
-
                         <Grid item xs={6}>
                           <Field
                             name="returnWeighOutTimestamp"
@@ -963,15 +942,10 @@ const TransactionPksRejectBulkingInView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            value={
-                              values?.returnWeighOutTimestamp
-                                ? moment(values.returnWeighOutTimestamp)
-                                    .local()
-                                    .format(`DD/MM/YYYY - HH:mm:ss`)
-                                : "-"
-                            }
+                            value={dtTrx || "-"}
                           />
                         </Grid>
+
                         <Grid item xs={6}>
                           <Field
                             name="returnWeighInKg"
@@ -997,39 +971,65 @@ const TransactionPksRejectBulkingInView = (props) => {
                             }
                           />
                         </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="returnWeighOutKg"
-                            label="Berat WB-OUT"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  kg
-                                </InputAdornment>
-                              ),
-                            }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.returnWeighOutKg > 0
-                                ? values.returnWeighOutKg.toFixed(2)
-                                : "0.00"
-                            }
-                          />
-                        </Grid>
 
+                        {WBMS.WB_STATUS === true && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighOutKg"
+                              label="Berat WB-OUT"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              inputProps={{ readOnly: true }}
+                              value={
+                                wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"
+                              }
+                            />
+                          </Grid>
+                        )}
+                        {WBMS.WB_STATUS === false && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighOutKg"
+                              label="Berat WB-OUT"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              value={
+                                values?.returnWeighOutKg > 0
+                                  ? values.returnWeighOutKg
+                                  : "0"
+                              }
+                            />
+                          </Grid>
+                        )}
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>TOTAL REJECT</Divider>
+                          <Divider>TOTAL</Divider>
                         </Grid>
                         <Grid item xs={12}>
                           <Field
                             name="returnWeighNetto"
-                            label="NETTO"
+                            label="TOTAL"
                             type="number"
                             component={TextField}
                             variant="outlined"
@@ -1089,4 +1089,4 @@ const TransactionPksRejectBulkingInView = (props) => {
   );
 };
 
-export default TransactionPksRejectBulkingInView;
+export default TransactionPksRejectBulkingIn;

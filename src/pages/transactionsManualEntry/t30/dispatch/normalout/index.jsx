@@ -152,10 +152,13 @@ const T30ManualEntryDispatchOut = () => {
           tempTrans.returnWeighInKg = wb.weight;
         } else if (WBMS.WB_STATUS === false) {
           tempTrans.returnWeighInKg = tempTrans.originWeighOutKg;
+          tempTrans.isManualTonase = 1;
         }
 
         tempTrans.originWeighOutKg = 0;
 
+        tempTrans.isManualEntry = 1;
+        tempTrans.typeTransaction = 5;
         tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
         tempTrans.returnWeighInTimestamp = moment().toDate();
         tempTrans.progressStatus = 6;
@@ -204,10 +207,10 @@ const T30ManualEntryDispatchOut = () => {
         tempTrans.isManualEntry = 1;
         tempTrans.typeTransaction = 5;
         tempTrans.deliveryStatus = 20;
+        tempTrans.progressStatus = 21;
         tempTrans.deliveryDate = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
-        tempTrans.progressStatus = 21;
         tempTrans.dtTransaction = moment()
           .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
           .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")

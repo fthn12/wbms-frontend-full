@@ -1,9 +1,18 @@
 import { useState, useEffect, useRef } from "react";
 import ReactToPrint from "react-to-print";
 import moment from "moment";
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Table, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Table,
+  Typography,
+} from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
+import QRCode from "react-qr-code";
 import { useAuth, useConfig } from "../hooks";
 
 const BonTripT30Print = (props) => {
@@ -19,6 +28,36 @@ const BonTripT30Print = (props) => {
   const jamMasuk = moment(dtTrans.originWeighInTimestamp).format("HH:mm:ss");
   const jamKeluar = moment(dtTrans.originWeighOutTimestamp).format("HH:mm:ss");
   const tanggal = moment(dtTrans.originWeighOutTimestamp).format("DD- MM-YYYY");
+
+  const qrData = {
+    siteType: 3,
+    productType: dtTrans.productType,
+    transporterCompanyId: dtTrans.transporterCompanyId,
+    transporterCompanyName: dtTrans.transporterCompanyName,
+    transporterCompanyCode: dtTrans.transporterCompanyCode,
+    driverId: dtTrans.driverId,
+    driverName: dtTrans.driverName,
+    driverNik: dtTrans.driverNik,
+    transportVehicleId: dtTrans.transportVehicleId,
+    transportVehiclePlateNo: dtTrans.transportVehiclePlateNo,
+    transportVehicleProductName: dtTrans.transportVehicleProductName,
+    transportVehicleProductCode: dtTrans.transportVehicleProductCode,
+    productName: dtTrans.productName,
+    productId: dtTrans.productId,
+    productCode: dtTrans.productCode,
+    currentSeal1: dtTrans.loadedSeal1,
+    currentSeal2: dtTrans.loadedSeal2,
+    currentSeal3: dtTrans.loadedSeal3,
+    currentSeal4: dtTrans.loadedSeal4,
+    originWeighInOperatorName: dtTrans.originWeighInOperatorName,
+    originWeighOutOperatorName: dtTrans.originWeighOutOperatorName,
+    originWeighInTimestamp: dtTrans.originWeighInTimestamp,
+    originWeighOutTimestamp: dtTrans.originWeighOutTimestamp,
+    originWeighInKg: dtTrans.originWeighInKg,
+    originWeighOutKg: dtTrans.originWeighOutKg,
+  };
+
+  const qrContent = "ARMIN" + JSON.stringify(qrData);
 
   return (
     <>
@@ -38,13 +77,26 @@ const BonTripT30Print = (props) => {
         <DialogContent dividers>
           <form ref={formRef}>
             <Box display="flex">
-              <img alt="LOGO" width="50px" height="85px" src={require("../assets/images/1.jpg")} />
+              <img
+                alt="LOGO"
+                width="50px"
+                height="85px"
+                src={require("../assets/images/1.jpg")}
+              />
               <Box ml={2} mt={2}>
                 <Typography fontSize="19px" fontWeight="bold">
                   PT. DHARMA SATYA NUSANTARA
                 </Typography>
 
                 <Typography fontSize="19px">DESPATCH MIAU</Typography>
+              </Box>
+              <Box ml="auto" mt={2}>
+                <QRCode 
+                size={150}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={qrContent}
+                viewBox={`0 0 256 256`}
+                />
               </Box>
             </Box>
 
@@ -79,14 +131,18 @@ const BonTripT30Print = (props) => {
                         Suplier
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.transporterCompanyName}</td>
+                      <td className="nota-text">
+                        {dtTrans.transporterCompanyName}
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
                         Dikirim ke
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.destinationSiteName}</td>
+                      <td className="nota-text">
+                        {dtTrans.destinationSiteName}
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
@@ -100,7 +156,9 @@ const BonTripT30Print = (props) => {
                         No. Kend
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.transportVehiclePlateNo}</td>
+                      <td className="nota-text">
+                        {dtTrans.transportVehiclePlateNo}
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
@@ -121,7 +179,9 @@ const BonTripT30Print = (props) => {
                         Jenis Barang
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.transportVehicleProductName}</td>
+                      <td className="nota-text">
+                        {dtTrans.transportVehicleProductName}
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
@@ -135,7 +195,9 @@ const BonTripT30Print = (props) => {
                         1st Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.originWeighInKg.toLocaleString()} KG</td>
+                      <td className="nota-text">
+                        {dtTrans.originWeighInKg.toLocaleString()} KG
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
@@ -149,7 +211,9 @@ const BonTripT30Print = (props) => {
                         2st Weight
                       </td>
                       <td width="10">:</td>
-                      <td className="nota-text">{dtTrans.originWeighOutKg.toLocaleString()} KG</td>
+                      <td className="nota-text">
+                        {dtTrans.originWeighOutKg.toLocaleString()} KG
+                      </td>
                     </tr>
                     <tr>
                       <td height="30" width="100">
@@ -157,7 +221,10 @@ const BonTripT30Print = (props) => {
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">
-                        {Math.abs(dtTrans.originWeighOutKg - dtTrans.originWeighInKg).toLocaleString()} KG
+                        {Math.abs(
+                          dtTrans.originWeighOutKg - dtTrans.originWeighInKg
+                        ).toLocaleString()}{" "}
+                        KG
                       </td>
                     </tr>
                     <tr>
@@ -166,7 +233,9 @@ const BonTripT30Print = (props) => {
                       </td>
                       <td width="10">:</td>
                       <td className="nota-text">
-                        {Math.abs(dtTrans.mandatoryDeductionKg + dtTrans.othersKg).toLocaleString()}
+                        {Math.abs(
+                          dtTrans.mandatoryDeductionKg + dtTrans.othersKg
+                        ).toLocaleString()}
                       </td>
                     </tr>
                     <tr>
@@ -179,7 +248,7 @@ const BonTripT30Print = (props) => {
                           dtTrans.originWeighOutKg -
                             dtTrans.originWeighInKg -
                             dtTrans.mandatoryDeductionKg -
-                            dtTrans.othersKg,
+                            dtTrans.othersKg
                         ).toLocaleString()}
                         KG
                       </td>
@@ -341,7 +410,9 @@ const BonTripT30Print = (props) => {
         <DialogActions>
           <Box>
             <ReactToPrint
-              trigger={() => <Button variant="contained">Print Transaction</Button>}
+              trigger={() => (
+                <Button variant="contained">Print Transaction</Button>
+              )}
               content={() => formRef.current}
               documentTitle="Print"
               pageStyle="print"

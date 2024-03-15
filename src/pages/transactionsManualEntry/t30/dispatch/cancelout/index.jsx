@@ -127,11 +127,11 @@ const TransactionManualPksCancelOut = (props) => {
 
       tempTrans.isManualEntry = 1;
       tempTrans.typeTransaction = 5;
+      tempTrans.progressStatus = 26;
       tempTrans.deliveryStatus = 32;
       tempTrans.deliveryDate = moment().toDate();
       tempTrans.returnWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighOutTimestamp = moment().toDate();
-      tempTrans.progressStatus = 26;
       tempTrans.dtTransaction = moment()
         .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
@@ -243,7 +243,7 @@ const TransactionManualPksCancelOut = (props) => {
                         )
                       }
                     >
-                      SIMPAN
+                       SIMPAN CANCEL (OUT)
                     </Button>
                   )}
                   {WBMS.WB_STATUS === false && (
@@ -258,7 +258,7 @@ const TransactionManualPksCancelOut = (props) => {
                         )
                       }
                     >
-                      SIMPAN
+                       SIMPAN CANCEL (OUT)
                     </Button>
                   )}
                   <Button

@@ -116,7 +116,11 @@ const TransactionT30CancelOut = (props) => {
       wbTransaction.isccSccModel = parseInt(wbTransaction.isccSccModel);
       wbTransaction.ispoSccModel = parseInt(wbTransaction.ispoSccModel);
 
-      wbTransaction.returnWeighOutKg = wb.weight;
+      if (WBMS.WB_STATUS === true) {
+        wbTransaction.returnWeighOutKg = wb.weight;
+      }
+
+      // tempTrans.returnWeighOutKg = wb.weight;
       wbTransaction.returnWeighOutOperatorName = user.name.toUpperCase();
       wbTransaction.returnWeighOutTimestamp = moment().toDate();
       wbTransaction.dtTransaction = moment()
@@ -155,9 +159,9 @@ const TransactionT30CancelOut = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    setWbTransaction({ returnWeighInKg: wb.weight });
-  }, [wb.weight]);
+  // useEffect(() => {
+  //   setWbTransaction({ returnWeighOutKg: wb.weight });
+  // }, [wb.weight]);
 
   useEffect(() => {
     if (
@@ -202,7 +206,7 @@ const TransactionT30CancelOut = (props) => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  <Button
+                  {/* <Button
                     type="submit"
                     variant="contained"
                     disabled={
@@ -214,7 +218,38 @@ const TransactionT30CancelOut = (props) => {
                     }
                   >
                     SIMPAN
-                  </Button>
+                  </Button> */}
+                  {WBMS.WB_STATUS === true && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          wb?.isStable &&
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ backgroundColor: "darkred" }}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
+                  {WBMS.WB_STATUS === false && (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      disabled={
+                        !(
+                          isValid &&
+                          values.returnWeighOutKg > WBMS.WB_MIN_WEIGHT
+                        )
+                      }
+                      sx={{ backgroundColor: "darkred" }}
+                    >
+                      SIMPAN
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     sx={{ ml: 1 }}
@@ -745,7 +780,7 @@ const TransactionT30CancelOut = (props) => {
                           />
                         </Grid>
 
-                        <Grid item xs={12} sx={{ mt: 3 }}>
+                        <Grid item xs={12} sx={{ mt: 2 }}>
                           <Divider>Catatan</Divider>
                         </Grid>
                         <Grid item xs={12}>

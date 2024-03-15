@@ -20,7 +20,7 @@ import {
 import { TextField, Autocomplete, Select } from "formik-mui";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import Dispatch from "./dispatch/in";
+import Dispatch from "./dispatch/normalin";
 import TBS from "./tbs/in";
 import OTHERS from "./others/in";
 import KERNEL from "./kernel/in";
@@ -100,7 +100,7 @@ const PksManualEntryWBIn = () => {
 
   const handleReject = () => {
     clearOpenedTransaction();
-    navigate(`/wb/transactions/bulking/manual-entry-dispatch-reject-in`);
+    navigate(`/wb/transactions/pks/dispatch-reject-bulking-in`);
   };
 
   const handleDispatchSubmit = async (values) => {
@@ -145,6 +145,7 @@ const PksManualEntryWBIn = () => {
 
       tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 1;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()

@@ -261,13 +261,7 @@ const TransactionPKSRejectOutView = (props) => {
                         component={TextField}
                         inputProps={{ readOnly: true }}
                       />
-                      {/* <Grid item xs={6}>
-                          <ProgressStatus
-                            progressStatus={values?.progressStatus}
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                          />
-                        </Grid> */}
-                      <Field
+                      {/* <Field
                         name="productType"
                         label="Tipe Transaksi"
                         component={Select}
@@ -285,12 +279,7 @@ const TransactionPKSRejectOutView = (props) => {
                             (item) => item.id === event.target.value
                           );
                           setSelectedOption(selectedProductType.id);
-                          // setFieldValue("productName", "");
-                          // setFieldValue("productId", "");
-                          // setFieldValue("productCode", "");
-                          // setFieldValue("transportVehicleProductName", "");
-                          // setFieldValue("transportVehicleId", "");
-                          // setFieldValue("transportVehicleProductCode", "");
+                        
                         }}
                       >
                         {dtTypeProduct &&
@@ -299,7 +288,19 @@ const TransactionPKSRejectOutView = (props) => {
                               {data.value}
                             </MenuItem>
                           ))}
-                      </Field>
+                      </Field> */}
+                      <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                      />
 
                       <Field
                         name="deliveryOrderNo"
@@ -338,208 +339,6 @@ const TransactionPKSRejectOutView = (props) => {
                         isReadOnly={true}
                         sx={{ mb: 2 }}
                       />
-                    </Grid>
-
-                    <Grid item xs={12} sm={6} lg={3}>
-                      <Grid container columnSpacing={1}>
-                        <Grid item xs={12}>
-                          <Divider>DATA PRODUK</Divider>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            name="product"
-                            label="Produk"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={`${values?.productCode} - ${values?.productName}`}
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="rspoSccModel"
-                            label="Sertifikasi RSPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="rspoCertificateNumber"
-                            label="Nomor Sertifikasi RSPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.rspoCertificateNumber
-                                ? values.rspoCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="isccSccModel"
-                            label="Sertifikasi ISCC"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="isccCertificateNumber"
-                            label="Nomor Sertifikasi ISCC"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.isccCertificateNumber
-                                ? values.isccCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <CertificateSelect
-                            name="ispoSccModel"
-                            label="Sertifikasi ISPO"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                          />
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Field
-                            name="ispoCertificateNumber"
-                            label="Nomor Sertifikasi ISPO"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.ispoCertificateNumber
-                                ? values.ispoCertificateNumber
-                                : "-"
-                            }
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 6.5 }}>Tangki</Divider>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <StorageTankSelect
-                            name="originSourceStorageTankId"
-                            label="Tangki Asal"
-                            isRequired={true}
-                            isReadOnly={true}
-                            sx={{ mt: 2 }}
-                            backgroundColor="whitesmoke"
-                            siteId={WBMS.SITE_REFID}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Divider sx={{ mt: 2, mb: 1 }}>Kualitas</Divider>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originFfaPercentage"
-                            label="FFA"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originFfaPercentage > 0
-                                ? values.originFfaPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originMoistPercentage"
-                            label="Moist"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originMoistPercentage > 0
-                                ? values.originMoistPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Field
-                            name="originDirtPercentage"
-                            label="Dirt"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 1, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                            }}
-                            value={
-                              values?.originDirtPercentage > 0
-                                ? values.originDirtPercentage
-                                : "0"
-                            }
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid>
-                      </Grid>
                     </Grid>
 
                     <Grid item xs={12} sm={6} lg={3}>
@@ -612,14 +411,14 @@ const TransactionPKSRejectOutView = (props) => {
                           />
                         </Grid>
                         <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Segel Tangki Isi</Divider>
+                          <Divider>Segel Tangki Bongkar</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal1"
-                            label="Segel ISI Mainhole 1"
+                            name="returnUnloadedSeal1"
+                            label="Segel BONGKAR Mainhole 1"
                             type="text"
-                            required={true}
+                            // required={true}
                             component={TextField}
                             variant="outlined"
                             size="small"
@@ -630,10 +429,10 @@ const TransactionPKSRejectOutView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal2"
-                            label="Segel ISI Valve 1"
+                            name="returnUnloadedSeal2"
+                            label="Segel BONGKAR Valve 1"
                             type="text"
-                            required={true}
+                            // required={true}
                             component={TextField}
                             variant="outlined"
                             size="small"
@@ -644,8 +443,8 @@ const TransactionPKSRejectOutView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal3"
-                            label="Segel ISI Mainhole 2"
+                            name="returnUnloadedSeal3"
+                            label="Segel BONGKAR Mainhole 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
@@ -657,8 +456,8 @@ const TransactionPKSRejectOutView = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Field
-                            name="loadedSeal4"
-                            label="Segel ISI Valve 2"
+                            name="returnUnloadedSeal4"
+                            label="Segel BONGKAR Valve 2"
                             type="text"
                             component={TextField}
                             variant="outlined"
@@ -668,58 +467,13 @@ const TransactionPKSRejectOutView = (props) => {
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        <Grid item xs={12} sx={{ mt: 2 }}>
-                          <Divider>Catatan</Divider>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            name="returnWeighInRemark"
-                            label="Alasan CANCEL (PEMBATALAN)"
-                            type="text"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            required
-                            multiline
-                            rows={5.4}
-                            sx={{
-                              mt: 2,
-                              backgroundColor: isReadOnly
-                                ? "whitesmoke"
-                                : "lightyellow",
-                            }}
-                            inputProps={{ readOnly: isReadOnly }}
-                          />
-                        </Grid>
-                        {/* <Grid item xs={12}>
-                              <Field
-                                name="originWeighInRemark"
-                                label="Alasan untuk Entri Manual"
-                                type="text"
-                                multiline
-                                rows={5.4}
-                                required={true}
-                                component={TextField}
-                                onChange={(e) => {
-                                  const { value } = e.target;
-                                  setFieldValue("originWeighInRemark", value);
-                                  setFieldValue("originWeighOutRemark", value);
-                                }}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                                inputProps={{ readOnly: true }}
-                              />
-                            </Grid> */}
                       </Grid>
                     </Grid>
 
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider>DATA TIMBANG KENDARAAN</Divider>
+                          <Divider>DATA TIMBANG ASAL</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -733,6 +487,7 @@ const TransactionPKSRejectOutView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.originWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -747,6 +502,7 @@ const TransactionPKSRejectOutView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.originWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -845,6 +601,7 @@ const TransactionPKSRejectOutView = (props) => {
                         <Grid item xs={12} sx={{ mt: 2 }}>
                           <Divider>TOTAL</Divider>
                         </Grid>
+
                         <Grid item xs={12}>
                           <Field
                             name="originWeighNetto"
@@ -870,37 +627,13 @@ const TransactionPKSRejectOutView = (props) => {
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
-                        {/* <Grid item xs={12}>
-                          <TextFieldMUI
-                            label=""
-                            type="text"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{
-                              mt: 2,
-                              backgroundColor: "transparent",
-                              input: {
-                                cursor: "default",
-                                borderColor: "transparent",
-                              },
-                              "& .MuiOutlinedInput-root": {
-                                "& fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&:hover fieldset": {
-                                  borderColor: "transparent",
-                                },
-                                "&.Mui-focused fieldset": {
-                                  borderColor: "transparent",
-                                },
-                              },
-                            }}
-                            inputProps={{ readOnly: true }}
-                          />
-                        </Grid> */}
+                      </Grid>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} lg={3}>
+                      <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider sx={{ mt: 2 }}>DATA TIMBANG REJECT</Divider>
+                          <Divider>DATA TIMBANG REJECT</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field
@@ -914,6 +647,7 @@ const TransactionPKSRejectOutView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.returnWeighInOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -928,6 +662,7 @@ const TransactionPKSRejectOutView = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
+                            value={values.returnWeighOutOperatorName || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1030,7 +765,7 @@ const TransactionPKSRejectOutView = (props) => {
                         <Grid item xs={12}>
                           <Field
                             name="returnWeighNetto"
-                            label="TOTAL"
+                            label="NETTO"
                             type="number"
                             component={TextField}
                             variant="outlined"
@@ -1050,6 +785,30 @@ const TransactionPKSRejectOutView = (props) => {
                                 ? returnWeighNetto.toFixed(2)
                                 : "0.00"
                             }
+                          />
+                        </Grid>
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <Divider>Catatan</Divider>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            name="returnWeighInRemark"
+                            label="Alasan REJECT (PENGEMBALIAN)"
+                            type="text"
+                            component={TextField}
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            required
+                            multiline
+                            rows={5.4}
+                            sx={{
+                              mt: 2,
+                              backgroundColor: isReadOnly
+                                ? "whitesmoke"
+                                : "lightyellow",
+                            }}
+                            inputProps={{ readOnly: isReadOnly }}
                           />
                         </Grid>
                       </Grid>

@@ -110,8 +110,8 @@ const TransactionPksCancelIn = (props) => {
 
       tempTrans.isManualEntry = 1;
       tempTrans.typeTransaction = 5;
-      // tempTrans.deliveryStatus = 26;
-      // tempTrans.deliveryDate = moment().toDate();
+      tempTrans.deliveryStatus = 26;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.progressStatus = 11;
@@ -132,7 +132,7 @@ const TransactionPksCancelIn = (props) => {
       setIsLoading(false);
 
       const id = response?.data?.transaction?.id;
-      navigate(`/wb/transactions/pks/manual-entry-dispatch-reject-in-view/${id}`);
+      navigate(`/wb/transactions/pks/dispatch-reject-t300-in-view/${id}`);
 
       setIsLoading(false);
       toast.success("Transaksi REJECT WB-IN telah tersimpan.");
@@ -231,9 +231,9 @@ const TransactionPksCancelIn = (props) => {
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
                   {WBMS.WB_STATUS === true && (
                     <CancelConfirmation
-                      title="Alasan REJECT"
-                      caption="SIMPAN REJECT (IN)"
-                      content="Anda yakin melakukan REJECT (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                    title="Alasan REJECT (PENGEMBALIAN)"
+                    caption="SIMPAN"
+                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
                       isDisabled={
                         !(
@@ -247,9 +247,9 @@ const TransactionPksCancelIn = (props) => {
                   )}
                   {WBMS.WB_STATUS === false && (
                     <CancelConfirmation
-                      title="Alasan REJECT (PEMBATALAN)"
-                      caption="SIMPAN REJECT (IN)"
-                      content="Anda yakin melakukan REJECT (PEMBATALAN) transaksi WB ini? Berikan keterangan yang cukup."
+                    title="Alasan REJECT (PENGEMBALIAN)"
+                    caption="SIMPAN"
+                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
                       isDisabled={
                         !(

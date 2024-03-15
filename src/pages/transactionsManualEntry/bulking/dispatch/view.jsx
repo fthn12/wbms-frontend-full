@@ -595,7 +595,7 @@ const LBNManualEntryDispatchView = () => {
                         <Grid item xs={12} sm={6} lg={3}>
                           <Grid container columnSpacing={1}>
                             <Grid item xs={12}>
-                              <Divider>DATA TIMBANG KENDARAAN</Divider>
+                              <Divider>DATA TIMBANG ASAL</Divider>
                             </Grid>
                             <Grid item xs={6}>
                               <Field

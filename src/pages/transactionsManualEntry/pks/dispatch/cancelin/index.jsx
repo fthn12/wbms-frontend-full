@@ -111,6 +111,8 @@ const TransactionPksCancelIn = (props) => {
 
       tempTrans.isManualEntry = 1;
       tempTrans.typeTransaction = 5;
+      tempTrans.deliveryStatus = 15;
+      tempTrans.deliveryDate = moment().toDate();
       tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighInTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
