@@ -403,7 +403,7 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -417,7 +417,7 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -430,7 +430,7 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "transparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -443,7 +443,7 @@ const BulkingManualEntryWBIn = () => {
                             variant="outlined"
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, backgroundColor: "tranparant" }}
+                            sx={{ mt: 2, backgroundColor: "lightyellow" }}
                             // inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -458,8 +458,8 @@ const BulkingManualEntryWBIn = () => {
                             isRequired={true}
                             isReadOnly={false}
                             sx={{ mt: 2 }}
-                            backgroundColor="transparant"
-                            siteId={WBMS.SITE.refid}
+                            backgroundColor="lightyellow"
+                            siteId={WBMS.SITE.refId}
                           />
                         </Grid>
                       </Grid>
@@ -736,7 +736,7 @@ const BulkingManualEntryWBIn = () => {
                               size="small"
                               fullWidth
                               required={true}
-                              sx={{ mt: 2 }}
+                              sx={{ mt: 2, backgroundColor: "lightyellow" }}
                               InputProps={{
                                 endAdornment: (
                                   <InputAdornment position="end">

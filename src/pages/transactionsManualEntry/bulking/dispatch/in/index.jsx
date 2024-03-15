@@ -145,7 +145,7 @@ const LBNManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow"}}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -159,7 +159,7 @@ const LBNManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow"}}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -172,7 +172,7 @@ const LBNManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "transparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow"}}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -185,7 +185,7 @@ const LBNManualEntryDispatchIn = (props) => {
               variant="outlined"
               size="small"
               fullWidth
-              sx={{ mt: 2, backgroundColor: "tranparant" }}
+              sx={{ mt: 2, backgroundColor: "lightyellow" }}
               // inputProps={{ readOnly: true }}
             />
           </Grid>
@@ -200,7 +200,7 @@ const LBNManualEntryDispatchIn = (props) => {
               isRequired={true}
               isReadOnly={false}
               sx={{ mt: 2 }}
-              backgroundColor="transparant"
+              backgroundColor="lightyellow"
               siteId={WBMS.SITE.refId}
             />
           </Grid>
@@ -456,7 +456,7 @@ const LBNManualEntryDispatchIn = (props) => {
                 size="small"
                 fullWidth
                 required={true}
-                sx={{ mt: 2 }}
+                sx={{ mt: 2, backgroundColor: "lightyellow" }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">kg</InputAdornment>

@@ -30,8 +30,10 @@ const BonTripT30Print = (props) => {
   const tanggal = moment(dtTrans.originWeighOutTimestamp).format("DD- MM-YYYY");
 
   const qrData = {
-    siteType: 3,
+    typeSite: 3,
     productType: dtTrans.productType,
+    bonTripRef: dtTrans.bonTripNo,
+    deliveryOrderNo: dtTrans.deliveryOrderNo,
     transporterCompanyId: dtTrans.transporterCompanyId,
     transporterCompanyName: dtTrans.transporterCompanyName,
     transporterCompanyCode: dtTrans.transporterCompanyCode,
@@ -42,8 +44,8 @@ const BonTripT30Print = (props) => {
     transportVehiclePlateNo: dtTrans.transportVehiclePlateNo,
     transportVehicleProductName: dtTrans.transportVehicleProductName,
     transportVehicleProductCode: dtTrans.transportVehicleProductCode,
-    productName: dtTrans.productName,
     productId: dtTrans.productId,
+    productName: dtTrans.productName,
     productCode: dtTrans.productCode,
     currentSeal1: dtTrans.loadedSeal1,
     currentSeal2: dtTrans.loadedSeal2,
@@ -91,11 +93,11 @@ const BonTripT30Print = (props) => {
                 <Typography fontSize="19px">DESPATCH MIAU</Typography>
               </Box>
               <Box ml="auto" mt={2}>
-                <QRCode 
-                size={150}
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                value={qrContent}
-                viewBox={`0 0 256 256`}
+                <QRCode
+                  size={550}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                  value={qrContent}
+                  viewBox={`0 0 256 256`}
                 />
               </Box>
             </Box>

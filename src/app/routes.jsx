@@ -142,7 +142,7 @@ const T30ManualEntryOutOthers = lazy(() =>
 );
 
 const T30ManualEntryDispatchView = lazy(() =>
-  import("../pages/transactionsManualEntry/t30/dispatch/view")
+  import("../pages/transactionsManualEntry/t30/dispatch/normalout/view")
 );
 const T30ManualEntryOthersView = lazy(() =>
   import("../pages/transactionsManualEntry/t30/others/view")
@@ -196,7 +196,7 @@ const BulkingManualEntryOutOthers = lazy(() =>
 );
 
 const BulkingManualEntryDispatchView = lazy(() =>
-  import("../pages/transactionsManualEntry/bulking/dispatch/view")
+  import("../pages/transactionsManualEntry/bulking/dispatch/out/view")
 );
 const BulkingManualEntryOthersView = lazy(() =>
   import("../pages/transactionsManualEntry/bulking/others/view")
