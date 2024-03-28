@@ -17,36 +17,36 @@ import { toast } from "react-toastify";
 import { Formik, Field } from "formik";
 import * as yup from "yup";
 import { grey, blue } from "@mui/material/colors";
-import { useProduct, useConfig, useKualitasCpo } from "../../../hooks";
+import { useConfig, useKualitasCpo } from "../../../hooks";
 
-const CreateKualitasCpo = (props) => {
+const ViewKualitasCpo = (props) => {
   const { isViewOpen, onClose, refetch, data } = props;
-  const { useCreateProductMutation } = useProduct();
   const { useCreateKualitasCpoMutation } = useKualitasCpo();
   const [create] = useCreateKualitasCpoMutation();
-  const [createProduct] = useCreateProductMutation();
   const { PRODUCT_TYPES } = useConfig();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
-  const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    try {
-      create(values).then((results) => {
-        toast.success("Data Berhasil Disimpan");
-        setSubmitting(false);
-        resetForm();
-        refetch();
-        onClose("", false);
-      });
-    } catch (error) {
-      toast.error(`${error.message}.`); // Tampilkan notifikasi error
-      return;
-    }
-  };
+  // const handleSubmit = (values, { setSubmitting, resetForm }) => {
+  //   try {
+  //     create(values).then((results) => {
+  //       toast.success("Data Berhasil Disimpan");
+  //       setSubmitting(false);
+  //       resetForm();
+  //       refetch();
+  //       onClose("", false);
+  //     });
+  //   } catch (error) {
+  //     toast.error(`${error.message}.`); // Tampilkan notifikasi error
+  //     return;
+  //   }
+  // };
 
   return (
     <Dialog open={isViewOpen} fullWidth maxWidth="md">
-      <DialogTitle sx={{ color: "white", backgroundColor: blue[900], fontSize: "18px" }}>
+      <DialogTitle
+        sx={{ color: "white", backgroundColor: blue[900], fontSize: "18px" }}
+      >
         DETAIL KUALITAS CPO
         <IconButton
           sx={{
@@ -63,8 +63,18 @@ const CreateKualitasCpo = (props) => {
         </IconButton>
       </DialogTitle>
 
-      <Formik onSubmit={handleSubmit} initialValues={data}>
-        {({ values, errors, touched, handleBlur, handleChange, handleSubmit, setFieldValue }) => (
+      <Formik
+      //  onSubmit={handleSubmit}
+        initialValues={data}>
+        {({
+          values,
+          errors,
+          touched,
+          handleBlur,
+          handleChange,
+          handleSubmit,
+          setFieldValue,
+        }) => (
           <form onSubmit={handleSubmit}>
             <DialogContent dividers>
               <Box
@@ -94,7 +104,10 @@ const CreateKualitasCpo = (props) => {
                     inputMode="decimal"
                     InputProps={{
                       endAdornment: (
-                        <InputAdornment position="end" sx={{ fontWeight: "bold" }}>
+                        <InputAdornment
+                          position="end"
+                          sx={{ fontWeight: "bold" }}
+                        >
                           %
                         </InputAdornment>
                       ),
@@ -103,7 +116,9 @@ const CreateKualitasCpo = (props) => {
                     sx={{ backgroundColor: "whitesmoke" }}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.FfaPercentage > 0 ? values.FfaPercentage : "0"}
+                    value={
+                      values?.FfaPercentage > 0 ? values.FfaPercentage : "0"
+                    }
                     name="FfaPercentage"
                     error={!!touched.FfaPercentage && !!errors.FfaPercentage}
                     helperText={touched.FfaPercentage && errors.FfaPercentage}
@@ -127,7 +142,10 @@ const CreateKualitasCpo = (props) => {
                     inputMode="decimal"
                     InputProps={{
                       endAdornment: (
-                        <InputAdornment position="end" sx={{ fontWeight: "bold" }}>
+                        <InputAdornment
+                          position="end"
+                          sx={{ fontWeight: "bold" }}
+                        >
                           %
                         </InputAdornment>
                       ),
@@ -136,10 +154,16 @@ const CreateKualitasCpo = (props) => {
                     sx={{ backgroundColor: "whitesmoke" }}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.MoistPercentage > 0 ? values.MoistPercentage : "0"}
+                    value={
+                      values?.MoistPercentage > 0 ? values.MoistPercentage : "0"
+                    }
                     name="MoistPercentage"
-                    error={!!touched.MoistPercentage && !!errors.MoistPercentage}
-                    helperText={touched.MoistPercentage && errors.MoistPercentage}
+                    error={
+                      !!touched.MoistPercentage && !!errors.MoistPercentage
+                    }
+                    helperText={
+                      touched.MoistPercentage && errors.MoistPercentage
+                    }
                   />
                 </FormControl>
 
@@ -161,7 +185,10 @@ const CreateKualitasCpo = (props) => {
                     inputMode="decimal"
                     InputProps={{
                       endAdornment: (
-                        <InputAdornment position="end" sx={{ fontWeight: "bold" }}>
+                        <InputAdornment
+                          position="end"
+                          sx={{ fontWeight: "bold" }}
+                        >
                           %
                         </InputAdornment>
                       ),
@@ -170,7 +197,9 @@ const CreateKualitasCpo = (props) => {
                     sx={{ backgroundColor: "whitesmoke" }}
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values?.DirtPercentage > 0 ? values.DirtPercentage : "0"}
+                    value={
+                      values?.DirtPercentage > 0 ? values.DirtPercentage : "0"
+                    }
                     name="DirtPercentage"
                     error={!!touched.DirtPercentage && !!errors.DirtPercentage}
                     helperText={touched.DirtPercentage && errors.DirtPercentage}
@@ -208,4 +237,4 @@ const CreateKualitasCpo = (props) => {
   );
 };
 
-export default CreateKualitasCpo;
+export default ViewKualitasCpo;

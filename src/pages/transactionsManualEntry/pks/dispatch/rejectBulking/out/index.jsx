@@ -129,7 +129,7 @@ const TransactionPksRejectBulkingIn = (props) => {
       tempTrans.typeTransaction = 5;
       tempTrans.progressStatus = 31;
       tempTrans.deliveryStatus = 36;
-      tempTrans.deliveryDate = moment().toDate();
+      tempTrans.deliveryDate = moment(tempTrans.deliveryDate).toISOString();
       tempTrans.returnWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.returnWeighOutTimestamp = moment().toDate();
       tempTrans.dtTransaction = moment()
@@ -217,7 +217,7 @@ const TransactionPksRejectBulkingIn = (props) => {
       <Header title="TRANSAKSI BULKING" subtitle="TIMBANG REJECT WB-OUT" />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
@@ -336,6 +336,23 @@ const TransactionPksRejectBulkingIn = (props) => {
                         fullWidth
                         // inputProps={{ readOnly: true }}
                         sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                      />
+                      <Field
+                        type="date"
+                        variant="outlined"
+                        component={TextField}
+                        size="small"
+                        fullWidth
+                        required={true}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                        label="TANGGAL Delivery"
+                        name="deliveryDate"
+                        value={moment(values?.deliveryDate).format(
+                          "YYYY-MM-DD"
+                        )}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
                       />
                       <Field
                         name="deliveryOrderNo"
@@ -672,7 +689,7 @@ const TransactionPksRejectBulkingIn = (props) => {
                     <Grid item xs={12} sm={6} lg={3}>
                       <Grid container columnSpacing={1}>
                         <Grid item xs={12}>
-                          <Divider >DATA TIMBANG REJECT</Divider>
+                          <Divider>DATA TIMBANG REJECT</Divider>
                         </Grid>
                         <Grid item xs={6}>
                           <Field

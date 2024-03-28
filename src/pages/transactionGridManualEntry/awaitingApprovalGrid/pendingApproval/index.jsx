@@ -22,9 +22,9 @@ import * as moment from "moment";
 
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
-import Header from "../../../components/layout/signed/Header";
+import Header from "../../../../components/layout/signed/Header";
 
-import { useConfig, useTransaction, useApp } from "../../../hooks";
+import { useConfig, useTransaction, useApp } from "../../../../hooks";
 import { useRef } from "react";
 
 ModuleRegistry.registerModules([
@@ -48,8 +48,12 @@ const ReportTransactionPending = () => {
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
-      OR: [{ isManualEntry: 1 }, { isManualTonase: 1 }],
+      progressStatus: { in: [1, 2, 6, 11, 20, 35, 36, 37] },
+      OR: [
+        { isManualEntry: 1 },
+        { isManualTonase: 1 },
+        { isManualBackdate: 1 },
+      ],
     },
 
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
@@ -313,8 +317,8 @@ const ReportTransactionPending = () => {
   return (
     <Box>
       <Header
-        title="TRANSAKSI MANUAL COMPLETE"
-        subtitle="Transaksi Manual Entry Complete"
+        title="TRANSAKSI MANUAL PENDING"
+        subtitle="Transaksi Manual Entry Pending"
       />
 
       {/* <Box display="flex" sx={{ mt: 3 }}>

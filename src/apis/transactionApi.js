@@ -5,7 +5,9 @@ export const TransactionAPI = () => {
   const endpoint = "transactions";
 
   const getById = async (id) => {
-    const response = await axios.get(`${endpoint}/${id}`).then((res) => res.data);
+    const response = await axios
+      .get(`${endpoint}/${id}`)
+      .then((res) => res.data);
     return response;
   };
 
@@ -22,48 +24,64 @@ export const TransactionAPI = () => {
   };
 
   const findMany = async (query) => {
-    const response = await axios.post(`${endpoint}/find-many`, query).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/find-many`, query)
+      .then((res) => res.data);
 
     return response;
   };
 
   const updateById = async (id, data) => {
-    const response = await axios.patch(`${endpoint}/${id}`, data).then((res) => res.data);
+    const response = await axios
+      .patch(`${endpoint}/${id}`, data)
+      .then((res) => res.data);
     return response;
   };
 
   const eDispatchFindOrCreateByQrcode = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-find-create-qrcode`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-find-create-qrcode`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchPksNormalInAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-normal-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-normal-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchPksNormalOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-normal-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-normal-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchPksCancelInAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-cancel-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-cancel-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchPksCancelOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-cancel-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-cancel-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchPksRejectT300InAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-reject-t300-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-reject-t300-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
@@ -77,79 +95,185 @@ export const TransactionAPI = () => {
   };
 
   const eDispatchPksRejectOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-pks-reject-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-pks-reject-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchT30NormalInAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-t30-normal-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-t30-normal-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchT30NormalOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-t30-normal-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-t30-normal-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchT30CancelInAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-t30-cancel-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-t30-cancel-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchT30CancelOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-t30-cancel-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-t30-cancel-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchBulkingNormalInAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-bulking-normal-in-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-bulking-normal-in-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchBulkingNormalOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-bulking-normal-out-after`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-bulking-normal-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const eDispatchBulkingRejectOutAfter = async (data) => {
-    const response = await axios.post(`${endpoint}/edispatch-bulking-reject-out-after`, data).then((res) => res.data);
-
-    return response;
-  };
-
-  const ManualEntryBackDate = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-backdate`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/edispatch-bulking-reject-out-after`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const ManualEntryInTbs = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-tbs`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/manual-entry-in-tbs`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryOutTbs = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-out-tbs`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const ManualEntryInKernel = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-kernel`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/manual-entry-in-kernel`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryOutKernel = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-out-kernel`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const ManualEntryInOthers = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-others`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/manual-entry-in-others`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryOutOthers = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-out-others`, data)
+      .then((res) => res.data);
 
     return response;
   };
 
   const ManualEntryInDispatch = async (data) => {
-    const response = await axios.post(`${endpoint}/manual-entry-in-dispatch`, data).then((res) => res.data);
+    const response = await axios
+      .post(`${endpoint}/manual-entry-in-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryOutDispatch = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-out-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateNormalDispatch = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-normal-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateCancelDispatch = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-cancel-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateRejectT300Dispatch = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-reject-t300-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateRejectBulkingDispatch = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-reject-bulking-dispatch`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateTbs = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-tbs`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateKernel = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-kernel`, data)
+      .then((res) => res.data);
+
+    return response;
+  };
+
+  const ManualEntryBackDateOthers = async (data) => {
+    const response = await axios
+      .post(`${endpoint}/manual-entry-backdate-others`, data)
+      .then((res) => res.data);
 
     return response;
   };
@@ -161,12 +285,26 @@ export const TransactionAPI = () => {
     findMany,
     updateById,
 
-    ManualEntryBackDate,
-
     ManualEntryInTbs,
+    ManualEntryOutTbs,
+
     ManualEntryInKernel,
+    ManualEntryOutKernel,
+
     ManualEntryInOthers,
+    ManualEntryOutOthers,
+
     ManualEntryInDispatch,
+    ManualEntryOutDispatch,
+
+    ManualEntryBackDateNormalDispatch,
+    ManualEntryBackDateCancelDispatch,
+    ManualEntryBackDateRejectT300Dispatch,
+    ManualEntryBackDateRejectBulkingDispatch,
+
+    ManualEntryBackDateTbs,
+    ManualEntryBackDateKernel,
+    ManualEntryBackDateOthers,
 
     eDispatchFindOrCreateByQrcode,
 

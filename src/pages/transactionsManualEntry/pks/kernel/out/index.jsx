@@ -29,10 +29,10 @@ import {
   useTransaction,
   useCompany,
   useProduct,
-  useDriver,
   useWeighbridge,
   useTransportVehicle,
   useApp,
+  useKualitasKernel,
 } from "../../../../../hooks";
 
 const PksManualEntryKernelOut = () => {
@@ -49,15 +49,48 @@ const PksManualEntryKernelOut = () => {
     setWbTransaction,
     clearOpenedTransaction,
   } = useTransaction();
-  const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { useFindFirstKualitasKernelQuery } = useKualitasKernel();
+
   const { setSidebar } = useApp();
   const [selectedOption, setSelectedOption] = useState(0);
 
+  // let now = moment();
+  // let startOf = now
+  //   .clone()
+  //   .startOf("day")
+  //   .add(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //   .add(WBMS.SITE_CUT_OFF_MINUTE, "minutes");
+  // let endOf = now
+  //   .clone()
+  //   .startOf("day")
+  //   .add(1, "day")
+  //   .add(WBMS.SITE_CUT_OFF_HOUR, "hours")
+  //   .add(WBMS.SITE_CUT_OFF_MINUTE, "minutes");
+
+  // if (now.isAfter(endOf)) {
+  //   startOf = startOf.add(1, "day");
+  //   endOf = endOf.add(1, "day");
+  // }
+
+  // const kualitasKernelFilter = {
+  //   where: {
+  //     AND: [
+  //       {
+  //         dtModified: {
+  //           gte: startOf.toDate(),
+  //           lte: endOf.toDate(),
+  //         },
+  //       },
+  //     ],
+  //   },
+  // };
+
+  const { data: dtKualitasKernel } =
+    useFindFirstKualitasKernelQuery();
   const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const productFilter = {
@@ -95,20 +128,6 @@ const PksManualEntryKernelOut = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.sptbs) {
-        tempTrans.sptbs = parseInt(tempTrans.sptbs);
-      }
-
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (selectedOption === 2) {
         tempTrans.progressStatus = 40;
       } else if (selectedOption === 3) {
@@ -117,13 +136,18 @@ const PksManualEntryKernelOut = () => {
         tempTrans.progressStatus = 42;
       }
 
-      if (WBMS.WB_STATUS === true) {
-        tempTrans.originWeighOutKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
+      if (selectedOption === 2) {
+        tempTrans.typeTransaction = 2;
+      } else if (selectedOption === 3) {
+        tempTrans.typeTransaction = 3;
+      } else if (selectedOption === 4) {
+        tempTrans.typeTransaction = 4;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.originWeighOutKg = wb.weight;
+      }
+
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -131,9 +155,7 @@ const PksManualEntryKernelOut = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, {
-        ...tempTrans,
-      });
+      const response = await transactionAPI.ManualEntryOutKernel(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -175,11 +197,6 @@ const PksManualEntryKernelOut = () => {
     }
   }, [selectedOption, refetchProducts]);
 
-  //weight wb
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighOutKg: wb.weight });
-  // }, [wb.weight]);
-
   useEffect(() => {
     if (!id) return handleClose();
 
@@ -188,6 +205,11 @@ const PksManualEntryKernelOut = () => {
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
         setSelectedOption(res.data.transaction.productType);
+        setOpenedTransaction({
+          moisturePercentage: dtKualitasKernel?.MoisturePercentage,
+          dirtPercentage: dtKualitasKernel?.DirtPercentage,
+          stonePercentage: dtKualitasKernel?.StonePercentage,
+        });
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -198,7 +220,7 @@ const PksManualEntryKernelOut = () => {
     return () => {
       // console.clear();
     };
-  }, []);
+  }, [dtKualitasKernel]);
 
   useEffect(() => {
     if (
@@ -240,7 +262,7 @@ const PksManualEntryKernelOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}

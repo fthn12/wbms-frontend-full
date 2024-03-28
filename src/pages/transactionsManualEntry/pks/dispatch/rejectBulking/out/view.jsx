@@ -301,7 +301,24 @@ const TransactionPKSRejectOutView = (props) => {
                         inputProps={{ readOnly: true }}
                         sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                       />
-
+                      <Field
+                        type="date"
+                        variant="outlined"
+                        component={TextField}
+                        size="small"
+                        fullWidth
+                        required={true}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        label="TANGGAL Delivery"
+                        name="deliveryDate"
+                        inputProps={{ readOnly: true }}
+                        value={moment(values?.deliveryDate).format(
+                          "YYYY-MM-DD"
+                        )}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
                       <Field
                         name="deliveryOrderNo"
                         label="NO DO"

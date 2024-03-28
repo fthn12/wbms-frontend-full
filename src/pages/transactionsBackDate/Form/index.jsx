@@ -1,6 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, IconButton, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Paper,
+} from "@mui/material";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import "ag-grid-enterprise";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
@@ -21,15 +27,19 @@ import Header from "../../../components/layout/signed/Header";
 import { useConfig, useTransaction, useApp } from "../../../hooks";
 import { useRef } from "react";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  RangeSelectionModule,
+  RowGroupingModule,
+  RichSelectModule,
+]);
 
 const ReportTransactionPending = () => {
   const navigate = useNavigate();
   const { setSidebar } = useApp();
   const { WBMS, PROGRESS_STATUS } = useConfig();
-  const { setOpenedTransaction, useFindManyTransactionQuery } = useTransaction();
-
-
+  const { setOpenedTransaction, useFindManyTransactionQuery } =
+    useTransaction();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,15 +48,15 @@ const ReportTransactionPending = () => {
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      isManualEntry: 1,
-      isManualTonase: 1,
+      isManualBackdate: 1,
       progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
     },
 
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
 
-  const { data: dtTransaction, refetch: refetchDtTransaction } = useFindManyTransactionQuery(data);
+  const { data: dtTransaction, refetch: refetchDtTransaction } =
+    useFindManyTransactionQuery(data);
 
   const handleViewClick = async (id, progressStatus, bonTripRef) => {
     try {
@@ -62,17 +72,20 @@ const ReportTransactionPending = () => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/pks-edispatch-normal-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/pks/manual-entry-dispatch-view";
+          urlPath = "/wb/transactions/pks/backdate-dispatch-normal-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/pks/manual-entry-dispatch-cancel-out-view";
+          urlPath =
+            "/wb/transactions/pks/backdate-dispatch-cancel-view";
+        } else if (progressStatus === 31 && bonTripRef) {
+          urlPath = "/wb/transactions/pks/backdate-dispatch-reject-bulking-view";
         } else if (progressStatus === 31) {
-          urlPath = "/wb/transactions/pks-edispatch-reject-out";
+          urlPath = "/wb/transactions/pks/backdate-dispatch-reject-t300-view";
         } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/pks/manual-entry-other-view";
+          urlPath = "/wb/transactions/pks/backdate-tbs-view";
         } else if (progressStatus === 41) {
-          urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
+          urlPath = "/wb/transactions/pks/backdate-kernel-view";
         } else if (progressStatus === 42) {
-          urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+          urlPath = "/wb/transactions/pks/backdate-others-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -82,11 +95,11 @@ const ReportTransactionPending = () => {
         if (progressStatus === 1) {
           urlPath = "/wb/transactions/t30-edispatch-normal-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/t30/manual-entry-dispatch-view";
+          urlPath = "/wb/transactions/t30/backdate-dispatch-normal-view";
         } else if (progressStatus === 26) {
-          urlPath = "/wb/transactions/t30/manual-entry-dispatch-cancel-out-view";
+          urlPath = "/wb/transactions/t30/backdate-dispatch-cancel-view";
         } else if (progressStatus === 42) {
-          urlPath = "/wb/transactions/t30/manual-entry-others-view";
+          urlPath = "/wb/transactions/t30/backdate-others-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -96,9 +109,11 @@ const ReportTransactionPending = () => {
         if (progressStatus === 2) {
           urlPath = "/wb/transactions/bulking-edispatch-in";
         } else if (progressStatus === 21) {
-          urlPath = "/wb/transactions/bulking/manual-entry-dispatch-view";
+          urlPath = "/wb/transactions/bulking/backdate-dispatch-view";
+        } else if (progressStatus === 31) {
+          urlPath = "/wb/transactions/bulking/backdate-dispatch-view";
         } else if (progressStatus === 42) {
-          urlPath = "/wb/transactions/bulking/manual-entry-others-view";
+          urlPath = "/wb/transactions/bulking/backdate-others-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -125,7 +140,8 @@ const ReportTransactionPending = () => {
   };
 
   const dateFormatter = (params) => {
-    if (params.data) return moment(params.value).format("DD MMM YYYY").toUpperCase();
+    if (params.data)
+      return moment(params.value).format("DD MMM YYYY").toUpperCase();
   };
 
   const timeFormatter = (params) => {
@@ -140,9 +156,14 @@ const ReportTransactionPending = () => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.originWeighInKg - params.data.originWeighOutKg);
+      netto = Math.abs(
+        params.data.originWeighInKg - params.data.originWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -150,9 +171,14 @@ const ReportTransactionPending = () => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.returnWeighInKg - params.data.returnWeighOutKg);
+      netto = Math.abs(
+        params.data.returnWeighInKg - params.data.returnWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -163,7 +189,13 @@ const ReportTransactionPending = () => {
           <Box display="flex" justifyContent="center" alignItems="center">
             <IconButton
               size="small"
-              onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
+              onClick={() =>
+                handleViewClick(
+                  params.data.id,
+                  params.data.progressStatus,
+                  params.data.bonTripRef
+                )
+              }
             >
               <PlagiarismIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -197,9 +229,24 @@ const ReportTransactionPending = () => {
       hide: true,
     },
     { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115 },
-    { headerName: "PRODUK", field: "productName", maxWidth: 90, cellStyle: { textAlign: "center" } },
-    { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
-    { headerName: "WB-OUT", field: "originWeighOutKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "PRODUK",
+      field: "productName",
+      maxWidth: 90,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "WB-IN",
+      field: "originWeighInKg",
+      maxWidth: 90,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "WB-OUT",
+      field: "originWeighOutKg",
+      maxWidth: 90,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "NETTO",
       field: "id",
@@ -207,8 +254,18 @@ const ReportTransactionPending = () => {
       cellStyle: { textAlign: "right" },
       valueFormatter: originNettoFormatter,
     },
-    { headerName: "RJCT-IN", field: "returnWeighInKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
-    { headerName: "RJCT-OUT", field: "returnWeighOutKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "RJCT-IN",
+      field: "returnWeighInKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "RJCT-OUT",
+      field: "returnWeighOutKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "RJCT NETTO",
       field: "id",
@@ -253,27 +310,43 @@ const ReportTransactionPending = () => {
       minWidth: "200",
       flex: 1,
     }),
-    [],
+    []
   );
 
   return (
     <Box>
-      <Header title="LAPORAN TRANSAKSI PENDING" subtitle="LAPORAN TRANSAKSI PENDING" />
+      <Header
+        title="TRANSAKSI BACKDATE "
+        subtitle="Transaksi BackDate "
+      />
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        <Button variant="contained" onClick={() => gridRef.current.api.exportDataAsExcel()}>
-          Export Excel
-        </Button>
-        <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => refetchDtTransaction()}>
-          Reload
+        <Button
+          variant="contained"
+          sx={{ mr: 0.5 }}
+          onClick={() => {
+            if (WBMS.SITE_TYPE === 1) {
+              navigate(`/wb/transactions/pks/backdate`);
+            } else if (WBMS.SITE_TYPE === 2) {
+              navigate(`/wb/transactions/t30/backdate`);
+            } else if (WBMS.SITE_TYPE === 3) {
+              navigate(`/wb/transactions/bulking/backdate`);
+            }
+          }}
+        >
+          FORM
         </Button>
       </Box>
 
       <Paper sx={{ mt: 1, p: 2, minHeight: "77vh" }}>
         <Box
           className="ag-theme-balham"
-          sx={{ "& .ag-header-cell-label": { justifyContent: "center" }, width: "auto", height: "75.5vh" }}
+          sx={{
+            "& .ag-header-cell-label": { justifyContent: "center" },
+            width: "auto",
+            height: "75.5vh",
+          }}
         >
           <AgGridReact
             ref={gridRef}

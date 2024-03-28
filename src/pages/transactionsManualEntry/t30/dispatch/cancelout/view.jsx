@@ -36,12 +36,17 @@ import {
   useConfig,
   useTransaction,
   useApp,
-  useProduct
+  useProduct,
 } from "../../../../../hooks";
 import { MenuItem } from "react-pro-sidebar";
-import { CompanyACP, DriverACP, ProductACP, TransportVehicleACP } from "components/FormManualEntry";
+import {
+  CompanyACP,
+  DriverACP,
+  ProductACP,
+  TransportVehicleACP,
+} from "components/FormManualEntry";
 
-const PksTransactionCancelInView = (props) => {
+const T30TransactionCancelOutView = (props) => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -53,8 +58,8 @@ const PksTransactionCancelInView = (props) => {
   const { urlPrev, setUrlPrev } = useApp();
   const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
     useTransaction();
-    const [dtTypeProduct] = useState(PRODUCT_TYPES);
-    const [selectedOption, setSelectedOption] = useState(0);
+  const [dtTypeProduct] = useState(PRODUCT_TYPES);
+  const [selectedOption, setSelectedOption] = useState(0);
   const [originWeighNetto, setOriginWeighNetto] = useState(0);
   const [returnWeighNetto, setReturnWeighNetto] = useState(0);
 
@@ -1066,4 +1071,4 @@ const PksTransactionCancelInView = (props) => {
   );
 };
 
-export default PksTransactionCancelInView;
+export default T30TransactionCancelOutView;

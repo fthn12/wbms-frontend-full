@@ -8,6 +8,7 @@ import {
   InputAdornment,
   Divider,
   Paper,
+  Checkbox,
   TextField as TextFieldMUI,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
@@ -16,7 +17,7 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
-import BonTripPrint from "../../../../components/BontripManualEntry";
+import BonTripPrint from "../../../../components/BontripOthers";
 import SortasiTBS from "../../../../components/SortasiTBS";
 import { DriverFreeSolo } from "components/FormOthers";
 
@@ -38,7 +39,8 @@ const PksManualEntryTbsView = () => {
   const { id } = useParams();
   const { urlPrev, setUrlPrev } = useApp();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
@@ -87,7 +89,9 @@ const PksManualEntryTbsView = () => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
@@ -105,7 +109,7 @@ const PksManualEntryTbsView = () => {
         openedTransaction.parthenocarpyKg +
         openedTransaction.looseFruitKg +
         openedTransaction.mandatoryDeductionKg +
-        openedTransaction.othersKg,
+        openedTransaction.othersKg
     );
     setTotalPotongan(total);
   }, [openedTransaction]);
@@ -135,7 +139,10 @@ const PksManualEntryTbsView = () => {
                   >
                     SIMPAN
                   </Button> */}
-                  <BonTripPrint dtTrans={{ ...openedTransaction }} sx={{ mx: 1 }} />
+                  <BonTripPrint
+                    dtTrans={{ ...openedTransaction }}
+                    sx={{ mx: 1 }}
+                  />
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -175,7 +182,9 @@ const PksManualEntryTbsView = () => {
                         freeSolo
                         readOnly={true}
                         disableClearable
-                        options={dtTransport?.records.map((record) => record.plateNo)}
+                        options={dtTransport?.records.map(
+                          (record) => record.plateNo
+                        )}
                         // onInputChange={(event, InputValue, reason) => {
                         //   if (reason !== "reset") {
                         //     setFieldValue("transportVehiclePlateNo", InputValue);
@@ -198,8 +207,14 @@ const PksManualEntryTbsView = () => {
                         variant="outlined"
                         fullWidth
                         options={dtCompany?.records || []}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
+                        getOptionLabel={(option) =>
+                          `[${option.code}] - ${option.name}`
+                        }
+                        value={
+                          dtCompany?.records?.find(
+                            (item) => item.id === values.transporterCompanyId
+                          ) || null
+                        }
                         // onChange={(event, newValue) => {
                         //   setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
                         //   setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
@@ -225,10 +240,17 @@ const PksManualEntryTbsView = () => {
                         // freeSolo
                         // disableClearable
                         options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+                          (option) =>
+                            !["cpo", "pko"].includes(option.name.toLowerCase())
                         )}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
+                        getOptionLabel={(option) =>
+                          `[${option.code}] - ${option.name}`
+                        }
+                        value={
+                          dtProduct?.records?.find(
+                            (item) => item.id === values.productId
+                          ) || null
+                        }
                         // onChange={(event, newValue) => {
                         //   setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
                         //   setFieldValue("transportVehicleId", newValue ? newValue.id : "");
@@ -255,7 +277,12 @@ const PksManualEntryTbsView = () => {
                           <Divider>DATA SUPIR & MUATAN</Divider>
                         </Grid>
                         <Grid item xs={12}>
-                        <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mt: 2 }} />
+                          <DriverFreeSolo
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
 
                           <Field
                             name="afdeling"
@@ -325,7 +352,11 @@ const PksManualEntryTbsView = () => {
                             size="small"
                             component={TextField}
                             fullWidth
-                            sx={{ mt: 2, mb: 2.5, backgroundColor: "whitesmoke" }}
+                            sx={{
+                              mt: 2,
+                              mb: 2.5,
+                              backgroundColor: "whitesmoke",
+                            }}
                             inputProps={{ readOnly: true }}
                           />
                           <Grid item xs={12}>
@@ -351,7 +382,593 @@ const PksManualEntryTbsView = () => {
                         <Grid item xs={12}>
                           <Divider sx={{ mb: 2 }}>KUALITAS TBS</Divider>
                         </Grid>
-                        <SortasiTBS isReadOnly={true} values={values} />
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="unRipeChecked"
+                            size="medium"
+                            checked={values?.unRipeChecked}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                            }}
+                            component={TextField}
+                            disabled={true}
+                            label="Buah Mentah"
+                            name="unRipePercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            name="unripeKg"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="underRipeChecked"
+                            size="medium"
+                            checked={values?.underRipeChecked}
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Buah Lewat Matang"
+                            name="underRipePercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="underRipeKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="longStalkChecked"
+                            checked={values?.longStalkChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Tangkai Panjang"
+                            name="longStalkPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="longStalkKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="emptyBunchChecked"
+                            checked={values?.emptyBunchChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Tandan Kosong"
+                            name="emptyBunchPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="emptyBunchKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="garbageDirtChecked"
+                            checked={values?.garbageDirtChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Sampah"
+                            name="garbageDirtPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="garbageDirtKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="waterChecked"
+                            checked={values?.waterChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Air"
+                            name="waterPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="waterKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="parthenocarpyChecked"
+                            checked={values?.parthenocarpyChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Parteno"
+                            name="parthenocarpyPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="parthenocarpyKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="looseFruitChecked"
+                            checked={values?.looseFruitChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Brondolan"
+                            name="looseFruitPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="looseFruitKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="mandatoryDeductionChecked"
+                            checked={values?.mandatoryDeductionChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                            }}
+                            disa
+                            disabled={true}
+                            bled={true}
+                            component={TextField}
+                            label="Pot. Wajib Vendor"
+                            name="mandatoryDeductionPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="mandatoryDeductionKg"
+                            value={values?.mandatoryDeductionKg}
+                          />
+                        </Grid>
+
+                        <Grid item xs={1.1}>
+                          <Checkbox
+                            name="othersChecked"
+                            checked={values?.othersChecked}
+                            size="medium"
+                            sx={{
+                              mt: 1,
+                            }}
+                            disabled={true}
+                          />
+                        </Grid>
+                        <Grid item xs={6.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  % / Jjg
+                                </InputAdornment>
+                              ),
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                              // readOnly: true,
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            label="Pot. Lainnya"
+                            name="othersPercentage"
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            component={TextField}
+                            sx={{
+                              mt: 1,
+                              backgroundColor: true ? "whitesmoke" : "",
+                            }}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
+                            }}
+                            disabled={true}
+                            name="othersKg"
+                          />
+                        </Grid>
+                        <Grid item xs={1.1}></Grid>
+                        <Grid item xs={10.9}>
+                          <Field
+                            type="number"
+                            variant="outlined"
+                            size="small"
+                            name="Total Potongan"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                            inputProps={{
+                              style: {
+                                backgroundColor: true ? "whitesmoke" : "",
+                              },
+                            }}
+                            disabled={true}
+                            component={TextField}
+                            value={totalPotongan}
+                            label="Total Potongan [KG]"
+                          />
+                        </Grid>
                       </Grid>
                     </Grid>
                     <Grid item xs={12} sm={6} lg={3}>
@@ -384,7 +1001,10 @@ const PksManualEntryTbsView = () => {
                             label="Operator WB-OUT"
                             value={values?.originWeighOutOperatorName}
                             name="originWeighOutOperatorName"
-                            inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -400,7 +1020,9 @@ const PksManualEntryTbsView = () => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -418,7 +1040,9 @@ const PksManualEntryTbsView = () => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutTimestamp
-                                ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -432,11 +1056,19 @@ const PksManualEntryTbsView = () => {
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="BERAT MASUK - IN"
                             name="originWeighInKg"
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -447,13 +1079,25 @@ const PksManualEntryTbsView = () => {
                             component={TextField}
                             size="small"
                             fullWidth
-                            sx={{ mt: 2, mb: 1.5, backgroundColor: "whitesmoke" }}
+                            sx={{
+                              mt: 2,
+                              mb: 1.5,
+                              backgroundColor: "whitesmoke",
+                            }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="BERAT KELUAR - OUT"
                             name="originWeighOutKg"
-                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -469,11 +1113,19 @@ const PksManualEntryTbsView = () => {
                             component={TextField}
                             sx={{ mt: 1.5, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="TOTAL SEBELUM"
                             name="weightNetto"
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -485,7 +1137,9 @@ const PksManualEntryTbsView = () => {
                             fullWidth
                             component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            label={<span style={{ color: "red" }}>POTONGAN</span>}
+                            label={
+                              <span style={{ color: "red" }}>POTONGAN</span>
+                            }
                             name="weightNetto"
                             value={totalPotongan}
                             inputProps={{ readOnly: true }}
@@ -500,11 +1154,18 @@ const PksManualEntryTbsView = () => {
                             component={TextField}
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="TOTAL SESUDAH"
                             name="weightNetto"
-                            value={(originWeighNetto - totalPotongan).toFixed(2) || "0.00"}
+                            value={
+                              (originWeighNetto - totalPotongan).toFixed(2) ||
+                              "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>

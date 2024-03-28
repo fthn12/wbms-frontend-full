@@ -43,6 +43,7 @@ import {
   useWeighbridge,
   useStorageTank,
   useKualitasCpo,
+  useKualitasPko,
 } from "../../../../../hooks";
 
 const T30ManualEntryDispatchOut = () => {
@@ -65,6 +66,7 @@ const T30ManualEntryDispatchOut = () => {
   const [isCancel, setIsCancel] = useState(false);
 
   const { useFindFirstKualitasCpoQuery } = useKualitasCpo();
+  const { useFindFirstKualitasPkoQuery } = useKualitasPko();
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
 
@@ -89,6 +91,7 @@ const T30ManualEntryDispatchOut = () => {
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
   const { data: dtSite } = useGetSitesQuery();
   const { data: dtKualitasCpo } = useFindFirstKualitasCpoQuery();
+  const { data: dtKualitasPko } = useFindFirstKualitasPkoQuery();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
 
@@ -119,17 +122,14 @@ const T30ManualEntryDispatchOut = () => {
     setIsLoading(true);
 
     try {
-      const selectedStorageTank = dtStorageTank.records.find(
+    const selectedStorageTank = dtStorageTank.records.find(
         (item) => item.id === values.originSourceStorageTankId
       );
 
       if (selectedStorageTank) {
         tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
-        tempTrans.originSiteCode = selectedStorageTank.code || "";
-        tempTrans.originSiteName = selectedStorageTank.name || "";
-      }
-      const selectedSite = dtSite.records.find(
+      }      const selectedSite = dtSite.records.find(
         (item) => item.id === WBMS.SITE.id
       );
 
@@ -152,16 +152,13 @@ const T30ManualEntryDispatchOut = () => {
           tempTrans.returnWeighInKg = wb.weight;
         } else if (WBMS.WB_STATUS === false) {
           tempTrans.returnWeighInKg = tempTrans.originWeighOutKg;
-          tempTrans.isManualTonase = 1;
         }
 
         tempTrans.originWeighOutKg = 0;
 
-        tempTrans.isManualEntry = 1;
-        tempTrans.typeTransaction = 5;
+        tempTrans.progressStatus = 6;
         tempTrans.returnWeighInOperatorName = user.name.toUpperCase();
         tempTrans.returnWeighInTimestamp = moment().toDate();
-        tempTrans.progressStatus = 6;
         tempTrans.dtTransaction = moment()
           .subtract(WBMS.SITE_CUT_OFF_HOUR, "hours")
           .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
@@ -200,14 +197,10 @@ const T30ManualEntryDispatchOut = () => {
 
         if (WBMS.WB_STATUS === true) {
           tempTrans.originWeighOutKg = wb.weight;
-        } else if (WBMS.WB_STATUS === false) {
-          tempTrans.isManualTonase = 1;
         }
 
-        tempTrans.isManualEntry = 1;
-        tempTrans.typeTransaction = 5;
-        tempTrans.deliveryStatus = 20;
         tempTrans.progressStatus = 21;
+        tempTrans.deliveryStatus = 20;
         tempTrans.deliveryDate = moment().toDate();
         tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.originWeighOutTimestamp = moment().toDate();
@@ -218,9 +211,7 @@ const T30ManualEntryDispatchOut = () => {
 
         const data = { tempTrans };
 
-        const response = await transactionAPI.updateById(tempTrans.id, {
-          ...tempTrans,
-        });
+        const response = await transactionAPI.ManualEntryOutDispatch(tempTrans);
 
         if (!response.status) throw new Error(response?.message);
 
@@ -250,11 +241,6 @@ const T30ManualEntryDispatchOut = () => {
     };
   }, []);
 
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
-
   //weight wb
   // useEffect(() => {
   //   setWbTransaction({ originWeighOutKg: wb.weight });
@@ -268,6 +254,23 @@ const T30ManualEntryDispatchOut = () => {
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
         setSelectedOption(res.data.transaction.productType);
+
+        const ProductName = res.data.transaction.productName;
+
+        if (ProductName === "PKO") {
+          setOpenedTransaction({
+            originFfaPercentage: dtKualitasPko?.FfaPercentage,
+            originMoistPercentage: dtKualitasPko?.MoistPercentage,
+            originDirtPercentage: dtKualitasPko?.DirtPercentage,
+          });
+        }
+        if (ProductName === "CPO") {
+          setOpenedTransaction({
+            originFfaPercentage: dtKualitasCpo?.FfaPercentage,
+            originMoistPercentage: dtKualitasCpo?.MoistPercentage,
+            originDirtPercentage: dtKualitasCpo?.DirtPercentage,
+          });
+        }
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -278,7 +281,7 @@ const T30ManualEntryDispatchOut = () => {
     return () => {
       // console.clear();
     };
-  }, []);
+  }, [dtKualitasPko, dtKualitasCpo]);
 
   useEffect(() => {
     if (
@@ -302,14 +305,9 @@ const T30ManualEntryDispatchOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
-          initialValues={{
-            ...openedTransaction,
-            originFfaPercentage: dtKualitasCpo?.FfaPercentage,
-            originMoistPercentage: dtKualitasCpo?.MoistPercentage,
-            originDirtPercentage: dtKualitasCpo?.DirtPercentage,
-          }}
+          initialValues={openedTransaction}
           validationSchema={validationSchema}
           // isInitialValid={false}
         >
@@ -778,7 +776,7 @@ const T30ManualEntryDispatchOut = () => {
                             </Grid>
                             <Grid item xs={4}>
                               <Field
-                                name="originFfaPeCrcentage"
+                                name="originFfaPercentage"
                                 label="FFA"
                                 type="number"
                                 component={TextField}

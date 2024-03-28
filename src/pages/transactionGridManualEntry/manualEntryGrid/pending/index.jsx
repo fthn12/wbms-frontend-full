@@ -22,9 +22,9 @@ import * as moment from "moment";
 
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
-import Header from "../../../components/layout/signed/Header";
+import Header from "../../../../components/layout/signed/Header";
 
-import { useConfig, useTransaction, useApp } from "../../../hooks";
+import { useConfig, useTransaction, useApp } from "../../../../hooks";
 import { useRef } from "react";
 
 ModuleRegistry.registerModules([
@@ -38,22 +38,22 @@ const ReportTransactionPending = () => {
   const navigate = useNavigate();
   const { setSidebar } = useApp();
   const { WBMS, PROGRESS_STATUS } = useConfig();
-  const {
-    useEDispatchTransactionMdispatchMutation,
-    useFindManyTransactionQuery,
-  } = useTransaction();
+  const { setOpenedTransaction, useFindManyTransactionQuery } =
+    useTransaction();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const gridRef = useRef();
 
-  const [eDispatchMdispatch] = useEDispatchTransactionMdispatchMutation();
-
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
-      OR: [{ isManualEntry: 1 }, { isManualTonase: 1 }],
+      progressStatus: { in: [1, 2, 6, 11, 20, 35, 36, 37] },
+      OR: [
+        { isManualEntry: 1 },
+        { isManualTonase: 1 },
+        { isManualBackdate: 1 },
+      ],
     },
 
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
@@ -83,11 +83,11 @@ const ReportTransactionPending = () => {
         } else if (progressStatus === 31) {
           urlPath = "/wb/transactions/pks-edispatch-reject-out";
         } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/pks/manual-entry-other-view";
-        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
-        } else if (progressStatus === 42) {
+        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
         } else if (progressStatus === 100) {
           urlPath = "/wb/transactions/t30-edispatch-deleted";
         } else {
@@ -317,18 +317,17 @@ const ReportTransactionPending = () => {
   return (
     <Box>
       <Header
-        title="TRANSAKSI MANUAL COMPLETE"
-        subtitle="Transaksi Manual Entry Complete"
+        title="TRANSAKSI MANUAL PENDING"
+        subtitle="Transaksi Manual Entry Pending"
       />
 
-      <Box display="flex" sx={{ mt: 3 }}>
+      {/* <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
         <Button
           variant="contained"
-          sx={{ ml: 0.5 }}
-          onClick={() => eDispatchMdispatch()}
+          onClick={() => gridRef.current.api.exportDataAsExcel()}
         >
-          Manual Submit All
+          Export Excel
         </Button>
         <Button
           variant="contained"
@@ -337,7 +336,7 @@ const ReportTransactionPending = () => {
         >
           Reload
         </Button>
-      </Box>
+      </Box> */}
 
       <Paper sx={{ mt: 1, p: 2, minHeight: "77vh" }}>
         <Box

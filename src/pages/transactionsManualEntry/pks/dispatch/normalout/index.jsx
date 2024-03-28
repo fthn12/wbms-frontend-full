@@ -43,6 +43,7 @@ import {
   useWeighbridge,
   useStorageTank,
   useKualitasCpo,
+  useKualitasPko,
 } from "../../../../../hooks";
 
 const PKSManualEntryDispatchOut = () => {
@@ -54,6 +55,7 @@ const PKSManualEntryDispatchOut = () => {
   const { WBMS, PRODUCT_TYPES } = useConfig();
 
   const { useFindFirstKualitasCpoQuery } = useKualitasCpo();
+  const { useFindFirstKualitasPkoQuery } = useKualitasPko();
   const {
     openedTransaction,
     clearWbTransaction,
@@ -88,6 +90,7 @@ const PKSManualEntryDispatchOut = () => {
 
   const { data: dtProduct } = useFindManyProductQuery(productFilter);
   const { data: dtKualitasCpo } = useFindFirstKualitasCpoQuery();
+  const { data: dtKualitasPko } = useFindFirstKualitasPkoQuery();
 
   const [dtTypeProduct] = useState(PRODUCT_TYPES);
   const [isCancel, setIsCancel] = useState(false);
@@ -195,12 +198,8 @@ const PKSManualEntryDispatchOut = () => {
 
         if (WBMS.WB_STATUS === true) {
           tempTrans.originWeighOutKg = wb.weight;
-        } else if (WBMS.WB_STATUS === false) {
-          tempTrans.isManualTonase = 1;
         }
 
-        tempTrans.isManualEntry = 1;
-        tempTrans.typeTransaction = 5;
         tempTrans.deliveryStatus = 20;
         tempTrans.progressStatus = 20;
         tempTrans.deliveryDate = moment().toDate();
@@ -214,9 +213,7 @@ const PKSManualEntryDispatchOut = () => {
 
         const data = { tempTrans };
 
-        const response = await transactionAPI.updateById(tempTrans.id, {
-          ...tempTrans,
-        });
+        const response = await transactionAPI.ManualEntryOutDispatch(tempTrans);
 
         if (!response.status) throw new Error(response?.message);
 
@@ -253,6 +250,23 @@ const PKSManualEntryDispatchOut = () => {
       .getById(id)
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
+
+        const ProductName = res.data.transaction.productName;
+
+        if (ProductName === "PKO") {
+          setOpenedTransaction({
+            originFfaPercentage: dtKualitasPko?.FfaPercentage,
+            originMoistPercentage: dtKualitasPko?.MoistPercentage,
+            originDirtPercentage: dtKualitasPko?.DirtPercentage,
+          });
+        }
+        if (ProductName === "CPO") {
+          setOpenedTransaction({
+            originFfaPercentage: dtKualitasCpo?.FfaPercentage,
+            originMoistPercentage: dtKualitasCpo?.MoistPercentage,
+            originDirtPercentage: dtKualitasCpo?.DirtPercentage,
+          });
+        }
         setSelectedOption(res.data.transaction.productType);
       })
       .catch((error) => {
@@ -264,7 +278,9 @@ const PKSManualEntryDispatchOut = () => {
     return () => {
       // console.clear();
     };
-  }, []);
+  }, [dtKualitasCpo]);
+
+  // console.log(dtKualitasCpo,"dta")
 
   useEffect(() => {
     if (
@@ -288,7 +304,7 @@ const PKSManualEntryDispatchOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}

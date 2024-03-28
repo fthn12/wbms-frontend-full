@@ -196,15 +196,7 @@ const PKSManualEntryDispatchView = () => {
     };
   }, []);
 
-  //validasi form
-  // const validateForm = () => {
-  //   return values.bonTripNo && values.driverName && ProductName && TransporterCompanyName && PlateNo;
-  // };
 
-  //weight wb
-  // useEffect(() => {
-  //   setWbTransaction({ originWeighOutKg: wb.weight });
-  // }, [wb.weight]);
 
   useEffect(() => {
     if (!id) return handleClose();

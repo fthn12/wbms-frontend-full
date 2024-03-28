@@ -138,7 +138,6 @@ const T30ManualEntryWBIn = () => {
         tempTrans.originWeighInKg = wb.weight;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 1;
       tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -169,22 +168,10 @@ const T30ManualEntryWBIn = () => {
 
     setIsLoading(true);
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
       }
 
-      tempTrans.typeTransaction = 4;
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -247,6 +234,7 @@ const T30ManualEntryWBIn = () => {
               submitForm,
               setFieldValue,
               handleChange,
+              resetForm,
             } = props;
             // console.log("Formik props:", props);
 
@@ -382,15 +370,21 @@ const T30ManualEntryWBIn = () => {
                           const selectedProductType = dtTypeProduct.find(
                             (item) => item.id === event.target.value
                           );
+
+                          //untuk kosongkan field saat pindah select
                           setSelectedOption(selectedProductType.id);
+
+                          resetForm();
                         }}
                       >
                         {dtTypeProduct &&
-                          dtTypeProduct.map((data, index) => (
-                            <MenuItem key={index} value={data.id}>
-                              {data.value}
-                            </MenuItem>
-                          ))}
+                          dtTypeProduct
+                            .filter((data) => data.id === 1 || data.id === 4)
+                            .map((data, index) => (
+                              <MenuItem key={index} value={data.id}>
+                                {data.value}
+                              </MenuItem>
+                            ))}
                       </Field>
 
                       {selectedOption === 1 && (

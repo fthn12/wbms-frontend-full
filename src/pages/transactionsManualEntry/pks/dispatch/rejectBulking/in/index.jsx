@@ -70,6 +70,7 @@ const TransactionPksRejectBulkingIn = (props) => {
     driverId: Yup.string().required("Wajib diisi"),
     bonTripRef: Yup.string().required("Wajib diisi"),
     deliveryOrderNo: Yup.string().required("Wajib diisi"),
+    deliveryDate: Yup.string().required("Wajib diisi"),
   });
 
   const { useFindManyProductQuery } = useProduct();
@@ -102,10 +103,13 @@ const TransactionPksRejectBulkingIn = (props) => {
         wbTransaction.isManualTonase = 1;
       }
 
+      wbTransaction.typeSite = 1;
       wbTransaction.isManualEntry = 1;
       wbTransaction.typeTransaction = 5;
       wbTransaction.deliveryStatus = 26;
-      wbTransaction.deliveryDate = moment().toDate();
+      wbTransaction.deliveryDate = moment(
+        wbTransaction.deliveryDate
+      ).toISOString();
       wbTransaction.returnWeighInTimestamp = moment().toDate();
       wbTransaction.returnWeighInOperatorName = user.name.toUpperCase();
       wbTransaction.dtTransaction = moment()
@@ -134,6 +138,14 @@ const TransactionPksRejectBulkingIn = (props) => {
       toast.error(`${error.message}.`);
     }
   };
+
+  useEffect(() => {
+    setWbTransaction({
+      bonTripNo: `${WBMS.BT_SITE_CODE}${WBMS.BT_SUFFIX_TRX}${moment().format(
+        "YYMMDDHHmmss"
+      )}`,
+    });
+  }, []);
 
   useEffect(() => {
     setDtTrx(moment().format(`DD/MM/YYYY - HH:mm:ss`));
@@ -174,7 +186,7 @@ const TransactionPksRejectBulkingIn = (props) => {
       <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
       {wbTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={wbTransaction}
           validationSchema={validationSchema}
@@ -211,7 +223,6 @@ const TransactionPksRejectBulkingIn = (props) => {
                         !(
                           isValid &&
                           wb?.isStable &&
-                          dirty &&
                           wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
@@ -309,6 +320,22 @@ const TransactionPksRejectBulkingIn = (props) => {
                         // inputProps={{ readOnly: true }}
                         sx={{ mb: 2, backgroundColor: "lightyellow" }}
                       />
+
+                      <Field
+                        type="date"
+                        variant="outlined"
+                        component={TextField}
+                        size="small"
+                        fullWidth
+                        required={true}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                        label="TANGGAL Delivery"
+                        name="deliveryDate"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                      />
+
                       <Field
                         name="deliveryOrderNo"
                         label="NO DO"

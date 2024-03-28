@@ -41,10 +41,7 @@ import {
   useAuth,
   useConfig,
   useProduct,
-  useDriver,
-  useCompany,
   useStorageTank,
-  useTransportVehicle,
   useTransaction,
   useWeighbridge,
   useApp,
@@ -70,17 +67,11 @@ const TransactionManualPksCancelOut = (props) => {
     setWbTransaction,
     clearOpenedTransaction,
   } = useTransaction();
-  const { useGetDriversQuery } = useDriver();
-  const { useGetCompaniesQuery } = useCompany();
-  const { useGetTransportVehiclesQuery } = useTransportVehicle();
-  const { setSidebar } = useApp();
+
   const [selectedOption, setSelectedOption] = useState(0);
   const [returnWeighNetto, setReturnWeighNetto] = useState(0);
 
-  const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
-  const { data: dtTransport, error } = useGetTransportVehiclesQuery();
-  const [isCancel, setIsCancel] = useState(false);
+
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const T30Site = eDispatchApi.getT30Site();
@@ -233,7 +224,7 @@ const TransactionManualPksCancelOut = (props) => {
       <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-OUT" />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+        enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           // isInitialValid={false}

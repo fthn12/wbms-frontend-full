@@ -71,12 +71,12 @@ const BulkingManualEntryWBIn = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // const validationSchema = Yup.object().shape({
-  //   transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
-  //   transporterCompanyName: Yup.string().required("Wajib diisi"),
-  //   productName: Yup.string().required("Wajib diisi"),
-  //   driverName: Yup.string().required("Wajib diisi"),
-  // });
+  const validationSchema = Yup.object().shape({
+    transportVehiclePlateNo: Yup.string().required("Wajib diisi"),
+    transporterCompanyName: Yup.string().required("Wajib diisi"),
+    productName: Yup.string().required("Wajib diisi"),
+    driverName: Yup.string().required("Wajib diisi"),
+  });
 
   const { useFindManyStorageTanksQuery } = useStorageTank();
   const [dtTrx, setDtTrx] = useState(null);
@@ -129,7 +129,6 @@ const BulkingManualEntryWBIn = () => {
         tempTrans.destinationWeighInKg = wb.weight;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 2;
       tempTrans.destinationWeighInTimestamp = moment().toDate();
       tempTrans.destinationWeighInOperatorName = user.name.toUpperCase();
@@ -178,8 +177,8 @@ const BulkingManualEntryWBIn = () => {
           enableReinitialize
           onSubmit={handleDispatchSubmit}
           initialValues={wbTransaction}
-          isInitialValid={false}
-          // validationSchema={validationSchema}
+          // isInitialValid={false}
+          validationSchema={validationSchema}
         >
           {(props) => {
             const {
@@ -217,8 +216,7 @@ const BulkingManualEntryWBIn = () => {
                         !(
                           isValid &&
                           wb?.isStable &&
-                          wb?.weight > WBMS.WB_MIN_WEIGHT &&
-                          dirty
+                          wb?.weight > WBMS.WB_MIN_WEIGHT
                         )
                       }
                       sx={{ mr: 1 }}
@@ -234,7 +232,6 @@ const BulkingManualEntryWBIn = () => {
                       isDisabled={
                         !(
                           isValid &&
-                          dirty &&
                           values.destinationWeighInKg > WBMS.WB_MIN_WEIGHT
                         )
                       }
@@ -263,6 +260,18 @@ const BulkingManualEntryWBIn = () => {
                         name="bonTripNo"
                         component={TextField}
                         inputProps={{ readOnly: true }}
+                      />{" "}
+                      <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
                       />
                       <Field
                         name="productType"
@@ -291,7 +300,6 @@ const BulkingManualEntryWBIn = () => {
                             </MenuItem>
                           ))}
                       </Field>
-
                       <TransportVehicleACP
                         name="transportVehicleId"
                         label="Nomor Plat"

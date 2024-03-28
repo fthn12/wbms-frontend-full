@@ -63,9 +63,13 @@ const TransactionGrid = (props) => {
         { dtModified: { gte: moment().subtract(3, "hours").format() } },
         { progressStatus: { in: [1, 2, 6, 11, 20, 35, 36, 37] } },
       ],
+      NOT: {
+        isManualBackdate: 1,
+      },
     },
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
+
   const { data: results, refetch } =
     useFindManyTransactionQuery(transactionFilter);
 

@@ -29,10 +29,10 @@ import {
   useTransaction,
   useCompany,
   useProduct,
-  useDriver,
   useWeighbridge,
   useTransportVehicle,
   useApp,
+  useKualitasKernel,
 } from "../../../../../hooks";
 
 const PksManualEntryOthersOut = () => {
@@ -49,15 +49,16 @@ const PksManualEntryOthersOut = () => {
     setWbTransaction,
     clearOpenedTransaction,
   } = useTransaction();
-  const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useFindManyProductQuery } = useProduct();
   const { useGetTransportVehiclesQuery } = useTransportVehicle();
+  const { useFindFirstKualitasKernelQuery } = useKualitasKernel();
+
   const { setSidebar } = useApp();
   const [selectedOption, setSelectedOption] = useState(0);
 
   const { data: dtCompany } = useGetCompaniesQuery();
-  const { data: dtDrivers } = useGetDriversQuery();
+  const { data: dtKualitasKernel } = useFindFirstKualitasKernelQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
 
   const productFilter = {
@@ -95,20 +96,6 @@ const PksManualEntryOthersOut = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.sptbs) {
-        tempTrans.sptbs = parseInt(tempTrans.sptbs);
-      }
-
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (selectedOption === 2) {
         tempTrans.progressStatus = 40;
       } else if (selectedOption === 3) {
@@ -117,13 +104,18 @@ const PksManualEntryOthersOut = () => {
         tempTrans.progressStatus = 42;
       }
 
-      if (WBMS.WB_STATUS === true) {
-        tempTrans.originWeighOutKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
+      if (selectedOption === 2) {
+        tempTrans.typeTransaction = 2;
+      } else if (selectedOption === 3) {
+        tempTrans.typeTransaction = 3;
+      } else if (selectedOption === 4) {
+        tempTrans.typeTransaction = 4;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
+      if (WBMS.WB_STATUS === true) {
+        tempTrans.originWeighOutKg = wb.weight;
+      }
+
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -131,9 +123,7 @@ const PksManualEntryOthersOut = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, {
-        ...tempTrans,
-      });
+      const response = await transactionAPI.ManualEntryOutOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -188,6 +178,11 @@ const PksManualEntryOthersOut = () => {
       .then((res) => {
         setOpenedTransaction(res.data.transaction);
         setSelectedOption(res.data.transaction.productType);
+        setOpenedTransaction({
+          moisturePercentage: dtKualitasKernel?.MoisturePercentage,
+          dirtPercentage: dtKualitasKernel?.DirtPercentage,
+          stonePercentage: dtKualitasKernel?.StonePercentage,
+        });
       })
       .catch((error) => {
         toast.error(`${error.message}.`);
@@ -198,7 +193,7 @@ const PksManualEntryOthersOut = () => {
     return () => {
       // console.clear();
     };
-  }, []);
+  }, [dtKualitasKernel]);
 
   useEffect(() => {
     if (
@@ -240,7 +235,7 @@ const PksManualEntryOthersOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
@@ -339,7 +334,6 @@ const PksManualEntryOthersOut = () => {
                           setFieldValue("productId", "");
                           setFieldValue("productCode", "");
                           setFieldValue("transportVehicleProductName", "");
-                          setFieldValue("transportVehicleId", "");
                           setFieldValue("transportVehicleProductCode", "");
                         }}
                       >

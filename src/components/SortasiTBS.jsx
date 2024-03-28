@@ -80,15 +80,14 @@ export const SortasiTBS = (props) => {
           size="small"
           fullWidth
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
           }}
           component={TextField}
           disabled={isReadOnly}
+        
           label="Buah Mentah"
           name="unRipePercentage"
         />
@@ -105,10 +104,9 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.unRipeChecked || isReadOnly}
+          disabled={isReadOnly}
         />
       </Grid>
-
       <Grid item xs={1.1}>
         <Checkbox
           name="underRipeChecked"
@@ -129,9 +127,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -154,11 +150,10 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.underRipeChecked || isReadOnly}
+          disabled={isReadOnly}
           name="underRipeKg"
         />
       </Grid>
-
       <Grid item xs={1.1}>
         <Checkbox
           name="longStalkChecked"
@@ -179,9 +174,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -204,7 +197,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.longStalkChecked || isReadOnly}
+          disabled={isReadOnly}
           name="longStalkKg"
         />
       </Grid>
@@ -228,9 +221,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -253,18 +244,15 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.emptyBunchChecked || isReadOnly}
+          disabled={isReadOnly}
           name="emptyBunchKg"
         />
       </Grid>
-
       <Grid item xs={1.1}>
         <Checkbox
           name="garbageDirtChecked"
           checked={values?.garbageDirtChecked}
-          onChange={(e) =>
-            setFieldValue("garbageDirtChecked", e.target.checked)
-          }
+          onChange={(e) => setFieldValue("garbageDirtChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -280,9 +268,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -305,11 +291,10 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.garbageDirtChecked || isReadOnly}
+          disabled={isReadOnly}
           name="garbageDirtKg"
         />
       </Grid>
-
       <Grid item xs={1.1}>
         <Checkbox
           name="waterChecked"
@@ -330,9 +315,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -355,7 +338,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.waterChecked || isReadOnly}
+          disabled={isReadOnly}
           name="waterKg"
         />
       </Grid>
@@ -363,9 +346,7 @@ export const SortasiTBS = (props) => {
         <Checkbox
           name="parthenocarpyChecked"
           checked={values?.parthenocarpyChecked}
-          onChange={(e) =>
-            setFieldValue("parthenocarpyChecked", e.target.checked)
-          }
+          onChange={(e) => setFieldValue("parthenocarpyChecked", e.target.checked)}
           size="medium"
           sx={{
             mt: 1,
@@ -381,9 +362,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -406,7 +385,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.parthenocarpyChecked || isReadOnly}
+          disabled={isReadOnly}
           name="parthenocarpyKg"
         />
       </Grid>
@@ -430,9 +409,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -455,16 +432,14 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.looseFruitChecked || isReadOnly}
+          disabled={isReadOnly}
           name="looseFruitKg"
         />
       </Grid>
       <Grid item xs={1.1}>
         <Checkbox
           name="mandatoryDeductionChecked"
-          onChange={(e) =>
-            setFieldValue("mandatoryDeductionChecked", e.target.checked)
-          }
+          onChange={(e) => setFieldValue("mandatoryDeductionChecked", e.target.checked)}
           checked={values?.mandatoryDeductionChecked}
           size="medium"
           sx={{
@@ -481,9 +456,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -507,7 +480,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.mandatoryDeductionChecked || isReadOnly}
+          disabled={isReadOnly}
           name="mandatoryDeductionKg"
           value={values?.mandatoryDeductionKg}
         />
@@ -533,9 +506,7 @@ export const SortasiTBS = (props) => {
           fullWidth
           sx={{ mt: 1 }}
           InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">% / Jjg</InputAdornment>
-            ),
+            endAdornment: <InputAdornment position="end">% / Jjg</InputAdornment>,
             style: {
               backgroundColor: isReadOnly ? "whitesmoke" : "",
             },
@@ -558,7 +529,7 @@ export const SortasiTBS = (props) => {
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
           }}
-          disabled={!values?.othersChecked || isReadOnly}
+          disabled={isReadOnly}
           name="othersKg"
         />
       </Grid>

@@ -1,6 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, CircularProgress, IconButton, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  IconButton,
+  Paper,
+} from "@mui/material";
 import { AgGridReact } from "ag-grid-react"; // the AG Grid React Component
 import "ag-grid-enterprise";
 import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
@@ -22,32 +28,40 @@ import { TransactionAPI } from "../../../apis";
 import { useConfig, useTransaction, useApp } from "../../../hooks";
 import { useRef } from "react";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule, RangeSelectionModule, RowGroupingModule, RichSelectModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  RangeSelectionModule,
+  RowGroupingModule,
+  RichSelectModule,
+]);
 
 const ReportTransactionDaily = () => {
   const navigate = useNavigate();
   const { setSidebar } = useApp();
-  const { WBMS, PROGRESS_STATUS } = useConfig();
-  const { setOpenedTransaction, useFindManyTransactionQuery } = useTransaction();
+  const { WBMS, PROGRESS_STATUS, SCC_MODEL } = useConfig();
+  const { setOpenedTransaction, useFindManyTransactionQuery } =
+    useTransaction();
 
   const transactionAPI = TransactionAPI();
 
   const [isLoading, setIsLoading] = useState(false);
 
   const gridRef = useRef();
-
   const data = {
     where: {
       typeSite: +WBMS.SITE_TYPE,
-      isManualEntry : 0,
-      isManualTonase : 0,
       progressStatus: { in: [21, 26, 31, 100, 40, 41, 42] },
+      // OR: [
+      //   { isManualBackdate: 1 },
+      //   { isManualEntry: 1 },
+      //   { isManualTonase: 1 },
+      // ],
     },
-
     orderBy: [{ progressStatus: "asc" }, { bonTripNo: "desc" }],
   };
 
-  const { data: dtTransaction, refetch: refetchDtTransaction } = useFindManyTransactionQuery(data);
+  const { data: dtTransaction, refetch: refetchDtTransaction } =
+    useFindManyTransactionQuery(data);
 
   const handleViewClick = async (id, progressStatus, bonTripRef) => {
     try {
@@ -83,11 +97,11 @@ const ReportTransactionDaily = () => {
         } else if (progressStatus === 37) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-out";
         } else if (progressStatus === 40) {
-          urlPath = "/wb/transactions/pks/manual-entry-other-view";
-        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-tbs-view";
-        } else if (progressStatus === 42) {
+        } else if (progressStatus === 41) {
           urlPath = "/wb/transactions/pks/manual-entry-kernel-view";
+        } else if (progressStatus === 42) {
+          urlPath = "/wb/transactions/pks/manual-entry-other-view";
         } else {
           throw new Error("Progress Status tidak valid.");
         }
@@ -137,8 +151,18 @@ const ReportTransactionDaily = () => {
     // else if (WBMS.SITE_TYPE === 3) return BULKING_PROGRESS_STATUS[params.value];
   };
 
+  const sertifikasiFormatter = (params) => {
+    if (params.data && params.data.productType === 1) {
+      const sertificate = SCC_MODEL.find((item) => item.id === params.value);
+      return sertificate ? sertificate.value : "";
+    } else {
+      return "";
+    }
+  };
+
   const dateFormatter = (params) => {
-    if (params.data) return moment(params.value).format("DD MMM YYYY").toUpperCase();
+    if (params.data)
+      return moment(params.value).format("DD MMM YYYY").toUpperCase();
   };
 
   const timeFormatter = (params) => {
@@ -153,9 +177,14 @@ const ReportTransactionDaily = () => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.originWeighInKg - params.data.originWeighOutKg);
+      netto = Math.abs(
+        params.data.originWeighInKg - params.data.originWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -163,9 +192,14 @@ const ReportTransactionDaily = () => {
     if (params?.data) {
       let netto = 0;
 
-      netto = Math.abs(params.data.returnWeighInKg - params.data.returnWeighOutKg);
+      netto = Math.abs(
+        params.data.returnWeighInKg - params.data.returnWeighOutKg
+      );
 
-      return netto.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return netto.toLocaleString("id-ID", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
     }
   };
 
@@ -176,7 +210,13 @@ const ReportTransactionDaily = () => {
           <Box display="flex" justifyContent="center" alignItems="center">
             <IconButton
               size="small"
-              onClick={() => handleViewClick(params.data.id, params.data.progressStatus, params.data.bonTripRef)}
+              onClick={() =>
+                handleViewClick(
+                  params.data.id,
+                  params.data.progressStatus,
+                  params.data.bonTripRef
+                )
+              }
             >
               <PlagiarismOutlinedIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -210,9 +250,45 @@ const ReportTransactionDaily = () => {
       hide: true,
     },
     { headerName: "NO DO", field: "deliveryOrderNo", maxWidth: 115 },
-    { headerName: "PRODUK", field: "productName", maxWidth: 90, cellStyle: { textAlign: "center" } },
-    { headerName: "WB-IN", field: "originWeighInKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
-    { headerName: "WB-OUT", field: "originWeighOutKg", maxWidth: 90, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "PRODUK",
+      field: "productName",
+      maxWidth: 90,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Sertifikasi RSPO",
+      field: "rspoSccModel",
+      maxWidth: 130,
+      valueFormatter: sertifikasiFormatter,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Sertifikasi ISCC",
+      field: "isccSccModel",
+      maxWidth: 130,
+      valueFormatter: sertifikasiFormatter,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "Sertifikasi ISPO",
+      field: "ispoSccModel",
+      maxWidth: 130,
+      valueFormatter: sertifikasiFormatter,
+      cellStyle: { textAlign: "center" },
+    },
+    {
+      headerName: "WB-IN",
+      field: "originWeighInKg",
+      maxWidth: 90,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "WB-OUT",
+      field: "originWeighOutKg",
+      maxWidth: 90,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "NETTO",
       field: "id",
@@ -220,8 +296,18 @@ const ReportTransactionDaily = () => {
       cellStyle: { textAlign: "right" },
       valueFormatter: originNettoFormatter,
     },
-    { headerName: "RJCT-IN", field: "returnWeighInKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
-    { headerName: "RJCT-OUT", field: "returnWeighOutKg", maxWidth: 95, cellStyle: { textAlign: "right" } },
+    {
+      headerName: "RJCT-IN",
+      field: "returnWeighInKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
+    {
+      headerName: "RJCT-OUT",
+      field: "returnWeighOutKg",
+      maxWidth: 95,
+      cellStyle: { textAlign: "right" },
+    },
     {
       headerName: "RJCT NETTO",
       field: "id",
@@ -266,7 +352,7 @@ const ReportTransactionDaily = () => {
       minWidth: "200",
       flex: 1,
     }),
-    [],
+    []
   );
 
   return (
@@ -275,10 +361,17 @@ const ReportTransactionDaily = () => {
 
       <Box display="flex" sx={{ mt: 3 }}>
         <Box flex={1}></Box>
-        <Button variant="contained" onClick={() => gridRef.current.api.exportDataAsExcel()}>
+        <Button
+          variant="contained"
+          onClick={() => gridRef.current.api.exportDataAsExcel()}
+        >
           Export Excel
         </Button>
-        <Button variant="contained" sx={{ ml: 0.5 }} onClick={() => refetchDtTransaction()}>
+        <Button
+          variant="contained"
+          sx={{ ml: 0.5 }}
+          onClick={() => refetchDtTransaction()}
+        >
           Reload
         </Button>
       </Box>
@@ -286,7 +379,11 @@ const ReportTransactionDaily = () => {
       <Paper sx={{ mt: 1, p: 2, minHeight: "77vh" }}>
         <Box
           className="ag-theme-balham"
-          sx={{ "& .ag-header-cell-label": { justifyContent: "center" }, width: "auto", height: "75.5vh" }}
+          sx={{
+            "& .ag-header-cell-label": { justifyContent: "center" },
+            width: "auto",
+            height: "75.5vh",
+          }}
         >
           <AgGridReact
             ref={gridRef}

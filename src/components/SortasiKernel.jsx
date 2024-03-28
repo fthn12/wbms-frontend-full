@@ -1,10 +1,17 @@
 import React from "react";
-import { Grid, InputAdornment, Divider, Checkbox, Field as FieldMUI } from "@mui/material";
-import { Field } from "formik";
+import {
+  Grid,
+  InputAdornment,
+  Divider,
+  Checkbox,
+  Field as FieldMUI,
+} from "@mui/material";
+import { Field, useFormikContext } from "formik";
 import { TextField } from "formik-mui";
 
 export const SortasiKernel = (props) => {
   const { isReadOnly } = props;
+  const { values } = useFormikContext();
 
   return (
     <>
@@ -24,6 +31,9 @@ export const SortasiKernel = (props) => {
           component={TextField}
           label="Moisture"
           name="moisturePercentage"
+          value={
+            values?.moisturePercentage > 0 ? values.moisturePercentage : "0"
+          }
         />
       </Grid>
       <Grid item xs={5}>
@@ -33,12 +43,13 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
+          sx={{ backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: isReadOnly,
           }}
           name="moistureKg"
+          value={values?.moistureKg > 0 ? values.moistureKg : "0"}
         />
       </Grid>
       <Grid item xs={7}>
@@ -58,6 +69,7 @@ export const SortasiKernel = (props) => {
           component={TextField}
           label="Dirt"
           name="dirtPercentage"
+          value={values?.dirtPercentage > 0 ? values.dirtPercentage : "0"}
         />
       </Grid>
       <Grid item xs={5}>
@@ -67,12 +79,13 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 2,   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
+          sx={{ mt: 2, backgroundColor: isReadOnly ? "whitesmoke" : "" }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: isReadOnly,
           }}
           name="dirtKg"
+          value={values?.dirtKg > 0 ? values.dirtKg : "0"}
         />
       </Grid>
       <Grid item xs={7}>
@@ -92,6 +105,7 @@ export const SortasiKernel = (props) => {
           component={TextField}
           label="Stone"
           name="stonePercentage"
+          value={values?.stonePercentage > 0 ? values.stonePercentage : "0"}
         />
       </Grid>
       <Grid item xs={5}>
@@ -101,12 +115,17 @@ export const SortasiKernel = (props) => {
           size="small"
           fullWidth
           component={TextField}
-          sx={{ mt: 2, mb: 1.5,   backgroundColor: isReadOnly ? "whitesmoke" : "", }}
+          sx={{
+            mt: 2,
+            mb: 1.5,
+            backgroundColor: isReadOnly ? "whitesmoke" : "",
+          }}
           InputProps={{
             endAdornment: <InputAdornment position="end">kg</InputAdornment>,
             readOnly: isReadOnly,
           }}
           name="stoneKg"
+          value={values?.stoneKg > 0 ? values.stoneKg : "0"}
         />
       </Grid>
 

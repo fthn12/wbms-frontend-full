@@ -1023,7 +1023,7 @@ const TransactionT30CancelOut = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            // value={user.name.toUpperCase()}
+                            value={user.name.toUpperCase()}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1060,13 +1060,7 @@ const TransactionT30CancelOut = (props) => {
                             required
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             inputProps={{ readOnly: true }}
-                            value={
-                              values?.returnWeighOutTimestamp
-                                ? moment(values.returnWeighOutTimestamp)
-                                    .local()
-                                    .format(`DD/MM/YYYY - HH:mm:ss`)
-                                : "-"
-                            }
+                            value={dtTrx || "-"}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -1095,31 +1089,60 @@ const TransactionT30CancelOut = (props) => {
                           />
                         </Grid>
 
-                        <Grid item xs={6}>
-                          <Field
-                            name="returnWeighOutKg"
-                            label="Berat WB-OUT"
-                            type="number"
-                            component={TextField}
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            sx={{ mt: 2, backgroundColor: "whitesmoke" }}
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  kg
-                                </InputAdornment>
-                              ),
-                            }}
-                            inputProps={{ readOnly: true }}
-                            value={
-                              values?.returnWeighOutKg > 0
-                                ? values.returnWeighOutKg.toFixed(2)
-                                : "0.00"
-                            }
-                          />
-                        </Grid>
+                        {WBMS.WB_STATUS === true && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighOutKg"
+                              label="Berat WB-OUT"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "whitesmoke" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              inputProps={{ readOnly: true }}
+                              value={
+                                wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"
+                              }
+                            />
+                          </Grid>
+                        )}
+                        {WBMS.WB_STATUS === false && (
+                          <Grid item xs={6}>
+                            <Field
+                              name="returnWeighOutKg"
+                              label="Berat WB-OUT"
+                              type="number"
+                              component={TextField}
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                              sx={{ mt: 2, backgroundColor: "lightyellow" }}
+                              InputProps={{
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    kg
+                                  </InputAdornment>
+                                ),
+                              }}
+                              // inputProps={{ readOnly: true }}
+                              value={
+                                values?.returnWeighOutKg > 0
+                                  ? values.returnWeighOutKg
+                                  : 0
+                              }
+                              // value={wb?.weight > 0 ? wb.weight.toFixed(2) : "0.00"}
+                            />
+                          </Grid>
+                        )}
+
 
                         <Grid item xs={12} sx={{ mt: 2 }}>
                           <Divider>TOTAL CANCEL</Divider>

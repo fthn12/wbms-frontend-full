@@ -104,7 +104,7 @@ const TransactionPksCancelIn = (props) => {
       let tempTrans = { ...values };
       if (WBMS.WB_STATUS === true) {
         tempTrans.returnWeighInKg = wb.weight;
-      }else if (WBMS.WB_STATUS === false) {
+      } else if (WBMS.WB_STATUS === false) {
         tempTrans.isManualTonase = 1;
       }
 
@@ -201,7 +201,7 @@ const TransactionPksCancelIn = (props) => {
       <Header title="TRANSAKSI PKS" subtitle="TIMBANG REJECT WB-IN" />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
@@ -231,9 +231,9 @@ const TransactionPksCancelIn = (props) => {
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
                   {WBMS.WB_STATUS === true && (
                     <CancelConfirmation
-                    title="Alasan REJECT (PENGEMBALIAN)"
-                    caption="SIMPAN"
-                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
                       isDisabled={
                         !(
@@ -247,9 +247,9 @@ const TransactionPksCancelIn = (props) => {
                   )}
                   {WBMS.WB_STATUS === false && (
                     <CancelConfirmation
-                    title="Alasan REJECT (PENGEMBALIAN)"
-                    caption="SIMPAN"
-                    content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
+                      title="Alasan REJECT (PENGEMBALIAN)"
+                      caption="SIMPAN"
+                      content="Anda yakin melakukan REJECT (PENGEMBALIAN) transaksi WB ini? Berikan keterangan yang cukup."
                       onClose={handleCancel}
                       isDisabled={
                         !(

@@ -60,16 +60,19 @@ const QRCodeScanner = (props) => {
           // console.log(JSON.parse(data.content.substring(5)));
           const qrData = JSON.parse(data.content.substring(5));
 
-          if (qrData?.typeSite && qrData.typeSite === 3) {
+          if (qrData?.typeSite && qrData.typeSite === 2) {
             setWbTransaction(qrData);
 
             setIsLoading(false);
 
             return navigate("/wb/transactions/bulking/manual-entry-in-qr");
-          } else if (qrData?.typeSite && qrData.typeSite === 1) {
-            console.log("Ini data dari Labanan");
+          } else if (qrData?.typeSite && qrData.typeSite === 3) {
+            setWbTransaction(qrData);
+
+            setIsLoading(false);
+
+            return navigate("/wb/transactions/pks/dispatch-reject-bulking-in");
           }
-          
         } else {
           transactionAPI
             .eDispatchFindOrCreateByQrcode(data)

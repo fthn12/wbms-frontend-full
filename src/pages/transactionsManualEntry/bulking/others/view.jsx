@@ -16,19 +16,27 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import moment from "moment";
 import Header from "../../../../components/layout/signed/HeaderTransaction";
-import BonTripPrint from "../../../../components/BontripManualEntry";
+import BonTripPrint from "../../../../components/BontripOthers";
 import { DriverFreeSolo } from "components/FormOthers";
 
 import { TransactionAPI } from "../../../../apis";
 
-import { useConfig, useTransaction, useCompany, useProduct, useDriver, useTransportVehicle } from "../../../../hooks";
+import {
+  useConfig,
+  useTransaction,
+  useCompany,
+  useProduct,
+  useDriver,
+  useTransportVehicle,
+} from "../../../../hooks";
 
 const BulkingManualEntryOthersView = () => {
   const navigate = useNavigate();
   const transactionAPI = TransactionAPI();
   const { id } = useParams();
   const { WBMS, SCC_MODEL } = useConfig();
-  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } = useTransaction();
+  const { openedTransaction, setOpenedTransaction, clearOpenedTransaction } =
+    useTransaction();
   const { useGetDriversQuery } = useDriver();
   const { useGetCompaniesQuery } = useCompany();
   const { useGetProductsQuery } = useProduct();
@@ -40,8 +48,6 @@ const BulkingManualEntryOthersView = () => {
   const { data: dtProduct } = useGetProductsQuery();
   const { data: dtDrivers } = useGetDriversQuery();
   const { data: dtTransport, error } = useGetTransportVehiclesQuery();
-
-
 
   const handleClose = () => {
     clearOpenedTransaction();
@@ -75,14 +81,19 @@ const BulkingManualEntryOthersView = () => {
     ) {
       setOriginWeighNetto(0);
     } else {
-      let total = Math.abs(openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg);
+      let total = Math.abs(
+        openedTransaction?.originWeighInKg - openedTransaction?.originWeighOutKg
+      );
       setOriginWeighNetto(total);
     }
   }, [openedTransaction]);
 
   return (
     <Box>
-      <Header title="Transaksi Bulking" subtitle="Data Timbangan Manual Entry" />
+      <Header
+        title="Transaksi Bulking"
+        subtitle="Data Timbangan Manual Entry"
+      />
       {openedTransaction && (
         <Formik
           // enableReinitialize
@@ -145,7 +156,9 @@ const BulkingManualEntryOthersView = () => {
                         freeSolo
                         readOnly={true}
                         disableClearable
-                        options={dtTransport?.records.map((record) => record.plateNo)}
+                        options={dtTransport?.records.map(
+                          (record) => record.plateNo
+                        )}
                         // onInputChange={(event, InputValue, reason) => {
                         //   if (reason !== "reset") {
                         //     setFieldValue("transportVehiclePlateNo", InputValue);
@@ -168,8 +181,14 @@ const BulkingManualEntryOthersView = () => {
                         variant="outlined"
                         fullWidth
                         options={dtCompany?.records || []}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtCompany?.records?.find((item) => item.id === values.transporterCompanyId) || null}
+                        getOptionLabel={(option) =>
+                          `[${option.code}] - ${option.name}`
+                        }
+                        value={
+                          dtCompany?.records?.find(
+                            (item) => item.id === values.transporterCompanyId
+                          ) || null
+                        }
                         // onChange={(event, newValue) => {
                         //   setFieldValue("transporterCompanyName", newValue ? newValue.name : "");
                         //   setFieldValue("transporterCompanyId", newValue ? newValue.id : "");
@@ -195,10 +214,17 @@ const BulkingManualEntryOthersView = () => {
                         // freeSolo
                         // disableClearable
                         options={(dtProduct?.records || []).filter(
-                          (option) => !["cpo", "pko"].includes(option.name.toLowerCase()),
+                          (option) =>
+                            !["cpo", "pko"].includes(option.name.toLowerCase())
                         )}
-                        getOptionLabel={(option) => `[${option.code}] - ${option.name}`}
-                        value={dtProduct?.records?.find((item) => item.id === values.productId) || null}
+                        getOptionLabel={(option) =>
+                          `[${option.code}] - ${option.name}`
+                        }
+                        value={
+                          dtProduct?.records?.find(
+                            (item) => item.id === values.productId
+                          ) || null
+                        }
                         // onChange={(event, newValue) => {
                         //   setFieldValue("transportVehicleProductName", newValue ? newValue.name : "");
                         //   setFieldValue("transportVehicleId", newValue ? newValue.id : "");
@@ -225,7 +251,12 @@ const BulkingManualEntryOthersView = () => {
                           <Divider>DATA SUPIR & MUATAN</Divider>
                         </Grid>
                         <Grid item xs={12}>
-                        <DriverFreeSolo name="driverName" label="Nama Supir" isReadOnly={true} sx={{ mt: 2 }} />
+                          <DriverFreeSolo
+                            name="driverName"
+                            label="Nama Supir"
+                            isReadOnly={true}
+                            sx={{ mt: 2 }}
+                          />
 
                           <Field
                             name="afdeling"
@@ -347,7 +378,10 @@ const BulkingManualEntryOthersView = () => {
                             label="Operator WB-OUT"
                             value={values?.originWeighOutOperatorName}
                             name="originWeighOutOperatorName"
-                            inputProps={{ readOnly: true, style: { textTransform: "uppercase" } }}
+                            inputProps={{
+                              readOnly: true,
+                              style: { textTransform: "uppercase" },
+                            }}
                           />
                         </Grid>
                         <Grid item xs={6}>
@@ -363,7 +397,9 @@ const BulkingManualEntryOthersView = () => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighInTimestamp
-                                ? moment(values.originWeighInTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighInTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -381,7 +417,9 @@ const BulkingManualEntryOthersView = () => {
                             inputProps={{ readOnly: true }}
                             value={
                               values?.originWeighOutTimestamp
-                                ? moment(values.originWeighOutTimestamp).local().format(`DD/MM/YYYY - HH:mm:ss`)
+                                ? moment(values.originWeighOutTimestamp)
+                                    .local()
+                                    .format(`DD/MM/YYYY - HH:mm:ss`)
                                 : "-"
                             }
                           />
@@ -395,11 +433,19 @@ const BulkingManualEntryOthersView = () => {
                             fullWidth
                             sx={{ mt: 2, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="BERAT MASUK - IN"
                             name="originWeighInKg"
-                            value={values?.originWeighInKg > 0 ? values.originWeighInKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighInKg > 0
+                                ? values.originWeighInKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -412,11 +458,19 @@ const BulkingManualEntryOthersView = () => {
                             fullWidth
                             sx={{ mt: 2, mb: 3, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="BERAT KELUAR - OUT"
                             name="originWeighOutKg"
-                            value={values?.originWeighOutKg > 0 ? values.originWeighOutKg.toFixed(2) : "0.00"}
+                            value={
+                              values?.originWeighOutKg > 0
+                                ? values.originWeighOutKg.toFixed(2)
+                                : "0.00"
+                            }
                             inputProps={{ readOnly: true }}
                           />
                         </Grid>
@@ -432,19 +486,25 @@ const BulkingManualEntryOthersView = () => {
                             fullWidth
                             sx={{ mt: 3, backgroundColor: "whitesmoke" }}
                             InputProps={{
-                              endAdornment: <InputAdornment position="end">kg</InputAdornment>,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  kg
+                                </InputAdornment>
+                              ),
                             }}
                             label="TOTAL"
                             name="weightNetto"
-                            value={originWeighNetto > 0 ? originWeighNetto.toFixed(2) : "0.00"}
+                            value={
+                              originWeighNetto > 0
+                                ? originWeighNetto.toFixed(2)
+                                : "0.00"
+                            }
                           />
                         </Grid>
                       </Grid>
                     </Grid>
                   </Grid>
                 </Paper>
-
-              
               </Form>
             );
           }}

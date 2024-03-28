@@ -30,10 +30,11 @@ const BonTripT30Print = (props) => {
   const tanggal = moment(dtTrans.originWeighOutTimestamp).format("DD- MM-YYYY");
 
   const qrData = {
-    typeSite: 3,
+    typeSite: 2,
     productType: dtTrans.productType,
     bonTripRef: dtTrans.bonTripNo,
     deliveryOrderNo: dtTrans.deliveryOrderNo,
+    deliveryDate: dtTrans.deliveryDate,
     transporterCompanyId: dtTrans.transporterCompanyId,
     transporterCompanyName: dtTrans.transporterCompanyName,
     transporterCompanyCode: dtTrans.transporterCompanyCode,
@@ -94,7 +95,7 @@ const BonTripT30Print = (props) => {
               </Box>
               <Box ml="auto" mt={2}>
                 <QRCode
-                  size={550}
+                  size={100}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                   value={qrContent}
                   viewBox={`0 0 256 256`}

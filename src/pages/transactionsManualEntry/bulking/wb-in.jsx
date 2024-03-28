@@ -124,16 +124,10 @@ const BulkingManualEntryWBIn = () => {
 
       if (WBMS.WB_STATUS === true) {
         tempTrans.destinationWeighInKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
       }
 
-      tempTrans.isManualEntry = 1;
-      tempTrans.typeTransaction = 5;
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 2;
       tempTrans.deliveryStatus = 22;
-      tempTrans.deliveryDate = moment().toDate();
       tempTrans.destinationWeighInTimestamp = moment().toDate();
       tempTrans.destinationWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -162,21 +156,10 @@ const BulkingManualEntryWBIn = () => {
 
     setIsLoading(true);
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
       }
-      tempTrans.typeTransaction = 4;
-      tempTrans.productType = parseInt(tempTrans.productType);
+
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -235,6 +218,7 @@ const BulkingManualEntryWBIn = () => {
               submitForm,
               setFieldValue,
               handleChange,
+              resetForm,
             } = props;
             // console.log("Formik props:", props);
 
@@ -346,7 +330,6 @@ const BulkingManualEntryWBIn = () => {
                       <Grid item xs={12}>
                         <Divider sx={{ mb: 2 }}>DATA KENDARAAN</Divider>
                       </Grid>
-
                       <Field
                         name="bonTripNo"
                         label="NO BONTRIP"
@@ -358,6 +341,21 @@ const BulkingManualEntryWBIn = () => {
                         sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                         inputProps={{ readOnly: true }}
                       />
+
+                      {selectedOption === 1 && (
+                        <Field
+                          name="bonTripRef"
+                          label="NO BONTRIP ASAL"
+                          type="text"
+                          component={TextField}
+                          variant="outlined"
+                          required
+                          size="small"
+                          fullWidth
+                          // inputProps={{ readOnly: true }}
+                          sx={{ mb: 2, backgroundColor: "lightyellow" }}
+                        />
+                      )}
                       <Field
                         name="productType"
                         label="Tipe Transaksi"
@@ -374,17 +372,22 @@ const BulkingManualEntryWBIn = () => {
                           const selectedProductType = dtTypeProduct.find(
                             (item) => item.id === event.target.value
                           );
+
+                          //untuk kosongkan field saat pindah select
                           setSelectedOption(selectedProductType.id);
+
+                          resetForm();
                         }}
                       >
                         {dtTypeProduct &&
-                          dtTypeProduct.map((data, index) => (
-                            <MenuItem key={index} value={data.id}>
-                              {data.value}
-                            </MenuItem>
-                          ))}
+                          dtTypeProduct
+                            .filter((data) => data.id === 1 || data.id === 4)
+                            .map((data, index) => (
+                              <MenuItem key={index} value={data.id}>
+                                {data.value}
+                              </MenuItem>
+                            ))}
                       </Field>
-
                       {selectedOption === 1 && (
                         <>
                           <TransportVehicleACP
@@ -414,7 +417,6 @@ const BulkingManualEntryWBIn = () => {
                           />
                         </>
                       )}
-
                       {selectedOption === 4 && (
                         <>
                           <Field

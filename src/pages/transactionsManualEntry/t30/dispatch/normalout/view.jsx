@@ -136,6 +136,7 @@ const T30ManualEntryDispatchView = () => {
                   <Button
                     variant="contained"
                     onClick={() => handleCancel(values)}
+                    sx={{ backgroundColor: "darkred", mr: "auto" }}
                   >
                     Cancel Transaksi
                   </Button>

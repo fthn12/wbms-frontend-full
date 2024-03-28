@@ -10,7 +10,7 @@ const KualitasKernelApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (response, meta, arg) =>
-        response?.data?.kualitasKernel,
+        response?.data?.sortasiKernel,
       providesTags: ["kualitas-kernel"],
     }),
 

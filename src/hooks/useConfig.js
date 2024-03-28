@@ -103,11 +103,17 @@ const roles = [
 ];
 
 const productTypes = [
-  // { id: 0, value: "Not Assigned" },
   { id: 1, value: "Dispatch" },
   { id: 2, value: "TBS" },
   { id: 3, value: "Kernel" },
   { id: 4, value: "Others" },
+];
+
+const backDateStatus = [
+  { id: 1, value: "NORMAL" },
+  { id: 2, value: "CANCEL" },
+  { id: 3, value: "REJECT T300" },
+  { id: 4, value: "REJECT BULKING" },
 ];
 
 const eDispatchServer = [
@@ -165,6 +171,7 @@ export const useConfig = () => {
     EDISPATCH_SERVER,
     SITE_TYPES,
     PRODUCT_TYPES,
+    BACKDATESTATUS,
     SCC_MODEL,
     VA_SCC_MODEL,
     RSPO_SCC_MODEL,
@@ -183,13 +190,12 @@ export const useConfig = () => {
     EDISPATCH_SERVER: eDispatchServer,
     SITE_TYPES: siteTypes,
     PRODUCT_TYPES: productTypes,
+    BACKDATESTATUS: backDateStatus,
     SCC_MODEL: sccModel,
     VA_SCC_MODELL: vaSccModel,
     RSPO_SCC_MODE: rspoSccModel,
     ISCC_SCC_MODEL: isccSccModel,
   };
-
-
 
   const syncConfig = () => {
     dispatch(getConfigs());
@@ -208,6 +214,7 @@ export const useConfig = () => {
     EDISPATCH_SERVER,
     SITE_TYPES,
     PRODUCT_TYPES,
+    BACKDATESTATUS,
     SCC_MODEL,
     VA_SCC_MODEL,
     RSPO_SCC_MODEL,

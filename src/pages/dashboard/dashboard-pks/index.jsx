@@ -30,15 +30,17 @@ const DashboardPKS = () => {
           isManualEntry : 0,
           isManualTonase : 0,
         },
-      ],
-      AND: [
-        {
-          dtTransaction: {
-            gte: startOf,
-            lte: endOf,
-          },
-        },
-      ],
+      ],   NOT: {
+        isManualBackdate: 1,
+      },
+      // AND: [
+      //   {
+      //     dtTransaction: {
+      //       gte: startOf,
+      //       lte: endOf,
+      //     },
+      //   },
+      // ],
   
     },
   };

@@ -140,16 +140,16 @@ const LBNManualEntryDispatchOut = () => {
 
       if (WBMS.WB_STATUS === true) {
         tempTrans.destinationWeighOutKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
       }
-      tempTrans.isManualEntry = 1;
 
       if (isReject) {
-        tempTrans.productType = parseInt(tempTrans.productType);
+        if (WBMS.WB_STATUS === false) {
+          tempTrans.isManualTonase = 1;
+        }
+
+        tempTrans.isManualEntry = 1;
         tempTrans.progressStatus = 31;
         tempTrans.deliveryStatus = 26;
-        tempTrans.deliveryDate = moment().toDate();
         tempTrans.destinationWeighOutTimestamp = moment().toDate();
         tempTrans.destinationWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.dtTransaction = moment()
@@ -171,10 +171,8 @@ const LBNManualEntryDispatchOut = () => {
         const id = response?.data?.transaction?.id;
         navigate(`/wb/transactions/bulking/manual-entry-dispatch-view/${id}`);
       } else {
-        tempTrans.productType = parseInt(tempTrans.productType);
         tempTrans.progressStatus = 21;
         tempTrans.deliveryStatus = 38;
-        tempTrans.deliveryDate = moment().toDate();
         tempTrans.destinationWeighOutTimestamp = moment().toDate();
         tempTrans.destinationWeighOutOperatorName = user.name.toUpperCase();
         tempTrans.dtTransaction = moment()
@@ -182,9 +180,7 @@ const LBNManualEntryDispatchOut = () => {
           .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
           .format();
 
-        const response = await transactionAPI.updateById(tempTrans.id, {
-          ...tempTrans,
-        });
+        const response = await transactionAPI.ManualEntryOutDispatch(tempTrans);
 
         if (!response.status) throw new Error(response?.message);
 
@@ -272,11 +268,11 @@ const LBNManualEntryDispatchOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
-          isInitialValid={false}
+          // isInitialValid={false}
         >
           {(props) => {
             const {
@@ -398,6 +394,19 @@ const LBNManualEntryDispatchOut = () => {
                         name="bonTripNo"
                         component={TextField}
                         inputProps={{ readOnly: true }}
+                      />
+
+                      <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        // inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "lightyellow" }}
                       />
                       <Field
                         name="productType"

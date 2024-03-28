@@ -33,6 +33,7 @@ import LibraryAddCheckOutlinedIcon from "@mui/icons-material/LibraryAddCheckOutl
 import DisplaySettingsOutlinedIcon from "@mui/icons-material/DisplaySettingsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
+import DateRangeIcon from "@mui/icons-material/DateRange";
 
 // hex to rgba converter
 // pakai rgba agar bisa set transparansi
@@ -302,36 +303,60 @@ const Sidebar = () => {
               selected={sidebar.selected}
               setSelected={setSelected}
             /> */}
-            <SubMenu label="Transaksi Manual" icon={<ListAltOutlinedIcon />}>
+
+            {(user.role === 5 || user.role === 6) && (
+              <SubMenu label="Transaksi Backdate" icon={<DateRangeIcon />}>
+                <Item
+                  title="Awaiting Approval"
+                  to="transactions-backdate-form"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+                <Item
+                  title="Approved"
+                  to="approve/transactions-manual-complete"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+              </SubMenu>
+            )}
+
+            <SubMenu
+              label="List Transaksi Manual"
+              icon={<ListAltOutlinedIcon />}
+            >
               <Item
-                title="Transaksi Pending"
+                title="Pending"
                 to="transactions-manual-pending"
                 icon={<ArrowRightOutlinedIcon />}
                 selected={sidebar.selected}
                 setSelected={setSelected}
               />
               <Item
-                title="Transaksi Complete"
+                title="Complete"
                 to="transactions-manual-complete"
                 icon={<ArrowRightOutlinedIcon />}
                 selected={sidebar.selected}
                 setSelected={setSelected}
               />
             </SubMenu>
+
             {(user.role === 5 || user.role === 6) && (
               <SubMenu
-                label="Setujui Transaksi"
+                label="Approve Transaksi"
                 icon={<LibraryAddCheckOutlinedIcon />}
               >
                 <Item
-                  title="Transaksi Pending"
+                  title="Awaiting Approval"
                   to="approve/transactions-manual-pending"
                   icon={<ArrowRightOutlinedIcon />}
                   selected={sidebar.selected}
                   setSelected={setSelected}
                 />
                 <Item
-                  title="Transaksi Complete"
+                  title="Approved"
                   to="approve/transactions-manual-complete"
                   icon={<ArrowRightOutlinedIcon />}
                   selected={sidebar.selected}
@@ -431,7 +456,14 @@ const Sidebar = () => {
                   selected={sidebar.selected}
                   setSelected={setSelected}
                 />
-                 <Item
+                <Item
+                  title="PKO"
+                  to="kualitas/pko"
+                  icon={<ArrowRightOutlinedIcon />}
+                  selected={sidebar.selected}
+                  setSelected={setSelected}
+                />
+                <Item
                   title="KERNEL"
                   to="kualitas/kernel"
                   icon={<ArrowRightOutlinedIcon />}

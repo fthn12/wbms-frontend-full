@@ -100,7 +100,7 @@ const PksManualEntryWBIn = () => {
 
   const handleReject = () => {
     clearOpenedTransaction();
-    navigate(`/wb/transactions/pks/dispatch-reject-bulking-in`);
+    navigate("/wb/transactions/pks/dispatch-reject-bulking-in");
   };
 
   const handleDispatchSubmit = async (values) => {
@@ -115,8 +115,6 @@ const PksManualEntryWBIn = () => {
       if (selectedStorageTank) {
         tempTrans.originSourceStorageTankCode = selectedStorageTank.code || "";
         tempTrans.originSourceStorageTankName = selectedStorageTank.name || "";
-        tempTrans.originSiteCode = selectedStorageTank.code || "";
-        tempTrans.originSiteName = selectedStorageTank.name || "";
       }
 
       const selectedSite = dtSite.records.find(
@@ -143,7 +141,6 @@ const PksManualEntryWBIn = () => {
         tempTrans.originWeighInKg = wb.weight;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.progressStatus = 1;
       tempTrans.deliveryDate = moment().toDate();
       tempTrans.originWeighInTimestamp = moment().toDate();
@@ -175,22 +172,10 @@ const PksManualEntryWBIn = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 2;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -221,22 +206,10 @@ const PksManualEntryWBIn = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 3;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -266,24 +239,10 @@ const PksManualEntryWBIn = () => {
 
     setIsLoading(true);
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighInKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
       }
 
-      tempTrans.productType = parseInt(tempTrans.productType);
-      tempTrans.typeTransaction = 4;
       tempTrans.originWeighInTimestamp = moment().toDate();
       tempTrans.originWeighInOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -350,6 +309,7 @@ const PksManualEntryWBIn = () => {
               submitForm,
               setFieldValue,
               handleChange,
+              resetForm,
             } = props;
             // console.log("Formik props:", props);
 
@@ -576,10 +536,11 @@ const PksManualEntryWBIn = () => {
                           const selectedProductType = dtTypeProduct.find(
                             (item) => item.id === event.target.value
                           );
+                       
+                          //untuk kosongkan field saat pindah select
                           setSelectedOption(selectedProductType.id);
-                          setFieldValue("mandatoryDeductionPercentage", 0);
-                          setFieldValue("mandatoryDeductionKg", 0);
-                          setFieldValue("othersKg", 0);
+
+                          resetForm();
                         }}
                       >
                         {dtTypeProduct &&

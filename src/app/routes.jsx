@@ -23,6 +23,10 @@ const DashboardAll = lazy(() => import("../pages/dashboard/dashboard-all"));
 
 const Transactions = lazy(() => import("../pages/transactions"));
 
+const TransactionsForm = lazy(() =>
+  import("../pages/transactionsBackDate/Form")
+);
+
 const PksManualEntryIn = lazy(() =>
   import("../pages/transactionsManualEntry/pks/wb-in")
 );
@@ -95,6 +99,32 @@ const RejectBulkingOutManualView = lazy(() =>
   import("../pages/transactionsManualEntry/pks/dispatch/rejectBulking/out/view")
 );
 
+const PksBackDate = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks")
+);
+
+const PksBackDateDispatchNormalView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/dispatch/normal/view")
+);
+const PksBackDateDispatchCancelView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/dispatch/cancel/view")
+);
+const PksBackDateDispatchRejectT300View = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/dispatch/rejectT300/view")
+);
+const PksBackDateDispatchRejectBulkingView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/dispatch/rejectBulking/view")
+);
+const PksBackDateTbsView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/tbs/view")
+);
+const PksBackDateKernelView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/kernel/view")
+);
+const PksBackDateOthersView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/pks/others/view")
+);
+
 const PksNormalIn = lazy(() => import("../pages/transactions/pks/NormalIn"));
 const PksNormalOut = lazy(() => import("../pages/transactions/pks/NormalOut"));
 const PksCancelIn = lazy(() => import("../pages/transactions/pks/CancelIn"));
@@ -161,6 +191,19 @@ const T30ManualEntryDispatchCancelOutView = lazy(() =>
   import("../pages/transactionsManualEntry/t30/dispatch/cancelout/view")
 );
 
+const T30BackDate = lazy(() =>
+  import("../pages/transactionsBackDate/Form/t30")
+);
+const T30BackDateDispatchNormalView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/t30/dispatch/normal/view")
+);
+const T30BackDateDispatchCancelView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/t30/dispatch/cancel/view")
+);
+const T30BackDateOthersView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/t30/others/view")
+);
+
 const T30NormalIn = lazy(() => import("../pages/transactions/t30/NormalIn"));
 const T30NormalOut = lazy(() => import("../pages/transactions/t30/NormalOut"));
 const T30CancelIn = lazy(() => import("../pages/transactions/t30/CancelIn"));
@@ -202,6 +245,17 @@ const BulkingManualEntryOthersView = lazy(() =>
   import("../pages/transactionsManualEntry/bulking/others/view")
 );
 
+const BulkingBackDate = lazy(() =>
+  import("../pages/transactionsBackDate/Form/bulking")
+);
+
+const BulkingBackDateDispatchView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/bulking/dispatch/view")
+);
+const BulkingBackDateOthersView = lazy(() =>
+  import("../pages/transactionsBackDate/Form/bulking/others/view")
+);
+
 const BulkingIn = lazy(() => import("../pages/transactions/bulking/In"));
 const BulkingOut = lazy(() => import("../pages/transactions/bulking/Out"));
 const BulkingViewIn = lazy(() =>
@@ -214,20 +268,17 @@ const BulkingViewOut = lazy(() =>
 const ReportTransactionDaily = lazy(() =>
   import("../pages/reports/transactions-daily")
 );
-const ReportTransactionPending = lazy(() =>
-  import("../pages/reports/transactions-pending-apprv")
-);
 
-const TransactionOnGoing = lazy(() => import("../pages/table-manual/pending"));
+const TransactionOnGoing = lazy(() => import("../pages/transactionGridManualEntry/manualEntryGrid/pending"));
 const TransactionComplete = lazy(() =>
-  import("../pages/table-manual/complete")
+  import("../pages/transactionGridManualEntry/manualEntryGrid/complete")
 );
 
 const TransactionPendingApproved = lazy(() =>
-  import("../pages/approve-transactions-manual/pending")
+  import("../pages/transactionGridManualEntry/awaitingApprovalGrid/pendingApproval")
 );
 const TransactionCompleteApproved = lazy(() =>
-  import("../pages/approve-transactions-manual/complete")
+  import("../pages/transactionGridManualEntry/awaitingApprovalGrid/approved")
 );
 
 // const MDProvince = lazy(() => import("../pages/master-data/md-province"));
@@ -254,6 +305,7 @@ const AdmUserView = lazy(() =>
 );
 
 const KualitasCpo = lazy(() => import("../pages/kualitas/kualitas-cpo"));
+const KualitasPko = lazy(() => import("../pages/kualitas/kualitas-pko"));
 const KualitasKernel = lazy(() => import("../pages/kualitas/kualitas-kernel"));
 
 const Config = lazy(() => import("../pages/administration/config-variable"));
@@ -432,6 +484,43 @@ const routes = () => {
             name="PksRejectT300OutManualView"
             element={<PksRejectT300OutManualView />}
           />
+
+          <Route
+            path="transactions-backdate-form"
+            element={<TransactionsForm />}
+          />
+
+          <Route path="transactions/pks/backdate" element={<PksBackDate />} />
+
+          <Route
+            path="transactions/pks/backdate-dispatch-normal-view/:id"
+            element={<PksBackDateDispatchNormalView />}
+          />
+          <Route
+            path="transactions/pks/backdate-dispatch-reject-t300-view/:id"
+            element={<PksBackDateDispatchRejectT300View />}
+          />
+          <Route
+            path="transactions/pks/backdate-dispatch-reject-bulking-view/:id"
+            element={<PksBackDateDispatchRejectBulkingView />}
+          />
+          <Route
+            path="transactions/pks/backdate-dispatch-cancel-view/:id"
+            element={<PksBackDateDispatchCancelView />}
+          />
+          <Route
+            path="transactions/pks/backdate-tbs-view/:id"
+            element={<PksBackDateTbsView />}
+          />
+          <Route
+            path="transactions/pks/backdate-kernel-view/:id"
+            element={<PksBackDateKernelView />}
+          />
+          <Route
+            path="transactions/pks/backdate-others-view/:id"
+            element={<PksBackDateOthersView />}
+          />
+
           <Route
             path="transactions/pks/dispatch-reject-bulking-in"
             name="RejectBulkingInManual"
@@ -497,6 +586,22 @@ const routes = () => {
             name="T30ManualEntryDispatchCancelOutView"
             element={<T30ManualEntryDispatchCancelOutView />}
           />
+
+          <Route path="transactions/t30/backdate" element={<T30BackDate />} />
+
+          <Route
+            path="transactions/t30/backdate-dispatch-normal-view/:id"
+            element={<T30BackDateDispatchNormalView />}
+          />
+          <Route
+            path="transactions/t30/backdate-dispatch-cancel-view/:id"
+            element={<T30BackDateDispatchCancelView />}
+          />
+          <Route
+            path="transactions/t30/backdate-others-view/:id"
+            element={<T30BackDateOthersView />}
+          />
+
           <Route
             path="transactions/t30-edispatch-normal-in"
             element={<T30NormalIn />}
@@ -577,14 +682,26 @@ const routes = () => {
             path="transactions/bulking-edispatch-out/:id"
             element={<BulkingViewOut />}
           />
+
+          <Route
+            path="transactions/bulking/backdate"
+            element={<BulkingBackDate />}
+          />
+
+          <Route
+            path="transactions/bulking/backdate-dispatch-view/:id"
+            element={<BulkingBackDateDispatchView />}
+          />
+          <Route
+            path="transactions/bulking/backdate-others-view/:id"
+            element={<BulkingBackDateOthersView />}
+          />
+
           <Route
             path="reports/transactions-daily"
             element={<ReportTransactionDaily />}
           />
-          <Route
-            path="reports/transactions-pending"
-            element={<ReportTransactionPending />}
-          />
+
           <Route
             path="transactions-manual-pending"
             element={<TransactionOnGoing />}
@@ -612,6 +729,7 @@ const routes = () => {
           />
           <Route path="md/companies" element={<MDCompany />} />
           <Route path="md/drivers" element={<MDDriver />} />
+          <Route path="kualitas/pko" element={<KualitasPko />} />
           <Route path="kualitas/cpo" element={<KualitasCpo />} />
           <Route path="kualitas/kernel" element={<KualitasKernel />} />
           <Route path="administration/configs/:id" element={<Config />} />

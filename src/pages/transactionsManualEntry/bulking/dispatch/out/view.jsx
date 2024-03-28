@@ -21,13 +21,13 @@ import {
   CertificateSelect,
   StorageTankSelect,
 } from "../../../../../components/FormikMUI";
+import BonTripPrint from "../../../../../components/BontripPrintBulking";
 import {
   DriverACP,
   CompanyACP,
   ProductACP,
   TransportVehicleACP,
 } from "../../../../../components/FormManualEntry";
-// import BonTripPrintT30 from "../../../../../components/BonTripPrint";
 
 import * as eDispatchApi from "../../../../../apis/eDispatchApi";
 
@@ -181,7 +181,9 @@ const LBNManualEntryDispatchView = () => {
             return (
               <Form>
                 <Box sx={{ display: "flex", mt: 3, justifyContent: "end" }}>
-                  {/* <BonTripPrintT30 dtTrans={{ ...values }}  sx={{ mx: 1 }} /> */}
+                  {values.progressStatus === 31 && (
+                    <BonTripPrint dtTrans={{ ...values }} sx={{ mx: 1 }} />
+                  )}
                   <Button variant="contained" onClick={handleClose}>
                     TUTUP
                   </Button>
@@ -210,6 +212,18 @@ const LBNManualEntryDispatchView = () => {
                         name="bonTripNo"
                         component={TextField}
                         inputProps={{ readOnly: true }}
+                      />
+                       <Field
+                        name="bonTripRef"
+                        label="NO BONTRIP ASAL"
+                        type="text"
+                        component={TextField}
+                        variant="outlined"
+                        required
+                        size="small"
+                        fullWidth
+                        inputProps={{ readOnly: true }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
                       />
                       <Field
                         name="productType"
@@ -595,7 +609,7 @@ const LBNManualEntryDispatchView = () => {
                         <Grid item xs={12} sm={6} lg={3}>
                           <Grid container columnSpacing={1}>
                             <Grid item xs={12}>
-                              <Divider>DATA TIMBANG ASAL</Divider>
+                              <Divider>DATA TIMBANG KENDARAAN</Divider>
                             </Grid>
                             <Grid item xs={6}>
                               <Field
@@ -661,7 +675,13 @@ const LBNManualEntryDispatchView = () => {
                                 label="Waktu WB-Out"
                                 name="destinationWeighOutTimestamp"
                                 inputProps={{ readOnly: true }}
-                                value={dtTrx || "-"}
+                                value={
+                                  values?.destinationWeighOutTimestamp
+                                    ? moment(values.destinationWeighOutTimestamp)
+                                        .local()
+                                        .format(`DD/MM/YYYY - HH:mm:ss`)
+                                    : "-"
+                                }
                               />
                             </Grid>
 

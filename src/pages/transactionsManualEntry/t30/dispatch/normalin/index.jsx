@@ -250,7 +250,7 @@ const T30ManualEntryDispatchIn = (props) => {
               name="loadedSeal1"
               label="Segel ISI Mainhole 1"
               type="text"
-              // required={true}
+              required={true}
               component={TextField}
               variant="outlined"
               size="small"
@@ -264,7 +264,7 @@ const T30ManualEntryDispatchIn = (props) => {
               name="loadedSeal2"
               label="Segel ISI Valve 1"
               type="text"
-              // required={true}
+              required={true}
               component={TextField}
               variant="outlined"
               size="small"

@@ -15,4 +15,5 @@ export * from "./useTransportVehicle";
 export * from "./useUser";
 export * from "./useWeighbridge";
 export * from "./useKualitasCpo";
+export * from "./useKualitasPko";
 export * from "./useKualitasKernel";

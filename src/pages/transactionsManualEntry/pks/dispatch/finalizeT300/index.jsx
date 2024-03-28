@@ -163,6 +163,7 @@ const UserCreate = () => {
       />
 
       <Formik
+        enableReinitialize
         onSubmit={handleFormikSubmit}
         initialValues={openedTransaction}
         validationSchema={validationSchema}

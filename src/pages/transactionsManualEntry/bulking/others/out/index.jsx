@@ -91,24 +91,11 @@ const BulkingManualEntryOthersOut = () => {
     setIsLoading(true);
 
     try {
-      if (tempTrans.afdeling) {
-        tempTrans.afdeling = tempTrans.afdeling.toUpperCase();
-      } else if (tempTrans.kebun) {
-        tempTrans.kebun = tempTrans.kebun.toUpperCase();
-      } else if (tempTrans.blok) {
-        tempTrans.blok = tempTrans.blok.toUpperCase();
-      } else if (tempTrans.npb) {
-        tempTrans.npb = tempTrans.npb.toUpperCase();
-      }
-
       if (WBMS.WB_STATUS === true) {
         tempTrans.originWeighOutKg = wb.weight;
-      } else if (WBMS.WB_STATUS === false) {
-        tempTrans.isManualTonase = 1;
       }
 
       tempTrans.progressStatus = 42;
-      tempTrans.productType = parseInt(tempTrans.productType);
       tempTrans.originWeighOutTimestamp = moment().toDate();
       tempTrans.originWeighOutOperatorName = user.name.toUpperCase();
       tempTrans.dtTransaction = moment()
@@ -116,9 +103,7 @@ const BulkingManualEntryOthersOut = () => {
         .subtract(WBMS.SITE_CUT_OFF_MINUTE, "minutes")
         .format();
 
-      const response = await transactionAPI.updateById(tempTrans.id, {
-        ...tempTrans,
-      });
+      const response = await transactionAPI.ManualEntryOutOthers(tempTrans);
 
       if (!response.status) throw new Error(response?.message);
 
@@ -199,7 +184,7 @@ const BulkingManualEntryOthersOut = () => {
       />
       {openedTransaction && (
         <Formik
-          // enableReinitialize
+          enableReinitialize
           onSubmit={handleFormikSubmit}
           initialValues={openedTransaction}
           validationSchema={validationSchema}
@@ -236,7 +221,12 @@ const BulkingManualEntryOthersOut = () => {
                       variant="contained"
                       sx={{ mr: 1 }}
                       disabled={
-                        !(isValid && dirty && values.progressStatus === 37)
+                        !(
+                          isValid &&
+                          dirty &&
+                          values.originWeighOutKg > WBMS.WB_MIN_WEIGHT &&
+                          values.progressStatus === 37
+                        )
                       }
                     >
                       SIMPAN
@@ -282,7 +272,8 @@ const BulkingManualEntryOthersOut = () => {
                           required: true,
                           size: "small",
                         }}
-                        sx={{ mb: 2 }}
+                        sx={{ mb: 2, backgroundColor: "whitesmoke" }}
+                        inputProps={{ readOnly: true }}
                         onChange={(event, newValue) => {
                           handleChange(event);
                           const selectedProductType = dtTypeProduct.find(

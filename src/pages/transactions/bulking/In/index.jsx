@@ -857,7 +857,7 @@ const TransactionBulkingNormalIN = (props) => {
                               size="small"
                               fullWidth
                               required={true}
-                              sx={{ mt: 2 }}
+                              sx={{ mt: 2, backgroundColor: "lightyellow" }}
                               InputProps={{
                                 endAdornment: (
                                   <InputAdornment position="end">
